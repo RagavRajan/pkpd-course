@@ -85,6 +85,9 @@ website:
           - ch5_simulation/ch5_simulation.qmd
           - ch6_model_evaluation/ch6_model_evaluation.qmd
           - ch7_pkpd_models/ch7_pkpd_models.qmd
+execute:
+  freeze: auto
+
 format:
   html:
     theme: cosmo
