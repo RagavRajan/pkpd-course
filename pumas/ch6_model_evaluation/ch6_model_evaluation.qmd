@@ -1,0 +1,308 @@
+---
+title: "Chapter 6: Model Qualification"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using PumasUtilities
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+Model qualification (or evaluation) methods help assess how well a model describes the observed data and whether it is suitable for its intended purpose:
+
+- Assumption Checking
+- Test Data Sets
+- Log-Likelihood Profile
+- Bootstrap
+- Leverage Analysis
+- Predictive Performance (VPC)
+- Posterior Predictive Check
+
+# A Risk-Based Approach to Model Qualification
+
+- The level of qualification should match the intended use of the model
+- Exploratory models require less rigorous qualification than models used for regulatory decision-making
+- All models should pass basic assumption checks and diagnostic evaluation
+
+# Model Qualification Methods
+
+## Assumption Checking
+
+- Distributional assumptions on random effects (ETAs should be approximately normal)
+- Residual error assumptions (CWRES should be approximately N(0,1))
+- Structural model assumptions (systematic trends in residuals indicate misspecification)
+
+::: {.callout-note title="Interpreting Diagnostic Plots: What Each Panel Reveals"}
+Standard goodness-of-fit diagnostics each target a specific aspect of model adequacy:
+
+1. **DV vs PRED** — Assesses population-level structural fit. Systematic deviations from the line of identity indicate structural model misspecification (e.g., wrong number of compartments or incorrect absorption model).
+2. **DV vs IPRED** — Assesses individual-level fit after incorporating empirical Bayes estimates. Scatter should be tighter than DV vs PRED; if not, the random effects structure may be inadequate.
+3. **CWRES vs PRED** — Evaluates residual error model adequacy. A fan-shaped (heteroscedastic) pattern suggests proportional error is needed; a U-shaped trend suggests structural misspecification persists even after accounting for random effects.
+4. **CWRES vs TIME** — Detects time-dependent model misspecification, such as missing absorption lag time, autoinduction, or time-varying clearance.
+
+If the model is correctly specified, CWRES should be approximately $N(0,1)$ with no systematic trends. Deviations from this expectation guide targeted model refinement.
+:::
+
+## Bootstrap: Qualification of Parameter Estimates
+
+::: {.callout-note title="Bootstrap vs. Asymptotic Standard Errors"}
+Asymptotic standard errors derived from the Fisher information matrix assume that the likelihood surface is approximately **quadratic** (i.e., the parameter estimates are normally distributed) near the minimum. This assumption can fail for small datasets, when variance parameters are estimated near their boundary (e.g., $\omega^2 \approx 0$), or when the likelihood surface is flat or irregular. In such cases, asymptotic confidence intervals may be misleading. **Bootstrap resampling** makes no distributional assumptions: by repeatedly resampling subjects with replacement and re-estimating the model, it constructs empirical confidence intervals that reflect the actual sampling distribution of the estimator. However, bootstrap is not without limitations — if the convergence rate across resamples falls below approximately 80%, this signals model instability or overparameterization, and the bootstrap results themselves become unreliable.
+:::
+
+Bootstrap provides non-parametric confidence intervals for parameter estimates by resampling subjects with replacement.
+
+### Base PK Model
+
+The book uses a 1-compartment IV model with combined error (ADVAN1 TRANS2):
+
+```{julia}
+#| label: ch6-data
+
+pk_df = CSV.read(joinpath(data_dir, "prob_5_1.csv"), DataFrame)
+rename!(pk_df,
+    :ID => :id, :DV => :dv, :AMT => :amt, :TIME => :time,
+    :II => :ii, :ADDL => :addl, :RATE => :rate,
+)
+
+# Prepare for Pumas
+pk_df.evid = ifelse.(pk_df.amt .> 0, 1, 0)
+pk_df.cmt = fill(1, nrow(pk_df))
+pk_df.dv = ifelse.(pk_df.evid .== 1, missing, pk_df.dv)
+
+pop = read_pumas(pk_df; covariates = [:HT, :WT, :CLCR, :SEX, :AGE])
+println("Subjects: ", length(pop))
+```
+
+```{julia}
+#| label: ch6-model
+
+# 1-cpt IV model with BLOCK(2) OMEGA and combined error
+# From 501.ctl: ADVAN1 TRANS2, Y=F + F*ERR(1) + ERR(2)
+pk_model = @model begin
+    @metadata begin
+        desc = "1-Cpt IV PopPK (Bootstrap Base Model)"
+    end
+    @param begin
+        tvCL   ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 75.0)
+        Ω      ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 1.0)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR SEX AGE HT
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, sqrt((cp * σ_prop)^2 + σ_add^2))
+    end
+end
+```
+
+```{julia}
+#| label: ch6-fit
+
+init_params = (
+    tvCL = 13.0, tvV = 75.0,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2, σ_add = 1.0,
+)
+
+base_fit = fit(pk_model, pop, init_params, Pumas.FOCEI())
+base_fit
+```
+
+```{julia}
+#| label: ch6-infer
+
+base_infer = infer(base_fit)
+base_infer
+```
+
+### Bootstrap Analysis
+
+In Pumas, bootstrap is performed via `infer(fit, Bootstrap())`:
+
+```{julia}
+#| label: ch6-bootstrap
+
+# Bootstrap with 200 replicates (use more for production — e.g., 1000)
+boot_result = infer(base_fit, Pumas.Bootstrap(samples = 200))
+boot_result
+```
+
+::: {.callout-note}
+In NONMEM, bootstrap requires external tools (PsN, metrumrg) to resample datasets and re-run the model hundreds of times. In Pumas, `infer(fit, Bootstrap())` handles everything in a single call.
+:::
+
+## Visual Predictive Check (VPC)
+
+VPC compares the distribution of observed data to simulated data from the model. It assesses whether the model can reproduce the key features of the observed data.
+
+In NONMEM, VPC requires `$SIMULATION` and post-processing with R/PsN. In Pumas, use `vpc()` and `vpc_plot()`:
+
+```{julia}
+#| label: ch6-vpc
+
+vpc_result = vpc(base_fit, 200)  # 200 simulations
+```
+
+```{julia}
+#| label: fig-ch6-vpc
+#| fig-cap: "Visual Predictive Check"
+
+vpc_plot(vpc_result)
+```
+
+## Log-Likelihood Profile
+
+Log-likelihood profiling provides confidence intervals for individual parameters by fixing one parameter at a range of values and re-estimating the rest:
+
+```{julia}
+#| label: ch6-ll-profile
+#| eval: false
+
+# Profile tvCL over a range around the estimate
+# (computationally intensive — commented for rendering speed)
+# cl_range = range(coef(base_fit).tvCL * 0.8, coef(base_fit).tvCL * 1.2, length = 20)
+# profiles = [fit(pk_model, pop, merge(coef(base_fit), (tvCL = cl,)), FOCEI();
+#             constantcoef = (tvCL = cl,)) for cl in cl_range]
+# ll_values = loglikelihood.(profiles)
+```
+
+## Diagnostics Summary
+
+```{julia}
+#| label: fig-ch6-gof
+#| fig-cap: "GOF Diagnostic Plots"
+
+insp = inspect(base_fit)
+insp_df = DataFrame(insp)
+obs = @rsubset(insp_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, obs.dv_pred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, obs.dv_ipred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "CWRES", title = "CWRES vs PRED")
+scatter!(ax3, obs.dv_pred, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time (hr)", ylabel = "CWRES", title = "CWRES vs TIME")
+scatter!(ax4, obs.time, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax4, 0, color = :black)
+
+fig
+```
+
+# Sensitivity Analysis
+
+- Evaluate the impact of model assumptions and data exclusion on conclusions
+- Re-estimate model with subsets of data removed (e.g., influential subjects)
+- Compare results when assumptions are relaxed (e.g., different error models)
+
+# EDA-Driven Model Selection
+
+Before evaluating a model's adequacy, the right model structure must be selected. Exploratory data analysis provides the first line of evidence:
+
+## Hysteresis Detection
+
+A concentration-effect (CE) plot reveals whether the response is in equilibrium with plasma concentrations:
+
+| CE Plot Pattern | Interpretation | Model Implication |
+|-----------------|---------------|-------------------|
+| No loop (single curve) | Equilibrium — effect tracks concentration | **Direct response** (Emax, sigmoid Emax) |
+| Counter-clockwise loop | Effect lags behind concentration | **Effect compartment** (ke0 delay) |
+| Clockwise loop | Tolerance, sensitization, or indirect mechanism | **Indirect response** (IDR Types I–IV) or tolerance model |
+
+::: {.callout-tip title="Systematic Model Selection Framework"}
+1. **Exploratory Data Analysis** — Plot effect vs. time, concentration-effect loops, identify temporal patterns
+2. **Mechanism-Based Selection** — Match drug pharmacology to model structure:
+   - Receptor binding → Direct or effect compartment
+   - Enzyme inhibition → IDR Type I or II
+   - Signal transduction cascade → IDR with transit or effect compartment
+   - Covalent binding → IDR Type IV or K-PD
+3. **Statistical Comparison** — Among mechanistically plausible candidates, use AIC/BIC and GOF to select the best fit
+4. **Qualification** — Bootstrap, VPC, sensitivity analysis for the selected model
+:::
+
+## Multi-Model Comparison
+
+When comparing more than two candidate models:
+
+```{julia}
+#| label: ch6-multi-compare
+#| eval: false
+
+# Compare multiple models systematically
+fits = [fit1, fit2, fit3]
+for (i, f) in enumerate(fits)
+    println("Model $i — AIC: ", round(aic(f), digits=1),
+            "  BIC: ", round(bic(f), digits=1),
+            "  -2LL: ", round(-2*loglikelihood(f), digits=1))
+end
+
+# Or use metrics_table for side-by-side comparison
+metrics_table(fit1, fit2, fit3)
+
+# LRT for nested pairs only
+lrtest(fit1, fit2)  # only valid when fit1 is nested within fit2
+```
+
+# Study Guide Questions
+
+1. What are the key differences between model evaluation and model qualification?
+2. When would you use a bootstrap analysis instead of asymptotic standard errors?
+3. What does a VPC tell you that GOF plots do not?
+4. When is model qualification less important?
+5. What are the limitations of the likelihood ratio test for model comparison?
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: Graphical Diagnostics** | [PKPD W6](../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.qmd) | DV vs PRED/IPRED interpretation, CWRES patterns, time-dependent misspecification |
+| **Lecture: Residual Diagnostics & Error Models** | [PKPD W7](../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.qmd) | Additive vs proportional vs combined error, residual analysis methodology |
+| **Lecture: Base Model & Likelihood Comparison** | [PKPD W5](../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.qmd) | -2LL, LRT, AIC/BIC theory, model comparison workflow |
+| PD model selection framework | [PD Model Selection](https://tutorials.pumas.ai/html/PDModels/05-model-selection.html) | EDA → mechanism → statistics workflow, hysteresis detection, warfarin case study |
+| Bayesian model comparison | [Bayesian Model Comparison](https://tutorials.pumas.ai/html/bayesian/05-model_comparison.html) | WAIC, LOO-CV, Bayes factors for non-nested models |
+| VPC customization | [Continuous VPC](https://tutorials.pumas.ai/html/LearningPaths/04-LP/11-Module/ContinuousVPC.html) | Stratified VPC, prediction-corrected VPC, log-scale |

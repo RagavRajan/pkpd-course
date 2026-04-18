@@ -1,0 +1,868 @@
+---
+title: "Chapter 3: Coding Population Nonlinear Mixed Effects Models"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+This chapter covers coding pharmacometric models in Pumas — the Julia equivalent of coding NONMEM control streams via NMTRAN. Topics include:
+
+- Coding pharmaco-statistical models through the Pumas `@model` macro
+- Interpreting modeling output
+- The Pumas analytical model library (equivalent to PREDPP)
+- Practice problems: enzyme kinetics, QTc, AST, and PopPK
+
+# Coding Pharmaco-Statistical Models in Pumas
+
+## NONMEM vs. Pumas Model Structure
+
+In NONMEM, models are specified through control stream records. In Pumas, the `@model` macro provides a structured, block-based equivalent:
+
+| NONMEM Record | Pumas Block | Purpose |
+|---------------|-------------|---------|
+| `$PROBLEM` | `@metadata` | Problem description |
+| `$INPUT` / `$DATA` | `read_pumas()` | Data specification |
+| `$THETA` | `@param` | Fixed effect parameters |
+| `$OMEGA` | `@param` + `@random` | Random effect variance |
+| `$SIGMA` | `@param` | Residual error parameters |
+| `$PK` | `@pre` | Individual parameter definitions |
+| `$PRED` | `@pre` + `@derived` | Algebraic model (no dynamics) |
+| `$SUBROUTINES` | `@dynamics` | PK model library |
+| `$DES` | `@dynamics begin ... end` | User-defined ODEs |
+| `$ERROR` | `@derived` | Observation model |
+| `$ESTIMATION` | `fit()` | Estimation method |
+| `$COVARIANCE` | `infer()` | Standard errors |
+| `$TABLE` | `inspect()` | Predictions and residuals |
+
+## PRED Model Example (No Dynamics)
+
+The book shows an Emax model coded with `$PRED`. Here is the NONMEM vs. Pumas side-by-side:
+
+::: {.panel-tabset}
+
+### NONMEM
+
+```
+$PROB EMAX MODEL
+$INPUT ID DV CONC
+$DATA PDDATA.CSV IGNORE=C
+
+$PRED
+EMAX=THETA(1)*EXP(ETA(1))
+EC50=THETA(2)*EXP(ETA(2))
+E=EMAX*CONC/(EC50+CONC)
+Y=E + EPS(1)
+
+$THETA (0, 100) (0, 20)   ; EMAX and EC50
+$OMEGA 0.4  0.4
+$SIGMA 9
+$ESTIMATION MAXEVAL=9999 PRINT=10
+```
+
+### Pumas
+
+```{julia}
+#| label: pred-emax-example
+#| eval: false
+
+emax_model = @model begin
+    @param begin
+        tvEmax ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 20.0)
+        Ω      ∈ PDiagDomain(2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 3.0)  # sqrt(9)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates CONC
+    @pre begin
+        Emax = tvEmax * exp(η[1])
+        EC50 = tvEC50 * exp(η[2])
+    end
+    @derived begin
+        mu := @. Emax * CONC / (EC50 + CONC)
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+```
+
+:::
+
+## PREDPP Model Example (Compartmental Dynamics)
+
+::: {.callout-note title="Physiological Meaning of PK Parameters"}
+The one-compartment oral PK model describes a drug that enters a **depot compartment** (representing the gastrointestinal tract), undergoes **first-order absorption** at rate $K_a$ into the systemic circulation (central compartment), and is eliminated by first-order processes governed by clearance ($CL$). The **volume of distribution** ($V$) is not a real physiological volume — it is a proportionality constant relating the total amount of drug in the body to the measured plasma concentration: $V = X / C$. For a 70-kg human, $V$ can far exceed total body water (~42 L) because drug partitions into tissues according to $V = V_P + V_T \cdot f_U / f_{UT}$, where $f_U$ and $f_{UT}$ are the fractions unbound in plasma and tissue, respectively. **Clearance** ($CL$) is the volume of blood irreversibly cleared of drug per unit time (L/hr). It is not itself a rate; rather, it converts an observed concentration into an elimination rate via $\text{Rate} = CL \times C$. For a linear system, $CL = \text{Dose} / \text{AUC}$ and is independent of dose.
+:::
+
+The book shows a 1-compartment oral PK model with ADVAN2 TRANS2. In Pumas, `Depots1Central1` is the analytical equivalent:
+
+::: {.panel-tabset}
+
+### NONMEM
+
+```
+$PROB Pop PK model
+$INPUT C ID DV AMT II ADDL TIME
+$DATA ../data.CSV IGNORE=C
+$SUB ADVAN2 TRANS2
+
+$PK
+CL=THETA(1)*EXP(ETA(1))
+V=THETA(2)*EXP(ETA(2))
+KA=THETA(3)*EXP(ETA(3))
+S2=V
+
+$ERROR
+Y=F*(1+ERR(1))
+IPRED=F
+
+$THETA (0, 8) (0, 50) (0, 0.45)
+$OMEGA 0.04 0.04 0.04
+$SIGMA 0.04
+$ESTIMATION MAXEVAL=9999 METHOD=0 POSTHOC
+```
+
+### Pumas
+
+```{julia}
+#| label: predpp-poppk-example
+#| eval: false
+
+poppk_model = @model begin
+    @param begin
+        tvCL ∈ RealDomain(lower = 0.0, init = 8.0)
+        tvV  ∈ RealDomain(lower = 0.0, init = 50.0)
+        tvKa ∈ RealDomain(lower = 0.0, init = 0.45)
+        Ω    ∈ PDiagDomain(3)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)  # sqrt(0.04)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV  * exp(η[2])
+        Ka = tvKa * exp(η[3])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+```
+
+:::
+
+## The Pumas Analytical Model Library
+
+Pumas provides closed-form analytical solutions equivalent to NONMEM's PREDPP ADVAN subroutines:
+
+| NONMEM ADVAN | Pumas Dynamics | Description | Required `@pre` |
+|-------------|---------------|-------------|----------------|
+| ADVAN1 | `Central1` | 1-cpt IV | `CL`, `Vc` |
+| ADVAN2 | `Depots1Central1` | 1-cpt oral | `CL`, `Vc`, `Ka` |
+| ADVAN3 | `Central1Periph1` | 2-cpt IV | `CL`, `Vc`, `Q`, `Vp` |
+| ADVAN4 | `Depots1Central1Periph1` | 2-cpt oral | `CL`, `Vc`, `Q`, `Vp`, `Ka` |
+| ADVAN11 | `Central1Periph2` | 3-cpt IV | `CL`, `Vc`, `Q2`, `Vp2`, `Q3`, `Vp3` |
+| ADVAN12 | `Depots1Central1Periph2` | 3-cpt oral | `CL`, `Vc`, `Q2`, `Vp2`, `Q3`, `Vp3`, `Ka` |
+| ADVAN6/13 | `@dynamics begin ... end` | User ODEs | User-defined |
+
+::: {.callout-note title="Choosing the Number of Compartments"}
+The choice of compartmental model is determined by the shape of the concentration-time curve on a **semi-logarithmic plot**. A **one-compartment model** assumes instantaneous distribution throughout the body, producing a monoexponential decline ($C(t) = C_0 \cdot e^{-Kt}$) that appears as a single straight line on a log-linear plot. A **two-compartment model** produces a **biexponential decline** with a rapid initial $\alpha$ (distribution) phase followed by a slower $\beta$ (elimination) phase — two distinct slopes on the semi-log plot. Adding an oral depot compartment (e.g., `Depots1Central1`, `Depots1Central1Periph1`) introduces a rising absorption phase governed by $K_a$; the depot represents the GI tract where drug undergoes first-order absorption. Zero-order absorption (constant-rate input) is used for sustained-release formulations or IV infusions. Importantly, the "number of compartments" refers only to the systemic distribution compartments — the depot is not counted. Model selection should be guided by the data (graphical assessment of the log-concentration profile), not by physiological plausibility alone.
+:::
+
+::: {.callout-note}
+**Key differences from NONMEM:**
+
+- No `S2=V` scaling needed — divide compartment by volume explicitly in `@derived`
+- Parameter names are case-sensitive and must match exactly: `CL`, `Vc`, `Ka`, `Q`, `Vp`
+- `TRANS2` parameterization (CL, V, KA) maps directly to Pumas analytical models
+:::
+
+### Four Ways to Specify Dynamics in Pumas
+
+Beyond the analytical library, Pumas supports multiple equivalent approaches for specifying model dynamics. All produce identical results for the same model:
+
+::: {.panel-tabset}
+
+#### Closed-Form (Analytical)
+
+Fastest. Use when the model matches a library structure.
+
+```{julia}
+#| eval: false
+@dynamics Depots1Central1
+```
+
+#### Explicit ODEs
+
+Most flexible. Required for nonlinear elimination, indirect response, or any custom dynamics.
+
+```{julia}
+#| eval: false
+@dynamics begin
+    Depot'   = -Ka * Depot
+    Central' = Ka * Depot - (CL / Vc) * Central
+end
+```
+
+Pumas automatically detects linear ODE systems and solves via matrix exponential (faster than numerical integration). Use `@options begin checklinear = false end` to force numerical integration for nonlinear systems.
+
+#### ModelingToolkit (Symbolic ODEs)
+
+Define the ODE symbolically outside the model, enabling structural identifiability analysis and automatic simplification.
+
+```{julia}
+#| eval: false
+using ModelingToolkit
+
+@mtkmodel MTK1Cpt begin
+    @parameters begin
+        Ka
+        CL
+        Vc
+    end
+    @variables begin
+        Depot(t) = 0.0
+        Central(t) = 0.0
+    end
+    @equations begin
+        D(Depot)   ~ -Ka * Depot
+        D(Central) ~ Ka * Depot - (CL / Vc) * Central
+    end
+end
+
+@mtkbuild sys = MTK1Cpt()
+
+# Then in your model:
+@dynamics sys
+```
+
+#### Catalyst (Reaction Networks)
+
+Define dynamics as chemical/pharmacological reactions — intuitive for PBPK, QSP, and TMDD models.
+
+```{julia}
+#| eval: false
+using Catalyst
+
+rn = @reaction_network begin
+    Ka,    Depot --> Central
+    CL/Vc, Central --> 0
+end
+
+# Then in your model:
+@dynamics rn
+```
+
+:::
+
+::: {.callout-tip title="Which Dynamics Approach to Use?"}
+- **Analytical (closed-form):** Default choice for standard 1/2/3-compartment models — fastest execution
+- **Explicit ODEs:** Nonlinear PK (Michaelis-Menten), indirect response, effect compartment, custom models
+- **ModelingToolkit:** When you need symbolic manipulation, identifiability analysis, or model composition
+- **Catalyst reactions:** PBPK, QSP, TMDD — large reaction networks where stoichiometry is natural
+:::
+
+### Absorption Model Patterns
+
+Beyond first-order absorption (`Ka` with `Depots1Central1`), Pumas supports a range of absorption models via `@dynamics` and `@dosecontrol`:
+
+| Absorption Type | Implementation | Key Parameters |
+|-----------------|----------------|----------------|
+| First-order | `Depots1Central1` or `Depot' = -Ka * Depot` | `Ka` |
+| Zero-order | `@dosecontrol begin duration = (Central = dur,) end` | `dur` (duration) |
+| Parallel ZO + FO | Dual virtual doses with `bioav` splitting | `Ka`, `dur`, `Frac` |
+| Two parallel FO | Two depot compartments with different Ka | `Ka1`, `Ka2`, `Frac` |
+| Transit compartments | Chain: `T1' = -Ktr*T1`; `T2' = Ktr*T1 - Ktr*T2`; ... | `Ktr`, `n` |
+| Erlang | `@delay(Erlang(N, MAT/N), Central)` | `N` (integer shape), `MAT` |
+| Gamma | `@delay(Gamma(N, MAT/N), Central)` | `N` (continuous shape), `MAT` |
+| Weibull | `@delay(Weibull(k, λ), Central)` | `k` (shape), `λ` (scale) |
+
+See the [Absorption Models tutorial](https://tutorials.pumas.ai/html/advanced_topics/absorption_models.html) for complete working examples of each.
+
+## Interpreting Modeling Output
+
+In Pumas, model output is accessed programmatically rather than parsed from text files:
+
+| NONMEM Output | Pumas Equivalent |
+|---------------|-----------------|
+| Minimum OFV | `loglikelihood(fit)` or `-2 * loglikelihood(fit)` |
+| Parameter estimates | `coef(fit)` |
+| Standard errors | `infer(fit)` |
+| ETA-shrinkage | Printed with `fit` summary |
+| PRED, IPRED, WRES | `inspect(fit)` → `DataFrame` |
+| AIC | `aic(fit)` |
+| BIC | `bic(fit)` |
+
+**Useful variance terms:**
+
+- For exponential IIV: $\%CV \approx \sqrt{\omega^2} \times 100$
+- For additive IIV: $SD = \sqrt{\omega^2}$
+- %RSE: $\%RSE = \frac{SE}{PE} \times 100$
+
+# Practice Problems
+
+::: {.callout-note title="Michaelis-Menten Kinetics: The Foundation of Emax and Nonlinear PK"}
+The Michaelis-Menten equation describes the rate of an enzymatic reaction as a function of substrate concentration:
+
+$$V = \frac{V_{\max} \cdot C}{K_M + C}$$
+
+$V_{\max}$ reflects the **enzyme capacity** — the maximum rate achievable when all enzyme active sites are saturated. $K_M$ is the substrate concentration at which the reaction rate is 50% of $V_{\max}$ and serves as a surrogate for **affinity**: a low $K_M$ indicates high affinity of substrate for enzyme. This equation is structurally identical to the $E_{\max}$ model in pharmacodynamics, where $E_{\max} \leftrightarrow V_{\max}$ and $EC_{50} \leftrightarrow K_M$. At low concentrations ($C \ll K_M$), the equation simplifies to $V \approx (V_{\max}/K_M) \cdot C$, yielding approximately **linear** (first-order) kinetics. At high concentrations ($C \gg K_M$), the rate saturates at $V_{\max}$, producing **zero-order** kinetics. This saturation is the mechanistic basis for **nonlinear (capacity-limited) pharmacokinetics** — drugs such as phenytoin and ethanol exhibit dose-disproportional increases in exposure because their metabolizing enzymes become saturated at therapeutic concentrations.
+:::
+
+## Problem 1: Enzyme Kinetics (Michaelis-Menten)
+
+Population analysis of in-vitro enzyme activity data in 20 liver slice samples. Concentrations: 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000 uM.
+
+```{julia}
+#| label: prob1-enz-data
+
+raw_enz = CSV.read(joinpath(data_dir, "enz3.csv"), DataFrame)
+
+# Fix data entry error (concentration > 1000 → 1000, as in R script)
+enz_df = @rtransform(raw_enz,
+    :Concentration = :Concentration > 1000 ? 1000.0 : Float64(:Concentration),
+)
+rename!(enz_df, :ID => :id, :Concentration => :CONC, :ObsActivity => :dv)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Concentration (uM)", ylabel = "Enzyme Activity")
+scatter!(ax, enz_df.CONC, enz_df.dv, color = :steelblue, markersize = 6)
+fig
+```
+
+```{julia}
+#| label: prob1-enz-prep
+
+# Use concentration as time axis (non-temporal PRED-style model)
+enz_df.time = Float64.(enz_df.CONC)
+
+pop_enz = read_pumas(enz_df; observations = [:dv], covariates = [:CONC], event_data = false)
+```
+
+```{julia}
+#| label: prob1-enz-model
+
+enz_model = @model begin
+    @metadata begin
+        desc = "Michaelis-Menten Enzyme Kinetics"
+    end
+    @param begin
+        tvKM   ∈ RealDomain(lower = 0.0, init = 20.0)
+        tvVMAX ∈ RealDomain(lower = 0.0, init = 120.0)
+        Ω      ∈ PDiagDomain(2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 3.16)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates CONC
+    @pre begin
+        KM   = tvKM * exp(η[1])
+        VMAX = tvVMAX * exp(η[2])
+    end
+    @derived begin
+        ACT := @. VMAX * CONC / (KM + CONC)
+        dv ~ @. Normal(ACT, σ_add)
+    end
+end
+```
+
+```{julia}
+#| label: prob1-enz-fit
+
+enz_params = (tvKM = 20.0, tvVMAX = 120.0, Ω = Diagonal([0.04, 0.04]), σ_add = sqrt(10.0))
+
+# FO estimation (METHOD=0)
+enz_fo = fit(enz_model, pop_enz, enz_params, Pumas.FO())
+enz_fo
+```
+
+```{julia}
+#| label: fig-prob1-enz-fit
+#| fig-cap: "Problem 1: Michaelis-Menten Fit to Enzyme Kinetics Data"
+
+enz_coefs = coef(enz_fo)
+conc_range = range(0.1, 1000, length = 200)
+pred_act = enz_coefs.tvVMAX .* conc_range ./ (enz_coefs.tvKM .+ conc_range)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Concentration (uM)", ylabel = "Enzyme Activity",
+    xscale = log10)
+scatter!(ax, enz_df.CONC, enz_df.dv, color = :steelblue, markersize = 5, alpha = 0.6)
+lines!(ax, collect(conc_range), pred_act, color = :red, linewidth = 2, label = "Population Pred")
+axislegend(ax, position = :lt)
+fig
+```
+
+## Problem 2: QTc Population Models
+
+Population analysis of QTc exposure response data from Phase 1. Three models are compared:
+
+1. **Naive pool (linear)** — no IIV, OMEGA BLOCK fixed at 0
+2. **Population linear** — with IIV on intercept and slope
+3. **Population Emax** — with IIV on E0, Emax, EC50
+
+```{julia}
+#| label: prob2-qtc-data
+
+dqtc_raw = CSV.read(joinpath(data_dir, "dqtc.csv"), DataFrame)
+rename!(dqtc_raw, "SID" => :id, "CONC" => :conc, "dqtc" => :dv)
+
+# Monotonic time per subject (row index)
+dqtc_raw.time = Vector{Float64}(undef, nrow(dqtc_raw))
+for gdf in groupby(dqtc_raw, :id)
+    gdf.time .= Float64.(1:nrow(gdf))
+end
+
+pop_dqtc = read_pumas(dqtc_raw; observations = [:dv], covariates = [:conc], event_data = false)
+println("Subjects: ", length(pop_dqtc))
+```
+
+### Model 1: Naive Pool Linear (no IIV)
+
+Equivalent to NONMEM `$OMEGA BLOCK(2) 0 / 0 0 FIXED`:
+
+```{julia}
+#| label: prob2-model1
+
+qtc_naive = @model begin
+    @param begin
+        tvINT ∈ RealDomain(init = 1.0)
+        tvSLP ∈ RealDomain(init = 0.02)
+        σ_add ∈ RealDomain(lower = 0.0, init = 5.0)
+    end
+    @covariates conc
+    @pre begin
+        INT = tvINT
+        SLP = tvSLP
+    end
+    @derived begin
+        mu := @. INT + SLP * conc
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+```
+
+```{julia}
+#| label: prob2-fit1
+
+qtc_naive_fit = fit(qtc_naive, pop_dqtc,
+    (tvINT = 1.0, tvSLP = 0.02, σ_add = 5.0),
+    Pumas.NaivePooled())
+qtc_naive_fit
+```
+
+### Model 2: Population Linear (diagonal IIV)
+
+```{julia}
+#| label: prob2-model2
+
+qtc_pop_lin = @model begin
+    @param begin
+        tvINT ∈ RealDomain(init = 1.0)
+        tvSLP ∈ RealDomain(init = 0.2)
+        Ω     ∈ PDiagDomain(2)
+        σ_add ∈ RealDomain(lower = 0.0, init = 3.16)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates conc
+    @pre begin
+        INT = tvINT + η[1]
+        SLP = tvSLP + η[2]
+    end
+    @derived begin
+        mu := @. INT + SLP * conc
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+```
+
+```{julia}
+#| label: prob2-fit2
+
+qtc_pop_fit = fit(qtc_pop_lin, pop_dqtc,
+    (tvINT = 1.0, tvSLP = 0.2, Ω = Diagonal([0.1, 0.2]), σ_add = sqrt(10.0)),
+    Pumas.FOCE())
+qtc_pop_fit
+```
+
+### Model 3: Population Emax
+
+```{julia}
+#| label: prob2-model3
+
+qtc_emax = @model begin
+    @param begin
+        tvE0   ∈ RealDomain(init = 0.1)
+        tvEmax ∈ RealDomain(init = 40.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 1000.0)
+        Ω      ∈ PSDDomain(3)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 3.16)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates conc
+    @pre begin
+        E0   = tvE0 + η[1]
+        EC50 = tvEC50 * exp(η[2])
+        Emax = tvEmax + η[3]
+    end
+    @derived begin
+        mu := @. E0 + Emax * conc / (EC50 + conc)
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+```
+
+```{julia}
+#| label: prob2-fit3
+
+qtc_emax_fit = fit(qtc_emax, pop_dqtc,
+    (tvE0 = 0.1, tvEmax = 40.0, tvEC50 = 1000.0,
+     Ω = [0.1 0.01 0.01; 0.01 0.1 0.01; 0.01 0.01 0.1],
+     σ_add = sqrt(10.0)),
+    Pumas.FOCE())
+qtc_emax_fit
+```
+
+### Model Comparison
+
+```{julia}
+#| label: prob2-compare
+
+println("Model Comparison (QTc)")
+println("=" ^ 50)
+println("Naive Linear  AIC: ", round(aic(qtc_naive_fit), digits = 1))
+println("Pop Linear    AIC: ", round(aic(qtc_pop_fit), digits = 1))
+println("Pop Emax      AIC: ", round(aic(qtc_emax_fit), digits = 1))
+```
+
+## Problem 3: AST Emax Population Model
+
+Population analysis of AST exposure response data from Phase 1.
+
+```{julia}
+#| label: prob3-ast-data
+
+ast_raw = CSV.read(joinpath(data_dir, "ast.csv"), DataFrame)
+rename!(ast_raw, "SID" => :id, "CONC" => :conc, "AST" => :dv)
+
+ast_raw.time = Vector{Float64}(undef, nrow(ast_raw))
+for gdf in groupby(ast_raw, :id)
+    gdf.time .= Float64.(1:nrow(gdf))
+end
+
+pop_ast = read_pumas(ast_raw; observations = [:dv], covariates = [:conc], event_data = false)
+```
+
+```{julia}
+#| label: prob3-ast-model
+
+ast_emax = @model begin
+    @metadata begin
+        desc = "AST Emax Population Model"
+    end
+    @param begin
+        tvE0   ∈ RealDomain(init = 20.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEmax ∈ RealDomain(init = 50.0)
+        Ω      ∈ PSDDomain(3)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 3.16)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates conc
+    @pre begin
+        E0   = tvE0 + η[1]
+        EC50 = tvEC50 * exp(η[2])
+        Emax = tvEmax + η[3]
+    end
+    @derived begin
+        mu := @. E0 + Emax * conc / (EC50 + conc)
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+```
+
+```{julia}
+#| label: prob3-ast-fit
+
+ast_fit = fit(ast_emax, pop_ast,
+    (tvE0 = 20.0, tvEC50 = 100.0, tvEmax = 50.0,
+     Ω = [0.1 0.01 0.01; 0.01 0.1 0.01; 0.01 0.01 0.1],
+     σ_add = sqrt(10.0)),
+    Pumas.FOCE())
+ast_fit
+```
+
+```{julia}
+#| label: prob3-ast-infer
+
+ast_infer = infer(ast_fit)
+ast_infer
+```
+
+```{julia}
+#| label: fig-prob3-ast-diag
+#| fig-cap: "Problem 3: AST Emax GOF Diagnostics"
+
+ast_insp = inspect(ast_fit)
+ast_insp_df = DataFrame(ast_insp)
+obs_rows = @rsubset(ast_insp_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, obs_rows.dv_pred, obs_rows.dv, color = :navy, markersize = 5)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, obs_rows.dv_ipred, obs_rows.dv, color = :navy, markersize = 5)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "WRES", title = "WRES vs PRED")
+scatter!(ax3, obs_rows.dv_pred, obs_rows.dv_wres, color = :navy, markersize = 5)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time", ylabel = "WRES", title = "WRES vs TIME")
+scatter!(ax4, obs_rows.time, obs_rows.dv_wres, color = :navy, markersize = 5)
+hlines!(ax4, 0, color = :black)
+
+fig
+```
+
+## Problem 4: Population PK (1-Compartment Oral)
+
+Population PK analysis of a typical Phase 1 dataset. The data has known errors that must be fixed (as discovered in the R script).
+
+```{julia}
+#| label: prob4-poppk-data
+
+pk_raw = CSV.read(joinpath(data_dir, "prob_2.csv"), DataFrame)
+rename!(pk_raw,
+    :ID => :id, :DV => :dv, :AMT => :amt,
+    :II => :ii, :ADDL => :addl, :TIME => :time,
+)
+
+# Data cleaning (from R script: IndPopModels.Problem2.R)
+# Fix 1: ID=13, AMT=20 should be 200
+@rtransform!(pk_raw, :amt = (:id == 13 && :amt == 20) ? 200.0 : Float64(:amt))
+
+# Fix 2: ID=22, II=6 should be 8
+@rtransform!(pk_raw, :ii = (:id == 22 && :ii == 6) ? 8 : :ii)
+
+# Fix 3: ID=2, dose TIME=24 should be 0
+@rtransform!(pk_raw, :time = (:id == 2 && :amt > 0 && :time == 24) ? 0.0 : Float64(:time))
+
+# Fix 4: ID=15, dose AMT=0 should be 200
+@rtransform!(pk_raw, :amt = (:id == 15 && :time == 0 && :amt == 0) ? 200.0 : Float64(:amt))
+
+# Drop comment column, add required columns
+select!(pk_raw, Not(:C))
+pk_raw.evid = ifelse.(pk_raw.amt .> 0, 1, 0)
+pk_raw.cmt = ifelse.(pk_raw.amt .> 0, 1, 2)  # depot=1, central=2
+pk_raw.dv = ifelse.(pk_raw.evid .== 1, missing, pk_raw.dv)
+
+pop_pk = read_pumas(pk_raw)
+println("Subjects: ", length(pop_pk))
+```
+
+```{julia}
+#| label: prob4-poppk-model
+
+# 1-cpt oral model: ADVAN2 TRANS2 equivalent
+poppk_1cpt = @model begin
+    @metadata begin
+        desc = "1-Compartment Oral PopPK (ADVAN2 TRANS2)"
+    end
+    @param begin
+        tvCL   ∈ RealDomain(lower = 0.0, init = 8.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 50.0)
+        tvKa   ∈ RealDomain(lower = 0.0, init = 0.45)
+        Ω      ∈ PDiagDomain(3)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV  * exp(η[2])
+        Ka = tvKa * exp(η[3])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+```
+
+```{julia}
+#| label: prob4-poppk-fit
+
+pk_params = (
+    tvCL = 8.0, tvV = 50.0, tvKa = 0.45,
+    Ω = Diagonal([0.04, 0.04, 0.04]),
+    σ_prop = 0.2,
+)
+
+# FO estimation first (matching NONMEM METHOD=0)
+pk_fo = fit(poppk_1cpt, pop_pk, pk_params, Pumas.FO())
+pk_fo
+```
+
+```{julia}
+#| label: prob4-poppk-foce
+
+# Re-fit with FOCEI for better estimates
+pk_focei = fit(poppk_1cpt, pop_pk, pk_params, Pumas.FOCEI())
+pk_focei
+```
+
+```{julia}
+#| label: prob4-poppk-infer
+
+pk_infer = infer(pk_focei)
+pk_infer
+```
+
+```{julia}
+#| label: fig-prob4-poppk-diag
+#| fig-cap: "Problem 4: PopPK GOF Diagnostics"
+
+pk_insp = inspect(pk_focei)
+pk_df = DataFrame(pk_insp)
+pk_obs = @rsubset(pk_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, pk_obs.dv_pred, pk_obs.dv, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, pk_obs.dv_ipred, pk_obs.dv, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "WRES", title = "WRES vs PRED")
+scatter!(ax3, pk_obs.dv_pred, pk_obs.dv_wres, color = :navy, markersize = 5, alpha = 0.6)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time (hr)", ylabel = "WRES", title = "WRES vs TIME")
+scatter!(ax4, pk_obs.time, pk_obs.dv_wres, color = :navy, markersize = 5, alpha = 0.6)
+hlines!(ax4, 0, color = :black)
+
+fig
+```
+
+```{julia}
+#| label: fig-prob4-individual
+#| fig-cap: "Problem 4: Individual Fits (first 9 subjects)"
+
+fig = Figure(size = (900, 700))
+for (i, subj_id) in enumerate(unique(pk_obs.id)[1:9])
+    row, col = divrem(i - 1, 3) .+ (1, 1)
+    ax = Axis(fig[row, col], xlabel = "Time", ylabel = "Conc",
+        title = "ID $subj_id")
+    sdf = @rsubset(pk_obs, :id == subj_id)
+    scatter!(ax, sdf.time, sdf.dv, color = :blue, markersize = 6)
+    lines!(ax, sdf.time, sdf.dv_ipred, color = :red, linewidth = 1.5)
+    lines!(ax, sdf.time, sdf.dv_pred, color = :gray, linewidth = 1, linestyle = :dash)
+end
+fig
+```
+
+::: {.callout-note title="Comparing Pumas Objective Function to NONMEM"}
+When validating a Pumas model against NONMEM results:
+
+- **NONMEM OFV (with constant)** = `-2 * loglikelihood(fit)` in Pumas — these should match exactly
+- **NONMEM OFV (without constant)** = `-2 * loglikelihood(fit) - N * log(2π)` where `N` = total observations
+- To compute the traditional OFV: `ofv = -2 * loglikelihood(fit) - nobs(fit) * log(2π)`
+
+Common reasons for mismatch:
+
+1. **Data differences** — column mapping, missing value handling, or filtering
+2. **Parameterization** — different IIV or error model form
+3. **Covariate interpolation** — NONMEM defaults to NOCB; Pumas defaults to LOCF (`covariates_direction = :left`)
+4. **Initial estimates** — compare EBEs via `empirical_bayes(fit)` against NONMEM's `.phi` file
+:::
+
+::: {.callout-tip title="Pumas Error Model Convenience Functions"}
+Pumas provides named error distributions that simplify `@derived` blocks:
+
+| Error Model | Manual Form | Convenience Form |
+|-------------|------------|-----------------|
+| Additive | `dv ~ Normal(cp, σ_add)` | `dv ~ Normal(cp, σ_add)` |
+| Proportional | `dv ~ Normal(cp, abs(cp) * σ_prop)` | `dv ~ ProportionalNormal(cp, σ_prop)` |
+| Combined | `dv ~ Normal(cp, √(σ_add² + (cp*σ_prop)²))` | `dv ~ CombinedNormal(cp, σ_add, σ_prop)` |
+
+`ProportionalNormal` and `CombinedNormal` handle the abs/sqrt internally.
+:::
+
+::: {.callout-note title="Connecting Error Models to Bioanalytical Assay Characteristics"}
+The choice of residual error model should be informed by the characteristics of the **bioanalytical assay**, not solely by statistical fit. **Additive error** implies constant measurement uncertainty across the concentration range, which is typical of assays operating near the **lower limit of quantification (LLOQ)** where absolute noise dominates. **Proportional error** implies uncertainty that scales with concentration, reflecting the behavior of most validated bioanalytical assays where the **coefficient of variation (%CV) is approximately constant** across the calibration range. **Combined error** captures both regimes simultaneously — additive noise dominates at low concentrations and proportional noise dominates at higher concentrations. In practice, the combined model is often the most realistic because assay precision degrades near the LLOQ (additive component) while maintaining a roughly constant %CV at mid-to-high concentrations (proportional component). Understanding the assay's validated range and precision profile provides a principled basis for selecting the error model prior to estimation.
+:::
+
+# Study Guide Questions
+
+1. Explain how you might interpret the standard error of the estimates.
+2. List three things that you should look for in the Monitoring of Search output (optimizer convergence in Pumas).
+3. List three diagnostic plots that you should create for a population NLME model.
+4. How can you make sense of the off-diagonal elements of a covariance matrix?
+5. Provide an initial estimate for the first element of OMEGA, assuming a proportional inter-individual %CV equal to 30%. (*Answer: 0.09, since for exponential IIV, omega = (CV/100)^2 = 0.3^2 = 0.09*)
+6. Provide an initial estimate for SIGMA, assuming a constant residual error with standard deviation equal to 5. (*Answer: In NONMEM sigma=25 (variance); in Pumas sigma_add=5 (SD)*)
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: 1-Cpt IV Bolus** | [PK W2](../lectures/pk/W2-one-compartment-iv-bolus-model.qmd) | The physiology behind the monoexponential model coded here |
+| **Lecture: Volume of Distribution** | [PK W4](../lectures/pk/W4-volume-of-distribution-and-protein-binding.qmd) | Why V is not a real volume — tissue partitioning, protein binding |
+| **Lecture: Clearance & Hepatic CL** | [PK W6](../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd) | CL as volume cleared per unit time, extraction ratio, intrinsic clearance |
+| **Lecture: Intrinsic CL & Enzyme Kinetics** | [PK W7a](../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd) | Vmax/KM foundation of Michaelis-Menten and Emax models |
+| **Lecture: Oral Absorption** | [PK W8](../lectures/pk/W8-extravascular-dosing-and-oral-absorption.qmd) | First-order absorption, bioavailability, flip-flop kinetics |
+| **Lecture: Error Model Specification** | [PKPD W7](../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.qmd) | Choosing additive vs proportional vs combined error from assay characteristics |
+| Complete Pumas fitting workflow | [Fitting](https://tutorials.pumas.ai/html/introduction/fitting.html) | Domain types, `@param`/`@random`/`@pre`/`@dynamics`/`@derived` deep dive, inference and GOF |
+| 9 ways to specify dynamics | [Dynamical Systems](https://tutorials.pumas.ai/html/introduction/dynamical_systems.html) | Closed-form, explicit ODE, ModelingToolkit, Catalyst — with linearity detection comparison |
+| NONMEM ↔ Pumas validation | [Comparing NONMEM & Pumas](https://tutorials.pumas.ai/html/NONMEMtoPumas/comparing_NONMEM_Pumas.html) | OFV matching, parameter extraction from .lst, EBE comparison, troubleshooting |
+| Absorption model catalog | [Absorption Models](https://tutorials.pumas.ai/html/advanced_topics/absorption_models.html) | First-order, zero-order, parallel, transit, Erlang, Gamma, Weibull — all with working code |
+| VEM estimation | [VEM Introduction](https://tutorials.pumas.ai/html/estimation/01-vem-introduction.html) | Variational EM as alternative to FOCE, options reference, comparison study |
+| MCEM estimation | [MCEM](https://tutorials.pumas.ai/html/estimation/05-mcem.html) | Monte Carlo EM for complex likelihoods |

@@ -1,0 +1,400 @@
+---
+title: "Chapter 5: Simulation"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+using Random
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+Simulation is a core tool in pharmacometrics for:
+
+- Predicting expected drug exposure and response in new scenarios
+- Evaluating trial designs
+- Supporting dose selection decisions
+- Assessing the impact of variability and uncertainty
+
+# Types of Simulation
+
+| Type | Random Effects | Residual Error | Use Case |
+|------|---------------|----------------|----------|
+| **Fixed parameter** | None ($\eta = 0$) | None | Typical subject profile |
+| **Individual** | From estimated EBEs | Optional | Predict for specific patient |
+| **Population** | Sampled from $\Omega$ | Sampled from $\Sigma$ | Predict variability in new cohort |
+| **With uncertainty** | Sampled from $\Omega$ | Sampled from $\Sigma$ | Account for parameter estimation uncertainty |
+
+# Simulation Model
+
+All examples use a 1-compartment oral PK model (same as the course's Phase 1 model):
+
+```{julia}
+#| label: sim-model
+
+sim_model = @model begin
+    @metadata begin
+        desc = "1-Cpt Oral PK for Simulation"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        Ω      ∈ PDiagDomain(3)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka = tvKa * exp(η[1])
+        CL = tvCL * exp(η[2])
+        Vc = tvV  * exp(η[3])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+
+# Parameter estimates (from a previous fit)
+sim_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0,
+    Ω = Diagonal([0.04, 0.04, 0.04]),
+    σ_prop = 0.2,
+)
+```
+
+# Fixed Parameter Simulation (Typical Subject)
+
+Simulate a single typical subject ($\eta = 0$, no residual error) for a 500 mg oral dose:
+
+```{julia}
+#| label: sim-fixed
+
+# Create a single-subject dosing regimen
+dose_500 = DosageRegimen(500, time = 0, cmt = 1)
+subj = Subject(id = "typical", events = dose_500,
+    observations = (dv = nothing,))
+
+# Simulate with η=0 (no IIV, no RUV)
+fixed_sim = simobs(sim_model, subj, sim_params;
+    obstimes = 0:0.1:24)
+```
+
+```{julia}
+#| label: fig-sim-fixed
+#| fig-cap: "Fixed Parameter Simulation (Typical Subject)"
+
+sim_df = DataFrame(fixed_sim)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Time (hr)", ylabel = "Concentration (mg/L)",
+    title = "Typical Subject: 500 mg Oral Dose")
+lines!(ax, sim_df.time, sim_df.dv, color = :blue, linewidth = 2)
+fig
+```
+
+# Population Simulation
+
+Simulate 100 subjects with IIV and residual variability:
+
+```{julia}
+#| label: sim-population
+
+Random.seed!(5469)  # matching NONMEM seed
+
+# Create 100 virtual subjects, all receiving 500 mg oral dose
+pop_sim = map(1:100) do i
+    Subject(id = string(i), events = dose_500,
+        observations = (dv = nothing,))
+end
+
+# Population simulation (samples η from Ω, ε from Σ)
+pop_sims = simobs(sim_model, pop_sim, sim_params;
+    obstimes = 0:0.5:24)
+```
+
+```{julia}
+#| label: fig-sim-pop
+#| fig-cap: "Population Simulation (100 Subjects)"
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Time (hr)", ylabel = "Concentration (mg/L)",
+    title = "Population Simulation: 500 mg Oral (N=100)")
+
+for s in pop_sims
+    sdf = DataFrame(s)
+    lines!(ax, sdf.time, sdf.dv, color = (:steelblue, 0.15), linewidth = 0.5)
+end
+
+# Overlay typical profile
+typ_df = DataFrame(fixed_sim)
+lines!(ax, typ_df.time, typ_df.dv, color = :red, linewidth = 2, label = "Typical")
+axislegend(ax, position = :rt)
+fig
+```
+
+# Individual Simulation (From Estimated Model)
+
+After fitting a model, simulate using individual EBE parameters:
+
+```{julia}
+#| label: sim-individual
+
+# First, fit the model to real data to get individual estimates
+sim_data = CSV.read(joinpath(data_dir, "sim_template.csv"), DataFrame)
+rename!(sim_data, :ID => :id, :AMT => :amt, :TIME => :time, :DV => :dv)
+sim_data.evid = ifelse.(sim_data.amt .> 0, 1, 0)
+sim_data.cmt = ifelse.(sim_data.amt .> 0, 1, 2)
+sim_data.dv = ifelse.(sim_data.evid .== 1, missing, sim_data.dv)
+
+pop_real = read_pumas(sim_data)
+
+# Fit to get individual parameters
+real_fit = fit(sim_model, pop_real, sim_params, Pumas.FOCEI())
+println("Fitted ", length(pop_real), " subjects")
+println("tvCL = ", round(coef(real_fit).tvCL, digits = 2))
+```
+
+```{julia}
+#| label: sim-from-fit
+
+# Simulate from the fitted model (uses individual EBEs)
+ind_sims = simobs(real_fit)
+```
+
+```{julia}
+#| label: fig-sim-ind
+#| fig-cap: "Individual Simulations from Fitted Model (first 9 subjects)"
+
+fig = Figure(size = (900, 700))
+for (i, s) in enumerate(ind_sims[1:min(9, end)])
+    row, col = divrem(i - 1, 3) .+ (1, 1)
+    ax = Axis(fig[row, col], xlabel = "Time", ylabel = "Conc",
+        title = "ID " * s.subject.id)
+    sdf = DataFrame(s)
+    lines!(ax, sdf.time, sdf.dv, color = :blue, linewidth = 1.5)
+    # Overlay observed data
+    obs_df = DataFrame(pop_real[i])
+    obs_rows = @rsubset(obs_df, !ismissing(:dv))
+    scatter!(ax, obs_rows.time, obs_rows.dv, color = :red, markersize = 6)
+end
+fig
+```
+
+# DosageRegimen Construction Patterns
+
+`DosageRegimen` is the primary tool for building dosing schedules programmatically:
+
+```{julia}
+#| label: dosage-regimen-patterns
+#| eval: false
+
+# Single oral dose (100 mg to depot compartment)
+dr1 = DosageRegimen(100; time = 0.0, cmt = 1)
+
+# Multiple oral doses (200 mg every 8 hours, 15 total doses)
+dr2 = DosageRegimen(200; time = 0.0, cmt = 1, addl = 14, ii = 8)
+
+# IV infusion (500 mg over 2 hours to central compartment)
+dr3 = DosageRegimen(500; time = 0.0, cmt = 2, rate = 250)  # rate = dose/duration
+
+# Loading dose + maintenance (combine regimens)
+iv_load   = DosageRegimen(500; time = 0.0, cmt = 2, duration = 1.0)
+oral_maint = DosageRegimen(200; time = 12.0, cmt = 1, addl = 13, ii = 12.0)
+combined  = DosageRegimen(iv_load, oral_maint)
+
+# Dose escalation (multiple dose levels)
+low_dose  = DosageRegimen(100; time = 0.0, cmt = 1, addl = 6, ii = 24.0)
+high_dose = DosageRegimen(200; time = 168.0, cmt = 1, addl = 6, ii = 24.0)
+escalation = DosageRegimen(low_dose, high_dose)
+```
+
+## Building Populations with Covariates
+
+```{julia}
+#| label: pop-building-patterns
+#| eval: false
+
+using Random
+
+# Population with random covariates
+Random.seed!(42)
+pop = map(1:100) do i
+    wt = rand(55.0:0.1:95.0)
+    age = rand(20:75)
+    sex = rand(["M", "F"])
+    Subject(
+        id = string(i),
+        events = DosageRegimen(200; time = 0.0, cmt = 1, addl = 6, ii = 24.0),
+        covariates = (WT = wt, AGE = age, SEX = sex),
+        observations = (dv = nothing,),
+    )
+end
+```
+
+# Multiple Dose Simulation
+
+::: {.callout-note title="Multiple Dosing: Accumulation and Steady State"}
+When a drug is administered repeatedly at a fixed interval $\tau$, the next dose arrives before the previous dose is fully eliminated, leading to **drug accumulation**. The accumulation factor is given by $R = 1/(1 - e^{-k_e \cdot \tau})$, where $k_e$ is the elimination rate constant. Steady state is reached after approximately **4--5 elimination half-lives**, at which point the rate of drug input equals the rate of elimination over one dosing interval. At steady state, the average concentration is:
+
+$$C_{ss,avg} = \frac{F \cdot \text{Dose}}{CL \cdot \tau}$$
+
+where $F = 1$ for intravenous administration. The peak-to-trough fluctuation at steady state depends on the ratio $\tau / t_{1/2}$ — shorter dosing intervals relative to the half-life produce less fluctuation but greater accumulation. Understanding these relationships is essential for selecting dosing regimens that maintain concentrations within the therapeutic window.
+:::
+
+Simulate a multiple-dose regimen (200 mg q8h for 5 days):
+
+```{julia}
+#| label: sim-multidose
+
+md_regimen = DosageRegimen(200, time = 0, cmt = 1, addl = 14, ii = 8)
+
+md_pop = map(1:50) do i
+    Subject(id = string(i), events = md_regimen,
+        observations = (dv = nothing,))
+end
+
+Random.seed!(2024)
+md_sims = simobs(sim_model, md_pop, sim_params;
+    obstimes = 0:0.5:120)
+```
+
+```{julia}
+#| label: fig-sim-md
+#| fig-cap: "Multiple Dose Simulation: 200 mg q8h (N=50)"
+
+fig = Figure(size = (700, 400))
+ax = Axis(fig[1, 1], xlabel = "Time (hr)", ylabel = "Concentration (mg/L)")
+
+for s in md_sims
+    sdf = DataFrame(s)
+    lines!(ax, sdf.time, sdf.dv, color = (:steelblue, 0.15), linewidth = 0.5)
+end
+
+# Compute and plot median + 90% PI
+# Stack all subjects, drop missing dv rows, then summarize by time
+sim_all = vcat([DataFrame(s) for s in md_sims]...)
+sim_obs = dropmissing(sim_all, :dv)
+sim_summary = combine(groupby(sim_obs, :time),
+    :dv => median => :med,
+    :dv => (x -> quantile(x, 0.05)) => :lo,
+    :dv => (x -> quantile(x, 0.95)) => :hi)
+sort!(sim_summary, :time)
+times = sim_summary.time
+med = sim_summary.med
+lo = sim_summary.lo
+hi = sim_summary.hi
+
+band!(ax, times, lo, hi, color = (:steelblue, 0.2))
+lines!(ax, times, med, color = :red, linewidth = 2, label = "Median")
+axislegend(ax, position = :rt)
+fig
+```
+
+# Simulation with Parameter Uncertainty
+
+::: {.callout-note title="Why Parameter Uncertainty Matters for Decision-Making"}
+Point estimates of population parameters ($CL$, $V$, $K_a$, etc.) carry standard errors from the estimation procedure. When simulating predictions for decision-making — such as dose selection for a Phase III trial or probability of target attainment — ignoring this uncertainty produces **overconfident predictions** that understate the true range of plausible outcomes. Propagating parameter uncertainty through simulation provides **prediction intervals** that reflect two distinct sources of variability: (1) inter-individual variability (from $\Omega$), which captures biological differences among patients, and (2) parameter estimation uncertainty (from the variance-covariance matrix of the estimates), which captures the precision of the population-level parameters given the available data. For high-stakes decisions, both sources must be incorporated to produce credible inference.
+:::
+
+To account for uncertainty in parameter estimates, resample parameters from their asymptotic distribution:
+
+```{julia}
+#| label: sim-uncertainty
+#| eval: false
+
+# After fitting, simulate with parameter uncertainty
+# Pumas can propagate uncertainty from the variance-covariance matrix:
+#
+# vcov_matrix = vcov(infer(real_fit))
+# uncertain_sims = [
+#     simobs(sim_model, md_pop, sample_params(real_fit);
+#            obstimes = 0:0.5:120)
+#     for _ in 1:100
+# ]
+#
+# This gives 100 sets of simulations, each with different
+# population parameters drawn from the uncertainty distribution.
+```
+
+::: {.callout-note}
+**NONMEM vs Pumas Simulation:**
+
+| NONMEM | Pumas |
+|--------|-------|
+| `$SIMULATION (seed) ONLYSIM SUB=N` | `simobs(model, pop, params)` |
+| Requires dummy data file | Create `Subject` programmatically |
+| Post-process with R | `DataFrame(simobs)` directly |
+| `$MSFI` for parameter uncertainty | `vcov(infer(fit))` for sampling |
+:::
+
+# Reproducibility: Seeds and RNG
+
+Simulation reproducibility requires explicit control of the random number generator:
+
+```{julia}
+#| label: rng-patterns
+#| eval: false
+
+using Random
+
+# Global seed — affects all subsequent random calls
+Random.seed!(1234)
+sims = simobs(model, pop, params; obstimes = 0:0.5:120)
+
+# Local seed — isolated, does not affect global state (preferred for functions)
+rng = Random.Xoshiro(1234)
+sims = simobs(model, pop, params; obstimes = 0:0.5:120, rng = rng)
+```
+
+::: {.callout-tip title="Best Practices for Reproducibility"}
+- **Development:** use local `rng` keyword to keep experiments isolated
+- **Final scripts:** set global `Random.seed!()` once at the top for full-script reproducibility
+- **Julia's default RNG** is `Xoshiro` (fast, high-quality) — previously `MersenneTwister`
+- Same seed + same code = identical results across runs on the same Julia version
+:::
+
+# Study Guide Questions
+
+1. What is the difference between a population simulation and an individual simulation?
+2. Why is simulation with parameter uncertainty important for decision-making?
+3. How would you simulate 1000 subjects receiving different doses to create a dose-response curve?
+4. What is the role of the random seed in simulation reproducibility?
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: IV Infusion Kinetics** | [PK W9](../lectures/pk/W9-iv-infusion-kinetics.qmd) | Steady-state theory, accumulation factor, loading dose rationale |
+| **Lecture: Math Foundations of PK** | [PK W1c](../lectures/pk/W1c-mathematical-foundations-of-pk.qmd) | Exponential/logarithmic functions, first-order rate processes underlying simulation |
+| Population generation | [Simulating Populations](https://tutorials.pumas.ai/html/simulation/simulating_populations.html) | `DosageRegimen` construction, `Subject` with covariates, infusions, combined regimens |
+| Reproducibility & RNG | [Reproducible Simulations](https://tutorials.pumas.ai/html/simulation/simulating_reproducible.html) | Seeds, `Xoshiro` vs `MersenneTwister`, local vs global reproducibility, `rand_covariates()` |

@@ -1,0 +1,465 @@
+---
+title: "Chapter 4: Covariate Model Building"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+Covariate model building identifies measurable patient factors that explain inter-individual variability in PK/PD parameters:
+
+- Objectives of covariate model development
+- Common covariate model parameterizations
+- Data reduction before covariate building
+- Covariate screening methods (traditional and automated)
+- Inferences about covariate effects
+
+# Objectives of Covariate Model Development
+
+- Identify factors that explain variability in PK/PD parameters
+- Reduce unexplained inter-individual variability
+- Improve model predictions for individual patients
+- Support dose adjustment recommendations for special populations
+
+::: {.callout-note title="Why Covariates Reduce Inter-Individual Variability"}
+When a covariate genuinely explains inter-individual variability, incorporating it into the model splits the single population parameter into covariate-defined subgroups, each with its own typical value. The random effect $\eta_i$ must then only account for the residual difference between the individual's true parameter and the subgroup-specific population prediction, rather than the overall population mean. This forces $\eta$ to do less work, producing a tighter distribution and a smaller $\omega$.
+
+**Intuitive example:** Suppose males have true CL $\approx$ 10 L/h and females have true CL $\approx$ 8 L/h. A model without a sex covariate estimates $\text{tvCL} \approx 9$ L/h with a large $\omega_{CL}$ that absorbs the male--female difference. A model that includes sex estimates $\text{tvCL}_\text{male} = 10$ and $\text{tvCL}_\text{female} = 8$, and $\omega_{CL}$ shrinks because within each group the $\eta$ values cluster more tightly around zero. The individual clearances have not changed --- $\eta$ simply shifts to accommodate the new, more precise population prediction.
+:::
+
+# Common Covariate Parameterizations
+
+## Continuous Covariates
+
+**Power model (centered on reference value):**
+
+$$TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3}$$
+
+**Linear model:**
+
+$$TVCL = \theta_1 + \theta_3 \cdot (CLCR - 80)$$
+
+::: {.callout-note title="Physiological Basis of Common Covariate-Parameter Relationships"}
+**Body weight on $V$:** The apparent volume of distribution is $V = V_P + \sum_i K_{P,i} \cdot V_{T,i}$, where $V_{T,i}$ are tissue volumes and $K_{P,i}$ are tissue-to-plasma partition coefficients. A larger body has greater tissue mass and total body water, so $V$ scales with body size. Allometric scaling formalizes this: $V \propto \text{BW}^{1.0}$ and $CL \propto \text{BW}^{0.75}$, reflecting biological scaling laws derived from fractal geometry and cross-species metabolic rate observations.
+
+**Creatinine clearance on $CL$:** For renally eliminated drugs, clearance is proportional to glomerular filtration rate (GFR). Filtration clearance is $CL_F = f_u \cdot \text{GFR}$, where only unbound drug is filtered. The Cockcroft-Gault equation estimates $\text{CLcr}$ as a surrogate for GFR, making it a natural covariate for renal clearance.
+
+**Hepatic function on $CL$:** For hepatically cleared drugs, the well-stirred model predicts $CL_H = \frac{Q_H \cdot f_u \cdot CL_{\text{int}}}{Q_H + f_u \cdot CL_{\text{int}}}$, where $Q_H$ is hepatic blood flow, $f_u$ is fraction unbound, and $CL_{\text{int}}$ is intrinsic clearance. Intrinsic clearance depends on hepatic enzyme activity (CYP genotype, enzyme induction/inhibition from DDIs), so covariates reflecting hepatic function or metabolizer status directly modulate $CL$.
+:::
+
+## Categorical Covariates
+
+**Proportional shift:**
+
+$$TVCL = \theta_1 \cdot (1 + \theta_3 \cdot SEX)$$
+
+**Separate typical values:**
+
+$$TVCL = \theta_1 \cdot (1 - SEX) + \theta_2 \cdot SEX$$
+
+## Desirable Properties
+
+- Centering continuous covariates on a reference value (e.g., median)
+- Power model ensures positivity of parameters
+- Interpretable covariate effects (e.g., fold-change per unit)
+
+# Data and Base Model
+
+```{julia}
+#| label: ch4-data
+
+cov_df = CSV.read(joinpath(data_dir, "poppk_wcovs.csv"), DataFrame)
+rename!(cov_df,
+    :ID => :id, :DV => :dv, :AMT => :amt, :TIME => :time,
+    :II => :ii, :ADDL => :addl, :RATE => :rate,
+)
+
+cov_df.evid = ifelse.(cov_df.amt .> 0, 1, 0)
+cov_df.cmt = fill(1, nrow(cov_df))
+cov_df.dv = ifelse.(cov_df.evid .== 1, missing, cov_df.dv)
+
+pop = read_pumas(cov_df; covariates = [:HT, :WT, :CLCR, :SEX, :AGE])
+println("Subjects: ", length(pop))
+```
+
+## EBE-Covariate Screening Plots
+
+::: {.callout-warning title="η-Shrinkage Limits EBE-Based Covariate Screening"}
+When $\eta$-shrinkage exceeds approximately 30%, individual empirical Bayes estimates (EBEs) regress toward zero and lose their ability to reflect true inter-individual differences. This has two consequences for covariate screening: (1) genuine covariate--parameter relationships may be obscured because the $\hat{\eta}$ values have collapsed toward the population mean, and (2) spurious patterns may emerge from the shrinkage structure itself rather than from biology. A flat EBE-vs-covariate plot under high shrinkage may reflect information poverty rather than the absence of a real relationship. Always compute and report $\eta$-shrinkage before interpreting EBE-covariate diagnostic plots; when shrinkage is substantial, consider alternative screening approaches such as simulation-based diagnostics.
+:::
+
+Before formal covariate modeling, screen ETA estimates vs. covariates:
+
+```{julia}
+#| label: ch4-base-model
+
+# Base model: 1-cpt IV, BLOCK(2) OMEGA, proportional error
+# From 501.ctl
+base_model = @model begin
+    @metadata begin
+        desc = "Base PopPK Model (no covariates)"
+    end
+    @param begin
+        tvCL   ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 75.0)
+        Ω      ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR SEX AGE HT
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+```
+
+```{julia}
+#| label: ch4-base-fit
+
+base_params = (
+    tvCL = 13.0, tvV = 75.0,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2,
+)
+base_fit = fit(base_model, pop, base_params, Pumas.FOCEI())
+base_fit
+```
+
+```{julia}
+#| label: fig-ch4-ebe-screening
+#| fig-cap: "EBE vs Covariate Screening Plots"
+
+base_insp = inspect(base_fit)
+base_df = DataFrame(base_insp)
+# Get one row per subject (first obs row)
+subj_df = combine(groupby(@rsubset(base_df, !ismissing(:dv)), :id), first)
+
+fig = Figure(size = (900, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "CLCR", ylabel = "ETA(CL)")
+scatter!(ax1, subj_df.CLCR, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax1, 0, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "WT", ylabel = "ETA(V)")
+scatter!(ax2, subj_df.WT, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax2, 0, color = :black)
+
+ax3 = Axis(fig[1, 3], xlabel = "AGE", ylabel = "ETA(CL)")
+scatter!(ax3, subj_df.AGE, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 1], xlabel = "AGE", ylabel = "ETA(V)")
+scatter!(ax4, subj_df.AGE, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax4, 0, color = :black)
+
+ax5 = Axis(fig[2, 2], xlabel = "SEX", ylabel = "ETA(CL)")
+scatter!(ax5, subj_df.SEX, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax5, 0, color = :black)
+
+ax6 = Axis(fig[2, 3], xlabel = "SEX", ylabel = "ETA(V)")
+scatter!(ax6, subj_df.SEX, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax6, 0, color = :black)
+
+fig
+```
+
+# Full Covariate Model
+
+From 510.ctl — power model parameterization with CLCR and AGE on CL, WT and AGE on V:
+
+$$TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3} \cdot \left(\frac{AGE}{45}\right)^{\theta_4}$$
+
+$$TVV = \theta_2 \cdot \left(\frac{WT}{70}\right)^{\theta_5} \cdot \left(\frac{AGE}{45}\right)^{\theta_6}$$
+
+```{julia}
+#| label: ch4-full-model
+
+full_cov_model = @model begin
+    @metadata begin
+        desc = "Full Covariate Model (power parameterization)"
+    end
+    @param begin
+        tvCL      ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV       ∈ RealDomain(lower = 0.0, init = 75.0)
+        dCL_CLCR  ∈ RealDomain(init = 0.5)      # THETA(3): CL~CLCR power
+        dCL_AGE   ∈ RealDomain(init = -0.3)      # THETA(4): CL~AGE power
+        dV_WT     ∈ RealDomain(init = 0.5)        # THETA(5): V~WT power
+        dV_AGE    ∈ RealDomain(init = 0.1)         # THETA(6): V~AGE power
+        Ω         ∈ PSDDomain(2)
+        σ_prop    ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR AGE SEX HT
+    @pre begin
+        TVCL = tvCL * (CLCR / 80)^dCL_CLCR * (AGE / 45)^dCL_AGE
+        CL   = TVCL * exp(η[1])
+        TVV  = tvV * (WT / 70)^dV_WT * (AGE / 45)^dV_AGE
+        Vc   = TVV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+```
+
+```{julia}
+#| label: ch4-full-fit
+
+full_params = (
+    tvCL = 13.0, tvV = 75.0,
+    dCL_CLCR = 0.5, dCL_AGE = -0.3,
+    dV_WT = 0.5, dV_AGE = 0.1,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2,
+)
+full_fit = fit(full_cov_model, pop, full_params, Pumas.FOCEI())
+full_fit
+```
+
+```{julia}
+#| label: ch4-full-infer
+
+full_infer = infer(full_fit)
+full_infer
+```
+
+# Model Comparison
+
+```{julia}
+#| label: ch4-compare
+
+println("Covariate Model Comparison")
+println("=" ^ 50)
+println("Base Model    AIC: ", round(aic(base_fit), digits = 1))
+println("Full Cov      AIC: ", round(aic(full_fit), digits = 1))
+
+delta_ofv = -2 * loglikelihood(base_fit) - (-2 * loglikelihood(full_fit))
+println("\nDelta OFV: ", round(delta_ofv, digits = 2), " (4 df)")
+println("Chi-sq critical (p=0.05, 4df): 9.49")
+println("Chi-sq critical (p=0.005, 4df): 14.86")
+```
+
+# Covariate Modeling Methods in Pumas
+
+## Automated Covariate Selection
+
+Pumas provides `covariate_select()` for automated forward addition / backward elimination. The key design principle: **define all covariate effects in the model upfront**, then use `control_param` to specify which parameters "turn on/off" each effect. Setting a control parameter to zero removes its covariate effect.
+
+### Forward Selection
+
+Starts with base model (all covariate effects zeroed out), iteratively adds the single most impactful covariate:
+
+```{julia}
+#| label: ch4-forward-select
+#| eval: false
+
+# Step 1: Define model with ALL candidate covariate effects pre-coded
+full_cov_model = @model begin
+    @param begin
+        tvCL     ∈ RealDomain(lower = 0.0, init = 4.0)
+        tvV      ∈ RealDomain(lower = 0.0, init = 70.0)
+        dWTCL    ∈ RealDomain(init = 0.0)     # WT effect on CL (power)
+        dWTV     ∈ RealDomain(init = 0.0)     # WT effect on V (power)
+        dCLCR_CL ∈ RealDomain(init = 0.0)     # CLCR effect on CL (power)
+        dAGE_CL  ∈ RealDomain(init = 0.0)     # AGE effect on CL (power)
+        dSEX_CL  ∈ RealDomain(init = 0.0)     # SEX effect on CL (proportional shift)
+        Ω        ∈ PSDDomain(2)
+        σ_prop   ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR AGE SEX
+    @pre begin
+        CL = tvCL * (WT / 70)^dWTCL * (CLCR / 80)^dCLCR_CL *
+             (AGE / 45)^dAGE_CL * (1 + dSEX_CL * (SEX == 1)) * exp(η[1])
+        Vc = tvV * (WT / 70)^dWTV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+
+# Step 2: Forward selection — control_param lists the covariate effect parameters
+covar_result = covariate_select(
+    full_cov_model, pop, init_params, Pumas.FOCEI();
+    control_param = (:dWTCL, :dWTV, :dCLCR_CL, :dAGE_CL, :dSEX_CL),
+    method = CovariateSelection.Forward,
+    criterion = aic,
+)
+
+# Access results
+covar_result.best_model    # final selected model
+covar_result.fits          # all intermediate fits
+```
+
+### Backward Elimination
+
+Starts with full model (all effects active), iteratively removes the least impactful:
+
+```{julia}
+#| label: ch4-backward-elim
+#| eval: false
+
+covar_result_be = covariate_select(
+    full_cov_model, pop, full_params, Pumas.FOCEI();
+    control_param = (:dWTCL, :dWTV, :dCLCR_CL, :dAGE_CL, :dSEX_CL),
+    method = CovariateSelection.Backward,
+    criterion = bic,   # BIC penalizes complexity more than AIC
+)
+```
+
+::: {.callout-note title="Covariate Selection Methodologies: SCM, GAM, and FFM"}
+**Stepwise Covariate Modeling (SCM):** The most widely used approach, consisting of forward addition followed by backward elimination within the full nonlinear mixed-effects model. Forward steps add covariates using a liberal threshold (e.g., $p < 0.05$); backward steps remove covariates using a stricter threshold (e.g., $p < 0.001$). Each step constitutes a hypothesis test, raising concerns about alpha spending from multiple comparisons --- in practice, corrections such as Bonferroni are rarely applied, which is a known limitation.
+
+**Generalized Additive Modeling (GAM):** A non-parametric, EBE-based screening method that operates outside the PK model. Individual $\hat{\eta}$ values are regressed against candidate covariates using simple linear models, and the best-fitting covariate is selected iteratively. GAM is computationally efficient but inherits the shrinkage bias of EBEs: when $\eta$-shrinkage is substantial, GAM results may be unreliable.
+
+**Full Fixed-Effects Model (FFM):** All biologically plausible covariates are included simultaneously from the outset, and no stepwise hypothesis testing is performed. Covariate importance is judged by the clinical significance of effect magnitudes (e.g., whether a covariate shifts exposure by $\geq$ 20%) rather than by $p$-values. FFM avoids the multiple-testing problem inherent in SCM but requires careful prior identification and de-correlation of candidate covariates using domain knowledge.
+:::
+
+### AIC vs BIC vs LRT
+
+| Criterion | Formula | Favors |
+|-----------|---------|--------|
+| AIC | $-2LL + 2k$ | Predictive accuracy; may overfit with large n |
+| BIC | $-2LL + k \cdot \log(n)$ | Parsimony; stronger penalty for large datasets |
+| LRT | $\Delta OFV \sim \chi^2(\Delta df)$ | Nested model comparison only; requires p-value cutoff |
+
+- **Forward selection:** typically use AIC (p ≈ 0.05 equivalent) or LRT with α = 0.05
+- **Backward elimination:** typically use BIC or LRT with stricter α = 0.01 (or 0.001)
+- AIC and BIC work for both nested and non-nested models
+
+::: {.callout-tip}
+**NONMEM vs Pumas Covariate Workflow:**
+
+- NONMEM: Manual control stream editing + SCM in PsN
+- Pumas: `covariate_select()` automates forward/backward selection, or use manual AIC/LRT comparison as shown above
+:::
+
+## Time-Varying Covariates
+
+Covariates that change during the study (e.g., weight, creatinine clearance, concomitant medications) require special handling:
+
+```{julia}
+#| label: ch4-time-varying
+#| eval: false
+
+# In the dataset: include covariate values at each observation/event time
+# Pumas interpolates between recorded values using piece-wise constant interpolation:
+#   :left  → LOCF (Last Observation Carried Forward) — Pumas default
+#   :right → NOCB (Next Observation Carried Backward) — NONMEM default
+
+pop = read_pumas(df; covariates = [:WT, :CLCR], covariates_direction = :left)
+
+# The covariate is automatically available as a time-varying quantity in @pre
+```
+
+::: {.callout-warning}
+**NONMEM defaults to NOCB** (right-continuous interpolation), while **Pumas defaults to LOCF** (left-continuous). When comparing results between the two, explicitly set `covariates_direction = :right` in Pumas for NONMEM equivalence.
+:::
+
+## Missing Covariates in Population Models
+
+| Strategy | When to Use | Pumas Implementation |
+|----------|------------|---------------------|
+| Median imputation | Standard approach for sporadic missingness | `@rtransform :WT = coalesce(:WT, 70.0)` before `read_pumas` |
+| Group-wise imputation | When covariate differs by subgroup | `groupby(:SEX)` → `@transform :WT = coalesce.(:WT, median(skipmissing(:WT)))` |
+| Complete case | When missingness is minimal | `dropmissing(df, [:WT, :CLCR])` |
+| Flag + sensitivity | When imputation impact is uncertain | Add `:WT_IMPUTED` column, run with/without imputed subjects |
+
+# GOF Diagnostics: Full Model
+
+```{julia}
+#| label: fig-ch4-full-gof
+#| fig-cap: "Full Covariate Model GOF Diagnostics"
+
+full_insp = inspect(full_fit)
+full_df = DataFrame(full_insp)
+obs = @rsubset(full_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, obs.dv_pred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, obs.dv_ipred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "CWRES", title = "CWRES vs PRED")
+scatter!(ax3, obs.dv_pred, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time", ylabel = "CWRES", title = "CWRES vs TIME")
+scatter!(ax4, obs.time, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax4, 0, color = :black)
+
+fig
+```
+
+# Study Guide Questions
+
+1. What are desirable properties of covariate-parameter models?
+2. How does centering a continuous covariate on its median help interpretation?
+3. What is the difference between forward addition and backward elimination?
+4. When might a statistically significant covariate NOT be clinically relevant?
+5. What are the limitations of using EBE-based covariate screening?
+6. How would you calculate the initial estimate for OMEGA assuming 30% CV with exponential IIV?
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: Covariate Fundamentals** | [PKPD W7.5](../lectures/pkpd/W7.5-covariate-modeling-fundamentals.qmd) | Covariate types, functional forms, parameterization strategies |
+| **Lecture: Covariate Diagnostics & Methodology** | [PKPD W8](../lectures/pkpd/W8-covariate-diagnostics-and-methodology.qmd) | EBE screening, η-shrinkage, SCM/GAM/FFM comparison |
+| **Lecture: Volume of Distribution** | [PK W4](../lectures/pk/W4-volume-of-distribution-and-protein-binding.qmd) | Why body weight affects V — tissue mass, body water, protein binding |
+| **Lecture: Renal Elimination** | [PK W7b](../lectures/pk/W7b-well-stirred-model-and-renal-elimination.qmd) | Why CLcr predicts CL — GFR, filtration, secretion, reabsorption |
+| Covariate model introduction | [Covariates](https://tutorials.pumas.ai/html/introduction/covariate.html) | Allometric scaling, hepatic/renal CL breakdown, time-varying covariates, categorical effects |
+| AIC/BIC/LRT theory | [Covariate Selection Intro](https://tutorials.pumas.ai/html/covariate_select/01-intro.html) | Mathematical derivations, penalty comparison, custom OFV functions |
+| Forward selection workflow | [Forward Selection](https://tutorials.pumas.ai/html/covariate_select/02-forward_selection.html) | `covariate_select()` API, control_param patterns, custom criteria |
+| Backward elimination workflow | [Backward Elimination](https://tutorials.pumas.ai/html/covariate_select/03-backward_elimination.html) | Full backward workflow, BIC criterion, result interpretation |
+| Mixed stepwise (SCM) | [Mixed Selection](https://tutorials.pumas.ai/html/covariate_select/04-mixed.html) | Combined forward + backward in one pipeline |
+| Cloud batch covariate search | [Batch Job](https://tutorials.pumas.ai/html/covariate_select/05-batch_job.html) | Running covariate_select on JuliaHub for large populations |

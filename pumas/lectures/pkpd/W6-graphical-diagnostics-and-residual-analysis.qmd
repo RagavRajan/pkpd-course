@@ -1,0 +1,204 @@
+---
+title: "Week 6: Model Diagnostics — Graphical Methods and Residual Analysis"
+subtitle: "Lecture Notes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Overview
+
+This lecture continues the discussion of model diagnostics initiated in the previous session. The focus shifts from numerical diagnostics (log-likelihood, AIC/BIC, likelihood ratio test, shrinkage) to graphical diagnostics. Before introducing the plots, the underlying assumptions of each block of a Pumas model are reviewed, as the purpose of diagnostics is to validate those assumptions.
+
+---
+
+## Review: Recap of Numerical Diagnostics
+
+The following numerical diagnostics were covered in the previous session and are accessible via the `metrics_table` function in Pumas:
+
+- Log-likelihood
+- AIC and BIC
+- Likelihood ratio test (degrees of freedom = difference in number of parameters between models)
+- Condition number (from `infer`)
+- Shrinkage values
+
+### Chi-Square Distribution and the Likelihood Ratio Test
+
+The likelihood ratio test uses the chi-square distribution to compare nested models. Students were encouraged to explore independently why the difference in log-likelihoods between two models follows a chi-square distribution with degrees of freedom equal to the difference in the number of parameters. Understanding this relationship connects foundational statistics (the chi-square distribution as the square of a normal distribution) to pharmacometric model comparison.
+
+Similarly, the distinctions between the Z-test and the T-test, and the derivation of empirical sample size thresholds (e.g., n > 30 for the T-test), are worth revisiting to strengthen statistical fundamentals.
+
+---
+
+## Model Assumptions by Block
+
+The assumptions of a Pumas model can be organized by model block. The goal of diagnostics is to verify that these assumptions hold in practice.
+
+### Dynamics Block
+
+The primary assumption here is the **structural model** itself — for example, that the drug follows a one-compartment system. This assumption is informed by exploratory data analysis and requires that the experimental design was appropriate to capture sufficient information. Both mechanistic and empirical structural models carry inherent assumptions:
+
+- **Empirical models** assume a functional form that the community agrees is appropriate, without necessarily grounding it in underlying biology.
+- **Mechanistic models** incorporate prior knowledge of physiological pathways, though those pathways themselves may be incompletely characterized.
+
+### Parameter Block
+
+Parameters such as clearance (CL) and volume of distribution (V) are assumed to reside within a defined domain (e.g., bounded below by zero for physiological parameters). If parameters are treated as distributions, those distributions carry their own assumptions.
+
+### Random Effects Block (η)
+
+The individual random effects are assumed to follow:
+
+$$\eta \sim \mathcal{N}(0, \Omega)$$
+
+This imposes:
+
+1. **Normality** of the random effects.
+2. **Zero mean** — deviations from the population are symmetric and unbiased.
+3. **Independence** — by default, η values (e.g., η_CL and η_V) are assumed independent, i.e., identically and independently distributed (IID). Correlation structures can be incorporated but are not assumed by default.
+
+### Pre-Block (Individual Parameter Model)
+
+The relationship between individual and population parameters — for example:
+
+$$CL_i = \theta_{CL} \cdot \exp(\eta_{CL,i})$$
+
+assumes a **log-normal distribution** for individual parameters. This ensures:
+
+- Parameters remain strictly positive.
+- The individual parameters are log-normally distributed, which is biologically appropriate for quantities such as clearance and volume.
+
+An equivalent formulation is to say that CL_i is drawn from a log-normal distribution with mean log(θ_CL) and variance Ω_CL.
+
+### Derived Block (Residual Error Model)
+
+The observed data are modeled as:
+
+$$DV_{ij} \sim \mathcal{N}(\hat{C}_{P,ij}, \sigma)$$
+
+where σ may represent additive, proportional, or combined residual error. This block assumes **normality of the residuals** around the model predictions, with mean zero.
+
+---
+
+## Graphical Diagnostics
+
+Graphical diagnostics map to the assumptions made at each model block. The following plots are examined here; additional diagnostics (BSV-related plots) will be covered in the next session.
+
+### 1. Observations vs. Population Predictions (DV vs. PRED)
+
+This plot places observed concentrations (DV) on the x-axis and population-level predictions (PRED) on the y-axis. Population predictions are derived solely from the population parameters (θ), setting all random effects η = 0:
+
+$$\hat{C}_{P,ij} = \frac{\text{Central}_i}{V_{C,\text{pop}}}$$
+
+**Line of identity:** Under an ideal model, all points fall on the line of identity (slope = 1, intercept = 0).
+
+**Interpretation of spread:** In a base model (no covariates), the spread of points around the line of identity represents variability not yet captured by BSV (between-subject variability) and RUV (residual unexplained variability). This plot provides no information about variability components because those components have been excluded.
+
+**Patterns and implications:**
+
+| Pattern | Interpretation |
+|---|---|
+| Points cluster along the line of identity | Model structurally adequate at the population level |
+| Systematic under-prediction | Structure may be misspecified, or a covariate is needed |
+| Systematic over-prediction | Same as above |
+
+**Important caveat:** At the population level, the only mechanism available to correct systematic bias is either the **structural model** (e.g., switching from one-compartment to two-compartment) or **covariate models**. Variability components cannot correct population-level bias.
+
+This plot provides a first-pass sanity check. It is best interpreted alongside other diagnostics rather than in isolation.
+
+---
+
+### 2. Observations vs. Individual Predictions (DV vs. IPRED)
+
+This plot uses individual predictions (IPRED), which incorporate the estimated random effects for each subject:
+
+$$\hat{C}_{P,ij} = \frac{\text{Central}_i}{V_{C,i}}$$
+
+where V_{C,i} = θ_VC · exp(η_{VC,i}).
+
+Because individual random effects are included, this plot accounts for **between-subject variability (BSV)**. The spread around the line of identity here reflects only the **residual unexplained variability (RUV)**.
+
+**Informativeness depends on data richness:** When individual data are sparse, the estimated η values shrink toward zero (shrink to the population mean), causing individual predictions to approach population predictions. In this regime, the IPRED vs. DV plot loses diagnostic value. This is quantified by **epsilon shrinkage** — high epsilon shrinkage renders this plot uninformative.
+
+Three common patterns:
+
+| Pattern | Interpretation |
+|---|---|
+| Points along the line of identity | Structure and BSV are well-specified |
+| Systematic over-prediction | Model over-estimates concentrations |
+| Systematic under-prediction | Model under-estimates concentrations |
+
+---
+
+### 3. Individual Subject Fit Plots (Concentration-Time Profiles)
+
+These plots display observed data alongside population predictions (PRED) and individual predictions (IPRED) for each subject over time. They serve several purposes:
+
+1. **Direct visual assessment** of whether the model captures the observed PK profile for each individual.
+2. **Pattern recognition** — systematic deviations appearing consistently across subjects (e.g., consistent under-prediction at early or late time points) signal structural misspecification.
+3. **Concordance check** — patterns observed at the individual subject level should be consistent with the DV vs. PRED and DV vs. IPRED plots. For instance, consistent under-prediction across individual fits should manifest as systematic deviation from the line of identity in the population prediction plot.
+
+**Prediction over a fine time grid:** Pumas allows predictions to be generated over a dense, user-defined time vector, regardless of where observations were collected. This is particularly valuable for:
+
+- Sparse study designs (e.g., only trough samples collected between rich sampling days).
+- Reconstructing a physiologically meaningful PK curve even when observed data are limited.
+
+Individual fit plots and residual vs. time plots should be examined together for a complete assessment.
+
+---
+
+### 4. Residuals vs. Time (CWRES or WRES vs. Time)
+
+This plot places time on the x-axis and residuals (DV − IPRED, or weighted/conditionally weighted residuals) on the y-axis.
+
+**Underlying assumption being validated:** The residual ε_{ij} is assumed to be IID:
+
+$$\varepsilon_{ij} \sim \mathcal{N}(0, \sigma)$$
+
+This means residuals should be:
+
+- **Centered at zero** — no systematic bias over time.
+- **Uniformly dispersed** — constant variance across time.
+- **Independent** — no serial correlation.
+
+**Common patterns and interpretation:**
+
+| Pattern | Description | Interpretation |
+|---|---|---|
+| Symmetric scatter around zero | Residuals randomly distributed on both sides of zero across all time points | Structural model is well-specified |
+| Positive residuals early, negative later | Consistent over-prediction at early times, under-prediction at late times | Structural misspecification |
+| Negative residuals early, positive later | Consistent under-prediction at early times, over-prediction at late times | Structural misspecification |
+| Megaphone (widening spread over time) | Variance increases as concentrations decrease | Residual error model may be misspecified (e.g., additive error inappropriate when concentrations are low) |
+| Inverse megaphone (narrowing spread over time) | Variance decreases over time | Same as above |
+| Consistently above or below zero | Uniform bias | Structural misspecification |
+
+**Primary diagnostic use:** The residuals vs. time plot is a diagnostic for **structural model misspecification**. It achieves this by translating the individual concentration-time profile into residual space — rather than plotting concentration vs. time, the residual (observed minus predicted) is plotted vs. time, revealing any systematic temporal trends in model fit.
+
+This plot should be interpreted alongside the individual fit plots, as they convey complementary information at different levels of aggregation.
+
+---
+
+## Holistic Interpretation of Diagnostics
+
+No single diagnostic is sufficient to fully characterize model adequacy. The plots described above are interdependent:
+
+- Systematic bias in the DV vs. PRED plot should be consistent with patterns seen in the individual fit plots and residuals vs. time.
+- The informativeness of the DV vs. IPRED plot depends on epsilon shrinkage, which must be assessed numerically before drawing conclusions from that plot.
+- Structural misspecification identified in the residuals vs. time plot may also explain deviations in the DV vs. PRED plot.
+
+The diagnostics covered here relate primarily to the structural model and residual error model. Diagnostics specific to the BSV components (random effects distributions, η shrinkage, ETA vs. covariate plots) will be addressed in the following session.
+
+---
+
+## Upcoming Sessions
+
+- **Next session:** Completion of graphical diagnostics, including BSV-related diagnostics (η shrinkage, ETA plots).
+- **Following session:** Covariate models.
+- **Subsequent sessions:** Model validation concepts, followed by hands-on Pumas workflow walkthroughs and project setup.
+
+---
+
+## Recommended Reading
+
+- Pumas learning paths, Learning Path 5, Module 7: log-normal vs. normal distributions and the BSV component.

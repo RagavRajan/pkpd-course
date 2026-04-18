@@ -1,0 +1,723 @@
+---
+title: "Chapter 1: Introduction to Nonlinear Regression and NLME Models"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+This chapter covers the foundational concepts for population PK-PD modeling:
+
+- Introduction to Population PKPD Modeling and Simulation
+- Fitting a Model to Data: Nonlinear Regression
+  - Phase 1 Exposure-Response Examples
+  - Maximum Likelihood Estimation
+  - Least-Squares Objective Functions
+  - Diagnostics for Regression Models
+- Maximum Likelihood for Population Repeated Measures Data
+  - Hierarchical Mixed-Effects Models
+  - Population NLMEM Objective Functions
+  - Diagnostics for Population Models
+
+# Introduction to Population PKPD Modeling and Simulation
+
+## What is Population PK-PD?
+
+Population pharmacokinetic-pharmacodynamic analysis aims to:
+
+- Determine PK (PD) model structure for the population
+- Estimate typical (mean) population PK (PD) parameters and inter-individual variability
+- Estimate individual PK (PD) parameters
+- Estimate residual (and inter-occasion) variability
+- Identify measurable sources of variability and describe their relationship to PK (PD) parameters
+- Study all of these in the intended patient population
+
+::: {.callout-note title="The Philosophy of Pharmacometric Modeling"}
+Pharmacometric analysis rests on two stacked pillars. The **lower pillar** is technical expertise — statistics, mathematics, and programming — accounting for roughly 20--30% of the analytical effort. The **upper pillar** is strategic expertise — scientific judgment, question formulation, and decision-making — which accounts for 70--80%. Without the technical foundation the strategic layer has no basis, but technical skill alone is insufficient.
+
+The principle of **parsimony** is central: the goal is the simplest model that adequately describes the central tendency and variability of the data. Not every analysis requires a full NLME model; some questions are best answered by NCA. The complexity of the model should be commensurate with the complexity of the question.
+
+As John Tukey observed: *"It is better to find an approximate answer to the right question than to find the right answer to an approximate question."* Investing time in formulating the right question — grounded in knowledge of the drug, disease, and trial — is more valuable than technical precision applied to a poorly defined problem.
+:::
+
+## Why Population PK-PD?
+
+**Goal:** To *understand* factors leading to variability in pharmacokinetic and pharmacodynamic response for appropriate drug use.
+
+- Efficient way to screen large numbers of diverse individuals
+- Allows investigation of multiple factors at once (drug interactions, food effects, pathophysiology, demographics)
+
+## Modeling and Simulation in Drug Development
+
+**"Drug Development = Model-Building"**
+
+- Quantitative support for decision making
+- Population parameter estimation
+- Transition from Phase I to Phase II/III
+- Dose selection for Phase III
+- Dose adjustment in special populations
+- Confirm drug interaction studies
+- Support for confirmatory efficacy/safety
+
+# Introduction to Nonlinear Regression Concepts
+
+## A Phase 1 Exposure-Response Example
+
+A multiple cohort ascending single dose study of MI2005A. One endpoint of interest is the effect on cardiac repolarization (delta QTc vs. plasma concentration).
+
+```{julia}
+#| label: fig-dqtc-scatter
+#| fig-cap: "Figure 1.2: Delta QTc vs. Plasma MI2005a Concentration"
+
+dqtc_df = CSV.read(joinpath(data_dir, "dqtc.csv"), DataFrame)
+rename!(dqtc_df, "SID" => :id, "CONC" => :conc, "dqtc" => :dqtc, "DOSE" => :dose, "TIME" => :time)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1],
+    xlabel = "Concentration (ng/mL)",
+    ylabel = "Delta QTc (msec)",
+)
+scatter!(ax, dqtc_df.conc, dqtc_df.dqtc, color = :steelblue, markersize = 6, alpha = 0.6)
+fig
+```
+
+## Maximum Likelihood Approach
+
+**Fitting a Model to Data:**
+
+1. Observe data
+2. Specify a model
+3. Choose initial estimates for parameters
+4. Obtain best estimates of parameters, given data and model
+5. Evaluate model fit
+
+### Terminology
+
+- **Dependent Variable (DV):** observed data to be described by the model (e.g., plasma concentration)
+- **Independent Variable:** observed quantities used in model prediction (e.g., dose, time)
+- **Covariate Factors:** other observed quantities used to explain inter-individual differences (e.g., weight, CLcr)
+- **Parameters:** variables to be estimated, given the data and proposed model (e.g., CL, V)
+
+::: {.callout-note title="PK Foundations: Variables, Parameters, Constants, and Error"}
+A **parameter** (e.g., $k_e$, $V$) is a numerical quantity estimated from observed data that defines the relationship between independent and dependent variables within a given model. Once estimated, it is treated as fixed within that model context. A **constant** is a value held fixed from prior knowledge — for example, hepatic blood flow ($\approx 1.5$ L/hr/kg) is treated as a physiological constant in many PK models, even though it was itself originally estimated as a parameter from experimental data. This distinction is frequently conflated in the literature.
+
+All data contain error, and this extends beyond model residuals:
+
+- **Dependent variable error:** bioanalytical assay imprecision (typically accepted within 15--20% of nominal).
+- **Independent variable error:** a nominal 2-hour sample may be collected at 2 hours and 5 minutes.
+- **Covariate error:** body weight recorded from a home scale of uncertain calibration.
+
+Identifying and characterizing these error sources *before* fitting any model is a critical and often underappreciated step in the analysis workflow.
+:::
+
+### The Likelihood Function
+
+Let observed data $Y$ be described with parameter $\theta$. The probability $P(Y)$ can be modeled as a function of $\theta$.
+
+The **maximum likelihood estimate (MLE)** $\hat{\theta}$ is the value of $\theta$ that maximizes $L(Y|\theta)$.
+
+For normally-distributed measurements:
+
+$$y_j \sim N(f(x_j, \theta), \sigma^2)$$
+
+The **ML objective function** (equivalent to $-2\log L$ minus constants):
+
+$$OF_{ML}(x_j, \theta, \sigma^2) = \sum_{j=1}^{n} \left[ \frac{(y_j - f(x_j, \theta))^2}{\sigma^2} + \log \sigma^2 \right]$$
+
+## Least-Squares Objective Functions
+
+**Ordinary Least Squares (OLS):**
+
+$$OF_{OLS} = \sum_{j=1}^{n} (obs_j - pred_j)^2$$
+
+**Weighted Least Squares (WLS)** (where $W$ is typically $1/obs$):
+
+$$OF_{WLS} = \sum_{j=1}^{n} \left[ (obs_j - pred_j)^2 \cdot W_j \right]$$
+
+**Extended Least Squares (ELS)** (Maximum Likelihood):
+
+$$OF_{ELS} = \sum_{j=1}^{n} \left[ \frac{(obs_j - pred_j)^2}{\sigma_j^2} + \log \sigma_j^2 \right]$$
+
+## 1-Compartment IV Bolus Example (Excel Workbook Equivalent)
+
+The book uses an Excel workbook to demonstrate nonlinear regression on a 1-compartment IV bolus PK model. Here we reproduce this in Julia/Pumas.
+
+**Model:** $C_t = \frac{Dose}{V} \cdot e^{-\frac{CL}{V} \cdot t}$
+
+**True values:** CL = 3.0 L/hr, V = 20.0 L
+
+::: {.callout-note title="The One-Compartment Model: Physiological Meaning"}
+The one-compartment model treats the entire body as a single, well-mixed space of volume $V$. Following an IV bolus, the drug is assumed to distribute instantaneously throughout this space, yielding an initial concentration $C_0 = \text{Dose}/V$. Thereafter, concentration declines monoexponentially according to first-order elimination:
+
+$$C(t) = \frac{\text{Dose}}{V} \cdot e^{-k_e \cdot t}$$
+
+where the elimination rate constant $k_e = CL/V$ is obtained from the slope of the log-linear concentration--time profile. Clearance $CL$ governs the rate of irreversible drug removal (units: volume/time), while $V$ relates the amount of drug in the body to the measured plasma concentration. On a semi-logarithmic plot, a straight line confirms monoexponential decline and supports the one-compartment assumption. Deviations from linearity (e.g., a biphasic decline) indicate distribution into peripheral tissues and motivate multi-compartment models.
+:::
+
+```{julia}
+#| label: simulate-pk-data
+# Simulate data from 1-cpt IV bolus (as in the Excel workbook)
+# True parameters: CL=3, V=20, Dose=1000, additive sigma=0.9
+
+true_CL = 3.0
+true_V = 20.0
+dose = 1000.0
+
+times = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 19]
+true_conc = @. dose / true_V * exp(-true_CL / true_V * times)
+
+# Add noise (from book's dataset — heteroscedastic, proportional to prediction)
+using Random
+Random.seed!(210)
+obs_conc = true_conc .+ randn(length(times)) .* (0.9 .* sqrt.(true_conc))
+
+pk_data = DataFrame(
+    time = Float64.(times),
+    obs = obs_conc,
+    pred_true = true_conc,
+)
+```
+
+```{julia}
+#| label: fig-pk-obs-pred
+#| fig-cap: "Observed vs. Predicted Concentration-Time Profile"
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Time (hr)", ylabel = "Concentration (mg/L)")
+scatter!(ax, pk_data.time, pk_data.obs, label = "Observed", color = :blue)
+lines!(ax, pk_data.time, pk_data.pred_true, label = "True", color = :magenta, linewidth = 2)
+axislegend(ax, position = :rt)
+fig
+```
+
+### OLS Estimation in Pumas
+
+We fit the 1-cpt IV bolus model using Pumas to find the MLE of CL and V.
+
+```{julia}
+#| label: ols-pumas-model
+
+# Create a Pumas-compatible dataset
+# Single subject, IV bolus at time 0
+ols_df = DataFrame(
+    id = fill(1, length(times) + 1),
+    time = vcat(0.0, Float64.(times)),
+    dv = vcat(missing, obs_conc),
+    amt = vcat(dose, fill(0.0, length(times))),
+    evid = vcat(1, fill(0, length(times))),
+    cmt = fill(1, length(times) + 1),
+)
+
+ols_pop = read_pumas(ols_df)
+```
+
+```{julia}
+#| label: ols-pumas-fit
+
+# 1-compartment IV bolus model with additive error
+pk_model_add = @model begin
+    @param begin
+        tvCL ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV  ∈ RealDomain(lower = 0.0, init = 30.0)
+        σ    ∈ RealDomain(lower = 0.0, init = 1.0)
+    end
+
+    @pre begin
+        CL = tvCL
+        Vc = tvV
+    end
+
+    @dynamics Central1
+
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, σ)
+    end
+end
+```
+
+```{julia}
+#| label: ols-fit-result
+
+ols_params = (tvCL = 5.0, tvV = 30.0, σ = 1.0)
+ols_fit = fit(pk_model_add, ols_pop, ols_params, Pumas.NaivePooled())
+ols_fit
+```
+
+### Proportional Error Model (WLS equivalent)
+
+```{julia}
+#| label: prop-pumas-fit
+
+pk_model_prop = @model begin
+    @param begin
+        tvCL  ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV   ∈ RealDomain(lower = 0.0, init = 30.0)
+        σprop ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+
+    @pre begin
+        CL = tvCL
+        Vc = tvV
+    end
+
+    @dynamics Central1
+
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σprop)
+    end
+end
+
+prop_params = (tvCL = 5.0, tvV = 30.0, σprop = 0.2)
+prop_fit = fit(pk_model_prop, ols_pop, prop_params, Pumas.NaivePooled())
+prop_fit
+```
+
+## Diagnostic Plots for Regression Models
+
+Standard diagnostic plots for evaluating model fit:
+
+```{julia}
+#| label: fig-diagnostics-ols
+#| fig-cap: "Diagnostic Plots for Additive Error Model"
+
+insp = inspect(ols_fit)
+insp_df = DataFrame(insp)
+obs_rows = @rsubset(insp_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+# PRED vs OBS
+ax1 = Axis(fig[1, 1], xlabel = "Observed", ylabel = "Predicted", title = "PRED vs OBS")
+scatter!(ax1, obs_rows.dv, obs_rows.dv_pred, color = :navy, markersize = 6)
+ablines!(ax1, 0, 1, color = :black)
+
+# RES vs PRED
+ax2 = Axis(fig[1, 2], xlabel = "Predicted", ylabel = "Residuals", title = "RES vs PRED")
+res = obs_rows.dv .- obs_rows.dv_pred
+scatter!(ax2, obs_rows.dv_pred, res, color = :navy, markersize = 6)
+hlines!(ax2, 0, color = :black)
+
+# RES vs TIME
+ax3 = Axis(fig[2, 1], xlabel = "Time", ylabel = "Residuals", title = "RES vs TIME")
+scatter!(ax3, obs_rows.time, res, color = :navy, markersize = 6)
+hlines!(ax3, 0, color = :black)
+
+# WRES vs PRED
+ax4 = Axis(fig[2, 2], xlabel = "Predicted", ylabel = "Weighted Residuals", title = "WRES vs PRED")
+wres = res ./ coef(ols_fit).σ
+scatter!(ax4, obs_rows.dv_pred, wres, color = :navy, markersize = 6)
+hlines!(ax4, 0, color = :black)
+
+fig
+```
+
+### Results Comparison: Heteroscedastic Data
+
+The book compares parameter estimates across estimation methods:
+
+| Parameter | LR | OLS | WLS | ELS | True |
+|-----------|------|------|------|------|------|
+| CL (L/hr) | 3.18 | 3.11 | 3.28 | 3.09 | 3.00 |
+| V (L)     | 25.52 | 24.82 | 25.14 | 25.30 | 20.00 |
+
+::: {.callout-note}
+When data are heteroscedastic (variance proportional to the mean), ELS/WLS give better estimates than OLS. In Pumas, this is handled by choosing the appropriate error model (proportional vs. additive) in the `@derived` block.
+:::
+
+# Practice Problems
+
+## Problem 1.1: Delta QTc Concentration-Response
+
+Using the Phase 1 MI2005A delta QTc data, fit a linear model (naive pooled approach) and compare OLS vs. ELS.
+
+```{julia}
+#| label: prob1-linear-dqtc
+
+# Keep original subject IDs — NaivePooled estimation ignores grouping structure
+# Use row index within each subject as the time axis (CONC is the covariate)
+dqtc_pool = DataFrame(
+    id = dqtc_df.id,
+    conc = Float64.(dqtc_df.conc),
+    dv = Float64.(dqtc_df.dqtc),
+)
+dqtc_pool.time = Vector{Float64}(undef, nrow(dqtc_pool))
+for gdf in groupby(dqtc_pool, :id)
+    gdf.time .= Float64.(1:nrow(gdf))
+end
+
+dqtc_pop = read_pumas(
+    dqtc_pool;
+    observations = [:dv],
+    covariates = [:conc],
+    event_data = false,
+)
+```
+
+```{julia}
+#| label: prob1-linear-model
+
+# Linear model: dQTc = intercept + slope * CONC
+linear_dqtc = @model begin
+    @param begin
+        tvINT ∈ RealDomain(init = 1.0)
+        tvSLP ∈ RealDomain(init = 0.02)
+        σ_add ∈ RealDomain(lower = 0.0, init = 5.0)
+    end
+
+    @covariates conc
+
+    @pre begin
+        INT = tvINT
+        SLP = tvSLP
+    end
+
+    @derived begin
+        mu := @. INT + SLP * conc
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+
+lin_params = (tvINT = 1.0, tvSLP = 0.02, σ_add = 5.0)
+lin_fit = fit(linear_dqtc, dqtc_pop, lin_params, Pumas.NaivePooled())
+lin_fit
+```
+
+```{julia}
+#| label: fig-prob1-dqtc-fit
+#| fig-cap: "Problem 1.1: Linear Model Fit to Delta QTc Data"
+
+lin_coefs = coef(lin_fit)
+conc_range = range(0, maximum(dqtc_df.conc), length = 100)
+pred_dqtc = lin_coefs.tvINT .+ lin_coefs.tvSLP .* conc_range
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Concentration (ng/mL)", ylabel = "Delta QTc (msec)")
+scatter!(ax, dqtc_df.conc, dqtc_df.dqtc, color = :steelblue, markersize = 5, alpha = 0.5)
+lines!(ax, collect(conc_range), pred_dqtc, color = :red, linewidth = 2, label = "Linear Fit")
+axislegend(ax, position = :lt)
+fig
+```
+
+## Problem 1.2: AST Concentration-Response (Emax)
+
+Fit a linear and Emax model to the pooled Phase 1 MI2005A AST data.
+
+```{julia}
+#| label: prob2-ast-data
+
+ast_df = CSV.read(joinpath(data_dir, "ast.csv"), DataFrame)
+rename!(ast_df, "SID" => :id, "CONC" => :conc, "AST" => :ast, "DOSE" => :dose, "TIME" => :time)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Concentration (ng/mL)", ylabel = "AST")
+scatter!(ax, ast_df.conc, ast_df.ast, color = :steelblue, markersize = 5, alpha = 0.5)
+fig
+```
+
+```{julia}
+#| label: prob2-emax-model
+
+# Keep original subject IDs, use row index as time
+ast_pool = DataFrame(
+    id = ast_df.id,
+    conc = Float64.(ast_df.conc),
+    dv = Float64.(ast_df.ast),
+)
+ast_pool.time = Vector{Float64}(undef, nrow(ast_pool))
+for gdf in groupby(ast_pool, :id)
+    gdf.time .= Float64.(1:nrow(gdf))
+end
+
+ast_pop = read_pumas(
+    ast_pool;
+    observations = [:dv],
+    covariates = [:conc],
+    event_data = false,
+)
+
+# Emax model: AST = E0 + Emax*CONC/(EC50 + CONC)
+emax_ast = @model begin
+    @param begin
+        tvE0   ∈ RealDomain(init = 15.0)
+        tvEmax ∈ RealDomain(init = 50.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 200.0)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 5.0)
+    end
+
+    @covariates conc
+
+    @pre begin
+        E0   = tvE0
+        Emax = tvEmax
+        EC50 = tvEC50
+    end
+
+    @derived begin
+        mu := @. E0 + Emax * conc / (EC50 + conc)
+        dv ~ @. Normal(mu, σ_add)
+    end
+end
+
+emax_params = (tvE0 = 15.0, tvEmax = 50.0, tvEC50 = 200.0, σ_add = 5.0)
+emax_fit = fit(emax_ast, ast_pop, emax_params, Pumas.NaivePooled())
+emax_fit
+```
+
+```{julia}
+#| label: fig-prob2-emax-fit
+#| fig-cap: "Problem 1.2: Emax Model Fit to AST Data"
+
+emax_coefs = coef(emax_fit)
+conc_range_ast = range(0, maximum(ast_df.conc), length = 200)
+pred_ast = emax_coefs.tvE0 .+ emax_coefs.tvEmax .* conc_range_ast ./ (emax_coefs.tvEC50 .+ conc_range_ast)
+
+fig = Figure(size = (600, 400))
+ax = Axis(fig[1, 1], xlabel = "Concentration (ng/mL)", ylabel = "AST")
+scatter!(ax, ast_df.conc, ast_df.ast, color = :steelblue, markersize = 5, alpha = 0.5)
+lines!(ax, collect(conc_range_ast), pred_ast, color = :red, linewidth = 2, label = "Emax Fit")
+axislegend(ax, position = :rb)
+fig
+```
+
+# Maximum Likelihood Models for Population Repeated Measures Data
+
+## Data for Population Analyses
+
+**Dependent Variable Types:**
+
+- **Continuous:** concentrations, blood pressure, weight
+- **Categorical:** dichotomous, ordered, counts, time-to-event
+
+**Data Terminology:**
+
+- **Repeated Measures:** more than one observation per individual
+- **Longitudinal:** repeated measures over time
+- **Sparse:** too few samples per individual
+- **Extensive:** enough samples per individual
+
+## Hierarchical Population Mixed-Effects Models
+
+### Population PK Analysis Methods
+
+| Method | Description |
+|--------|-------------|
+| Naive Pooled | Treat all data as from single individual |
+| Naive Averaged | Average concentrations across individuals at each time |
+| Standard Two-Stage | Individual fits, then summarize across subjects |
+| MAP Bayesian | Empirical Bayes estimates with population prior |
+| Nonlinear Mixed-Effects | Simultaneous estimation of fixed + random effects |
+
+### Random Effects Hierarchy
+
+A typical population PK model has two levels of random effects:
+
+**Level 1 — Inter-Individual Variability:**
+$$CL_i = TVCL \cdot e^{\eta_{CL,i}}$$
+
+**Level 2 — Residual Variability:**
+$$y_{ij} = f_{ij}(\theta, \eta_i) + \varepsilon_{ij}$$
+
+where $\eta \sim N(0, \omega^2)$ and $\varepsilon \sim N(0, \sigma^2)$.
+
+::: {.callout-note title="Understanding Random Effects: What η Really Means"}
+The random effect $\eta_i$ captures the deviation of individual $i$ from the population mean. By construction, $\eta \sim \mathcal{N}(0, \omega^2)$, so its mean is zero — it represents a *deviation*, not an absolute value. A critical principle: **$\eta$ will be whatever it needs to be to match the observed data.** The optimizer does not have knowledge of the underlying physiology; it simply assigns each subject the $\eta$ that minimizes the objective function, even if that value falls far outside the assumed normal distribution.
+
+The three common IIV parameterizations differ in what they imply about the distribution of the parameter itself:
+
+| Parameterization | Equation | Implied Distribution of $CL_i$ |
+|---|---|---|
+| Additive | $CL_i = TVCL + \eta_i$ | Normal — allows $CL_i < 0$ |
+| Proportional | $CL_i = TVCL \cdot (1 + \eta_i)$ | Normal — allows $CL_i < 0$ for large negative $\eta$ |
+| Exponential | $CL_i = TVCL \cdot e^{\eta_i}$ | Log-normal — constrains $CL_i > 0$ |
+
+The **exponential parameterization** is preferred in practice because physiological parameters such as clearance and volume are strictly positive. The log-normal distribution enforced by the exponential form guarantees this constraint without requiring additional boundary handling in the optimizer.
+:::
+
+### Inter-Individual Variance Models
+
+| Model | Equation | Distribution |
+|-------|----------|-------------|
+| Additive | $CL_i = TVCL + \eta_i$ | Normal CL |
+| Proportional | $CL_i = TVCL \cdot (1 + \eta_i)$ | Normal CL |
+| Exponential | $CL_i = TVCL \cdot e^{\eta_i}$ | Log-Normal CL |
+
+::: {.callout-tip title="Log-Normal Parameterization: Five Equivalent Forms"}
+The exponential IIV model ($CL_i = TVCL \cdot e^{\eta_i}$) is the most common in population PK because it constrains CL > 0. There are **five mathematically equivalent** ways to code this in Pumas:
+
+1. **Exponentiated Normal η** (most common): `CL = tvCL * exp(η)` where `η ~ Normal(0, ω²)`
+2. **LogNormal random effect**: `CL = tvCL * exp(η)` where `η ~ LogNormal(0, ω²)` — Pumas handles the transform
+3. **Explicit log transform**: `CL = exp(log(tvCL) + η)` where `η ~ Normal(0, ω²)`
+4. **Model on log scale**: `logCL = tvlogCL + η`, then `CL = exp(logCL)` — useful when literature reports log-scale parameters
+5. **Direct LogNormal**: `CL ~ LogNormal(log(tvCL), ω)` in `@random`
+
+All five produce identical distributions. Choose based on:
+
+- **Form 1** is standard and keeps η accessible for EBE diagnostics
+- **Forms 3–4** are useful when initial estimates are on the log scale
+- **%CV interpretation**: for small ω (< 0.3), ω ≈ CV; for larger ω, $CV = \sqrt{e^{\omega^2} - 1}$
+:::
+
+### Residual Variance Models
+
+| Model | Equation | Pumas `@derived` |
+|-------|----------|-----------------|
+| Additive | $Y_{ij} = F_{ij} + \varepsilon$ | `dv ~ Normal(pred, sigma_add)` |
+| Proportional | $Y_{ij} = F_{ij} \cdot (1 + \varepsilon)$ | `dv ~ Normal(pred, abs(pred) * sigma_prop)` |
+| Combined | $Y_{ij} = F_{ij}(1+\varepsilon_1) + \varepsilon_2$ | `dv ~ Normal(pred, sqrt(sigma_add^2 + (pred*sigma_prop)^2))` |
+
+## Population NLMEM Objective Functions
+
+### Estimation Methods in Pumas (vs. NONMEM)
+
+| NONMEM | Pumas | Description |
+|--------|-------|-------------|
+| METHOD=0 (FO) | `Pumas.FO()` | First-Order, $\eta=0$ |
+| METHOD=1 (FOCE) | `Pumas.FOCE()` | First-Order Conditional, $\eta=\hat\eta_i$ |
+| METHOD=1 INTER | `Pumas.FOCEI()` | FOCE with $\eta$-$\varepsilon$ interaction |
+| METHOD=1 LAPLACIAN | `Pumas.LaplaceI()` | Laplacian approximation |
+
+::: {.callout-tip}
+In Pumas, FOCEI is the recommended default for most population models. Use `LaplaceI()` for models with non-normal likelihoods (e.g., discrete, time-to-event).
+:::
+
+::: {.callout-note title="Additional Estimation Methods in Pumas"}
+Beyond the classical NONMEM-equivalent methods, Pumas provides:
+
+| Method | Pumas | When to Use |
+|--------|-------|-------------|
+| MAP Bayesian | `Pumas.MAP()` | Individual estimation with informative priors |
+| Full Bayesian MCMC | `Pumas.BayesMCMC()` | Small datasets, prior information, uncertainty quantification |
+| Variational EM (VEM) | `Pumas.VEM()` | Discrete/censored/TTE likelihoods, large populations |
+
+VEM uses variational inference to approximate the posterior — it avoids the inner/outer loop of FOCE and handles non-standard likelihoods natively. See the [VEM tutorial](https://tutorials.pumas.ai/html/estimation/01-vem-introduction.html) for details.
+:::
+
+## Diagnostics for Population NLME Models
+
+Key diagnostics include:
+
+- **Minimum Objective Function Value** (-2LL)
+- **Parameter Estimates** (fixed effects, random effects)
+- **Standard Errors** (from `infer()`)
+- **Shrinkage** (eta-shrinkage, epsilon-shrinkage)
+- **Diagnostic Plots:** DV vs PRED, DV vs IPRED, CWRES vs PRED, CWRES vs TIME
+- **AIC:** $AIC = 2p + (-2\log L)$ — lower is better
+- **Likelihood Ratio Test:** $\Delta OFV \sim \chi^2(df = \Delta p)$
+
+::: {.callout-tip title="The Pumas Modeling Workflow"}
+The complete Pumas workflow follows a systematic pipeline:
+
+1. **Define model** — `@model` macro with `@param`, `@random`, `@pre`, `@dynamics`, `@derived`
+2. **Prepare data** — `read_pumas()` to create a `Population` from a DataFrame
+3. **Fit** — `fit(model, population, init_params, algorithm)` → returns fitted model
+4. **Infer** — `infer(fit)` → confidence intervals, RSE, standard errors via `coeftable()`
+5. **Inspect** — `inspect(fit)` → residuals, predictions, individual estimates
+6. **Diagnose** — `goodness_of_fit(inspect_result)` → standard 4-panel GOF plot
+7. **Compare** — `metrics_table(fit1, fit2)` → AIC, BIC, -2LL side by side; `lrtest(fit1, fit2)` for nested models
+8. **Predict/Simulate** — `predict()` / `simobs()` → VPCs via `vpc()` + `vpc_plot()`
+
+Each step builds on the previous. The `inspect()` result is reusable across diagnostics, GOF plots, and individual fits — compute it once and pass it around.
+:::
+
+### WRES vs. CWRES
+
+- **WRES** (Weighted Residuals): appropriate for FO estimation only
+- **CWRES** (Conditional Weighted Residuals): appropriate for conditional estimation (FOCE, FOCEI, Laplacian)
+
+::: {.callout-important}
+In Pumas, `inspect()` automatically computes the appropriate weighted residuals based on the estimation method used.
+:::
+
+## AIC Example
+
+```{julia}
+#| label: aic-example
+
+# Compare additive vs proportional error for dQTc linear model
+
+# Proportional error model
+linear_dqtc_prop = @model begin
+    @param begin
+        tvINT  ∈ RealDomain(init = 1.0)
+        tvSLP  ∈ RealDomain(init = 0.02)
+        σprop  ∈ RealDomain(lower = 0.0, init = 0.3)
+    end
+
+    @covariates conc
+
+    @pre begin
+        INT = tvINT
+        SLP = tvSLP
+    end
+
+    @derived begin
+        mu := @. INT + SLP * conc
+        dv ~ @. Normal(mu, abs(mu) * σprop + 1e-6)
+    end
+end
+
+prop_lin_params = (tvINT = 1.0, tvSLP = 0.02, σprop = 0.3)
+prop_lin_fit = fit(linear_dqtc_prop, dqtc_pop, prop_lin_params, Pumas.NaivePooled())
+
+println("AIC (Additive):     ", aic(lin_fit))
+println("AIC (Proportional): ", aic(prop_lin_fit))
+println("\nLower AIC = better fit to the data")
+```
+
+# Study Guide Questions
+
+1. Which diagnostic plot is most informative about the pattern of residual error variability?
+2. Which diagnostic plot is most informative about the performance of the modeling strategy with respect to residual error variance?
+3. What are some strategies for detecting and avoiding local minima?
+4. What are the distributional assumptions associated with the maximum likelihood objective function?
+5. Can Maximum Likelihood methods be accurately applied to continuous data that are non-normally distributed?
+6. Describe the key assumptions made in the FO approximation.
+7. What is the eta-epsilon interaction?
+8. If ETABAR is not significantly different from zero, does that indicate that underlying assumptions about inter-individual random effects have been met?
+
+# Supplementary Material
+
+The following tutorials from PumasTutorials.jl expand on topics introduced in this chapter:
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: PK Terminology & Data** | [PK W1a](../lectures/pk/W1a-foundations-of-pk-terminology-and-data.qmd) | Variables, parameters, constants, and the concept of error in PK data |
+| **Lecture: Modeling Philosophy** | [PKPD W1](../lectures/pkpd/W1-philosophy-principles-and-practice.qmd) | Two pillars of pharmacometrics, parsimony, asking the right question |
+| **Lecture: Structural Models & Estimation** | [PKPD W2](../lectures/pkpd/W2-structural-models-and-parameter-estimation.qmd) | Model building principles, estimation approaches, FO/FOCE/Laplacian |
+| **Lecture: PopPK Model Components & NLME** | [PKPD W4](../lectures/pkpd/W4-population-pk-model-components-and-nlme.qmd) | Structural/variability/covariate submodels, η and ε distributions |
+| **Lecture: 1-Cpt IV Bolus Model** | [PK W2](../lectures/pk/W2-one-compartment-iv-bolus-model.qmd) | Monoexponential decline, ke, half-life, the model behind the code |
+| End-to-end PK workflow | [Introduction](https://tutorials.pumas.ai/html/introduction/introduction.html) | NCA → 1-cpt → 2-cpt → model comparison → VPC, all in one analysis |
+| Pumas model syntax deep dive | [Fitting](https://tutorials.pumas.ai/html/introduction/fitting.html) | Domain types (`RealDomain`, `PDiagDomain`, `PSDDomain`), `@param`/`@random`/`@pre`/`@dynamics`/`@derived` block details |
+| Dynamical system specification | [Dynamical Systems](https://tutorials.pumas.ai/html/introduction/dynamical_systems.html) | 9 equivalent ways to code the same model: closed-form, explicit ODE, ModelingToolkit, Catalyst reactions — with linearity detection |
+| Log-normal vs. normal parameterization | [Log vs Normal](https://tutorials.pumas.ai/html/introduction/logvsnorm.html) | 5 equivalent Pumas code forms for exponential IIV, with simulation proof of equivalence |
+| NONMEM OFV comparison | [Comparing NONMEM & Pumas](https://tutorials.pumas.ai/html/NONMEMtoPumas/comparing_NONMEM_Pumas.html) | Exact relationship: `-2*loglikelihood(fit) == OFV_with_constant`; adjustment formula and troubleshooting |

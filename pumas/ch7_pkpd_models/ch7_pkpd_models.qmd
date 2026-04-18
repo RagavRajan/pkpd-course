@@ -1,0 +1,604 @@
+---
+title: "Chapter 7: Direct and Indirect Continuous Pop PK-PD Models"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+This chapter covers continuous PK-PD models linking drug concentrations to pharmacodynamic response:
+
+- Direct PK-PD (Emax)
+- Effect Compartment PK-PD
+- Non-Parametric Effect Compartment
+- PK-PD with Tolerance
+- Indirect Response Models (Types I-IV)
+
+# Background
+
+PK-PD models link the pharmacokinetic profile to an observed pharmacodynamic response. The approach depends on the relationship between drug concentration and effect:
+
+- **Direct PK-PD:** Effect is an instantaneous function of concentration
+- **Indirect PK-PD:** Effect is mediated through a rate process (production or loss)
+- **Effect Compartment:** Accounts for temporal delay between concentration and effect
+
+::: {.callout-note title="Pharmacological Basis: Why Emax Models Work"}
+Most drugs exert their effects by binding to receptors, inhibiting enzymes, or modulating ion channels. The concentration-effect relationship follows the **law of mass action**: at low concentrations, the effect increases approximately linearly with concentration; at high concentrations, binding sites saturate and the effect plateaus. This saturable behavior is captured by the $E_{max}$ model:
+
+$$E = \frac{E_{max} \cdot C}{EC_{50} + C}$$
+
+which is mathematically identical to the **Michaelis-Menten** equation for enzyme kinetics. Here, $EC_{50}$ is the concentration producing 50% of maximum effect (analogous to $K_M$), and $E_{max}$ is the maximum achievable effect (analogous to $V_{max}$). The sigmoid (Hill) extension introduces a shape parameter $\gamma$ that controls the steepness of the curve: $E = E_{max} \cdot C^{\gamma} / (EC_{50}^{\gamma} + C^{\gamma})$. When $\gamma > 1$, the curve is steeper (switch-like behavior); when $\gamma < 1$, it is shallower. This pharmacological foundation — grounded in receptor occupancy theory — is why the $E_{max}$ model is the fundamental building block of virtually all PD modeling.
+:::
+
+# Data
+
+The exercises use three datasets:
+
+- `ch7_pk.csv` — PK-only data (TYPE=0)
+- `ch7_pkpd.csv` — Combined PK+PD data (TYPE=0 for PK, TYPE=1 for PD)
+- `ch7_indirect_pkpd.csv` — Combined PK+PD with indirect response endpoint
+
+```{julia}
+#| label: load-data
+
+pk_df = CSV.read(joinpath(data_dir, "ch7_pk.csv"), DataFrame)
+pkpd_df = CSV.read(joinpath(data_dir, "ch7_pkpd.csv"), DataFrame)
+ind_df = CSV.read(joinpath(data_dir, "ch7_indirect_pkpd.csv"), DataFrame)
+
+println("PK data: ", nrow(pk_df), " rows, ", length(unique(pk_df.ID)), " subjects")
+println("PKPD data: ", nrow(pkpd_df), " rows")
+println("Indirect data: ", nrow(ind_df), " rows")
+```
+
+# Base PK Model
+
+All PK-PD models build on a 1-compartment oral PK model (ADVAN2 TRANS2):
+
+```{julia}
+#| label: pk-data-prep
+
+# Prepare PK-only data
+pk_only = @rsubset(pk_df, :TYPE == 0 || :AMT > 0)
+rename!(pk_only, :ID => :id, :AMT => :amt, :TIME => :time, :DV => :dv, :CMT => :cmt)
+pk_only.evid = ifelse.(pk_only.amt .> 0, 1, 0)
+pk_only.dv = ifelse.(pk_only.evid .== 1, missing, pk_only.dv)
+
+pop_pk = read_pumas(pk_only)
+println("PK subjects: ", length(pop_pk))
+```
+
+```{julia}
+#| label: pk-base-model
+
+pk_base = @model begin
+    @metadata begin
+        desc = "Base PK: 1-Cpt Oral (ADVAN2 TRANS2)"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        ω²_Ka  ∈ RealDomain(lower = 0.0, init = 0.04)
+        Ω_pk   ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 1.41)
+    end
+    @random begin
+        η_Ka ~ Normal(0.0, sqrt(ω²_Ka))
+        η_pk ~ MvNormal(Ω_pk)
+    end
+    @pre begin
+        Ka = tvKa * exp(η_Ka)
+        CL = tvCL * exp(η_pk[1])
+        Vc = tvV  * exp(η_pk[2])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, sqrt((cp * σ_prop)^2 + σ_add^2))
+    end
+end
+```
+
+```{julia}
+#| label: pk-base-fit
+
+pk_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0,
+    ω²_Ka = 0.04,
+    Ω_pk = [0.04 0.01; 0.01 0.04],
+    σ_prop = 0.2, σ_add = sqrt(2.0),
+)
+pk_fit = fit(pk_base, pop_pk, pk_params, Pumas.FOCEI())
+pk_fit
+```
+
+# Direct PK-PD
+
+In the direct model, effect is an instantaneous function of plasma concentration:
+
+$$E = E_0 + \frac{E_{max} \cdot C_p}{EC_{50} + C_p}$$
+
+This requires no additional dynamics — the PD is computed directly from the PK prediction in the error block.
+
+::: {.panel-tabset}
+
+### NONMEM
+
+```
+$ERROR
+EMAX=THETA(4)*EXP(ETA(4))
+EC50=THETA(5)*EXP(ETA(5))
+E0=THETA(6)*EXP(ETA(6))
+EFF=E0+EMAX*F/(EC50+F)+ERR(2)
+CONC=F + F*ERR(1)
+Y=EFF*TYPE + CONC*(1-TYPE)
+```
+
+### Pumas
+
+```{julia}
+#| label: direct-pkpd-model
+
+# Prepare combined PK+PD data — pivot to wide format for multi-DV
+# PK and PD observations at same times need to be on same row
+pkpd_dose = @rsubset(pkpd_df, :AMT > 0)
+pkpd_pk = @rsubset(pkpd_df, :TYPE == 0, :AMT == 0)
+pkpd_pd = @rsubset(pkpd_df, :TYPE == 1)
+
+pk_w = select(pkpd_pk, :ID, :TIME, :DV => :dv_pk)
+pd_w = select(pkpd_pd, :ID, :TIME, :DV => :dv_pd)
+obs_w = outerjoin(pk_w, pd_w, on = [:ID, :TIME])
+obs_w.AMT .= 0; obs_w.CMT .= 2; obs_w.evid .= 0
+
+dose_w = select(pkpd_dose, :ID, :TIME, :AMT, :CMT)
+dose_w.dv_pk .= missing; dose_w.dv_pd .= missing; dose_w.evid .= 1
+
+pkpd_combined = vcat(dose_w, obs_w, cols = :union)
+pkpd_combined.AMT = coalesce.(pkpd_combined.AMT, 0)
+pkpd_combined.evid = coalesce.(pkpd_combined.evid, 0)
+pkpd_combined.CMT = coalesce.(pkpd_combined.CMT, 2)
+sort!(pkpd_combined, [:ID, :TIME, order(:evid, rev = true)])
+
+rename!(pkpd_combined, :ID => :id, :TIME => :time, :AMT => :amt, :CMT => :cmt)
+pop_pkpd = read_pumas(pkpd_combined; observations = [:dv_pk, :dv_pd])
+println("PKPD subjects: ", length(pop_pkpd))
+```
+
+:::
+
+```{julia}
+#| label: direct-pkpd-def
+
+direct_pkpd = @model begin
+    @metadata begin
+        desc = "Direct Emax PK-PD"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.7)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 4.7)
+        tvV    ∈ RealDomain(lower = 0.0, init = 38.0)
+        tvEmax ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0   ∈ RealDomain(lower = 0.0, init = 60.0)
+        Ω      ∈ PDiagDomain(6)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 2.24)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Emax = tvEmax * exp(η[4])
+        EC50 = tvEC50 * exp(η[5])
+        E0   = tvE0 * exp(η[6])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        # PK observation (proportional error)
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        # PD observation (direct Emax + additive error)
+        eff := @. E0 + Emax * cp / (EC50 + cp)
+        dv_pd ~ @. Normal(eff, σ_pd)
+    end
+end
+```
+
+```{julia}
+#| label: direct-pkpd-fit
+
+direct_params = (
+    tvKa = 1.7, tvCL = 4.7, tvV = 38.0,
+    tvEmax = 100.0, tvEC50 = 5.0, tvE0 = 60.0,
+    Ω = Diagonal(fill(0.04, 6)),
+    σ_prop = 0.2, σ_pd = sqrt(5.0),
+)
+direct_fit = fit(direct_pkpd, pop_pkpd, direct_params, Pumas.FOCEI())
+direct_fit
+```
+
+# Effect Compartment PK-PD
+
+When there is a temporal delay between plasma concentration and effect, an effect compartment links the PK to PD:
+
+$$\frac{dC_e}{dt} = K_{e0} \cdot (C_p - C_e)$$
+
+$$E = E_0 + \frac{E_{max} \cdot C_e}{EC_{50} + C_e}$$
+
+In NONMEM, this uses ADVAN4 TRANS1 with a negligible-mass trick (K23 very small). In Pumas, we write the ODE explicitly:
+
+```{julia}
+#| label: ecomp-model
+
+ecomp_pkpd = @model begin
+    @metadata begin
+        desc = "Effect Compartment PK-PD (Emax)"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        tvKe0  ∈ RealDomain(lower = 0.0, init = 0.07)
+        tvEmax ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0   ∈ RealDomain(lower = 0.0, init = 60.0)
+        Ω      ∈ PDiagDomain(7)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 4.47)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Ke0  = tvKe0 * exp(η[4])
+        Emax = tvEmax * exp(η[5])
+        EC50 = tvEC50 * exp(η[6])
+        E0   = tvE0 * exp(η[7])
+    end
+    @dynamics begin
+        Depot'   = -Ka * Depot
+        Central' =  Ka * Depot - (CL / Vc) * Central
+        Ce'      =  Ke0 * (Central / Vc - Ce)  # effect compartment
+    end
+    @derived begin
+        cp := @. Central / Vc
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        eff := @. E0 + Emax * Ce / (EC50 + Ce)
+        dv_pd ~ @. Normal(eff, σ_pd)
+    end
+end
+```
+
+```{julia}
+#| label: ecomp-fit
+
+ecomp_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0, tvKe0 = 0.07,
+    tvEmax = 100.0, tvEC50 = 5.0, tvE0 = 60.0,
+    Ω = Diagonal(fill(0.04, 7)),
+    σ_prop = 0.2, σ_pd = sqrt(20.0),
+)
+ecomp_fit = fit(ecomp_pkpd, pop_pkpd, ecomp_params, Pumas.FOCEI())
+ecomp_fit
+```
+
+# Indirect Response Models
+
+Indirect response models describe drug effects on the production or loss of a response variable. The core concept is **turnover**: at steady state, the rate of production ($K_{in}$) equals the rate of loss ($K_{out} \cdot R$), giving baseline $R_0 = K_{in} / K_{out}$.
+
+$$\frac{dR}{dt} = K_{in} \cdot S(C_p) - K_{out} \cdot R$$
+
+where $S(C_p)$ is a stimulation or inhibition function applied to either $K_{in}$ or $K_{out}$:
+
+| Type | Target | Function | Equation | Response Direction |
+|------|--------|----------|----------|--------------------|
+| **I** | Inhibit $K_{in}$ | $1 - \frac{I_{max} \cdot C}{IC_{50} + C}$ | $\frac{dR}{dt} = K_{in}(1-E) - K_{out} \cdot R$ | ↓ Decrease |
+| **II** | Inhibit $K_{out}$ | $1 - \frac{I_{max} \cdot C}{IC_{50} + C}$ | $\frac{dR}{dt} = K_{in} - K_{out}(1-E) \cdot R$ | ↑ Increase |
+| **III** | Stimulate $K_{in}$ | $1 + \frac{E_{max} \cdot C}{EC_{50} + C}$ | $\frac{dR}{dt} = K_{in}(1+E) - K_{out} \cdot R$ | ↑ Increase |
+| **IV** | Stimulate $K_{out}$ | $1 + \frac{E_{max} \cdot C}{EC_{50} + C}$ | $\frac{dR}{dt} = K_{in} - K_{out}(1+E) \cdot R$ | ↓ Decrease |
+
+::: {.callout-note title="Key IDR Characteristics"}
+- **Turnover half-life:** $t_{1/2} = \ln(2) / K_{out}$ — determines how quickly the response changes
+- **Effect persistence:** Response continues to change after drug is eliminated (because the turnover system takes time to re-equilibrate)
+- **Types I & IV** decrease the response; **Types II & III** increase it — but through different mechanisms
+- **Distinguishing Types I vs IV (or II vs III):** Requires dense PD sampling at early time points — the onset/offset kinetics differ
+:::
+
+::: {.callout-note title="The Turnover Concept: Why Biological Responses Have Inherent Delays"}
+Most biological responses — blood pressure, clotting factors, cholesterol, blood glucose, cortisol — exist in a **dynamic equilibrium** where a production process ($K_{in}$) is balanced by a degradation or loss process ($K_{out}$). At baseline, this equilibrium satisfies $K_{in} = K_{out} \times R_0$, where $R_0$ is the baseline response. Drugs perturb this equilibrium by altering either the production or the loss rate, but the response cannot change instantaneously because the existing pool of response variable must **turn over**. The characteristic time scale for this process is the turnover half-life:
+
+$$t_{1/2,\text{turnover}} = \frac{\ln 2}{K_{out}}$$
+
+This delay is fundamentally different from a distributional delay modeled by an effect compartment ($k_{e0}$). The effect compartment delay arises from the time required for drug to equilibrate between plasma and the biophase; the turnover delay arises from the time required for the **biological system itself** to respond to the perturbation. Distinguishing these two mechanisms — pharmacokinetic delay vs. pharmacodynamic (systems-level) delay — is essential for selecting the appropriate model structure and for making correct predictions about the time course of drug effect.
+:::
+
+::: {.callout-tip title="Clinical Examples by IDR Type"}
+| Type | Clinical Examples |
+|------|------------------|
+| **Type I** (↓ Kin) | Corticosteroid suppression of cortisol, warfarin inhibition of clotting factor synthesis |
+| **Type II** (↓ Kout) | Heparin reducing factor Xa clearance, EPO reducing RBC destruction |
+| **Type III** (↑ Kin) | EPO stimulating RBC production, GH stimulating IGF-1 synthesis |
+| **Type IV** (↑ Kout) | Diuretics increasing sodium excretion, furosemide increasing urine output |
+:::
+
+## Indirect Response Type I: Inhibition of Kin
+
+```{julia}
+#| label: indirect-data
+
+# Prepare indirect PK-PD data — pivot to wide format for multi-DV
+# PK and PD observations are at the same time points, so we merge them into one row
+
+dose_rows = @rsubset(ind_df, :AMT > 0)
+pk_rows = @rsubset(ind_df, :TYPE == 0, :AMT == 0)
+pd_rows = @rsubset(ind_df, :TYPE == 1)
+
+# Merge PK + PD at same (ID, TIME) into wide format
+pk_wide = select(pk_rows, :ID, :TIME, :DV => :dv_pk)
+pd_wide = select(pd_rows, :ID, :TIME, :DV => :dv_pd)
+obs_wide = outerjoin(pk_wide, pd_wide, on = [:ID, :TIME])
+obs_wide.AMT .= 0
+obs_wide.CMT .= 2
+obs_wide.evid .= 0
+
+# Dose rows
+dose_prep = select(dose_rows, :ID, :TIME, :AMT, :CMT)
+dose_prep.dv_pk .= missing
+dose_prep.dv_pd .= missing
+dose_prep.evid .= 1
+
+# Combine and sort
+combined = vcat(dose_prep, obs_wide, cols = :union)
+combined.AMT = coalesce.(combined.AMT, 0)
+combined.evid = coalesce.(combined.evid, 0)
+combined.CMT = coalesce.(combined.CMT, 2)
+sort!(combined, [:ID, :TIME, order(:evid, rev = true)])
+
+rename!(combined, :ID => :id, :TIME => :time, :AMT => :amt, :CMT => :cmt)
+pop_ind = read_pumas(combined; observations = [:dv_pk, :dv_pd])
+println("Indirect PKPD subjects: ", length(pop_ind))
+```
+
+```{julia}
+#| label: ind1-model
+
+# Type I: Inhibit Kin
+# From ind1_pkpd.ctl: ADVAN6, $DES with DADT(3) = KIN*(1-E) - KOUT*A(3)
+ind1_model = @model begin
+    @metadata begin
+        desc = "Indirect Response Type I: Inhibit Kin"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        tvKin  ∈ RealDomain(lower = 0.0, init = 10.0)
+        tvKout ∈ RealDomain(lower = 0.0, init = 0.05)
+        tvIC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        Ω      ∈ PDiagDomain(3)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 4.47)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Kin  = tvKin
+        Kout = tvKout
+        IC50 = tvIC50
+        # Emax fixed at 1 (as in ctl: THETA(6) = 1 FIX)
+    end
+    @init begin
+        Response = Kin / Kout  # steady-state baseline
+    end
+    @dynamics begin
+        Depot'    = -Ka * Depot
+        Central'  =  Ka * Depot - (CL / Vc) * Central
+        Response' =  Kin * (1 - Central / Vc / (IC50 + Central / Vc)) - Kout * Response
+    end
+    @derived begin
+        cp := @. Central / Vc
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        dv_pd ~ @. Normal(Response, σ_pd)
+    end
+end
+```
+
+```{julia}
+#| label: ind1-fit
+
+ind1_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0,
+    tvKin = 10.0, tvKout = 0.05, tvIC50 = 5.0,
+    Ω = Diagonal([0.04, 0.04, 0.04]),
+    σ_prop = 0.2, σ_pd = sqrt(20.0),
+)
+ind1_fit = fit(ind1_model, pop_ind, ind1_params, Pumas.FOCEI())
+ind1_fit
+```
+
+## Model Comparison
+
+```{julia}
+#| label: pkpd-compare
+
+println("PK-PD Model Comparison")
+println("=" ^ 50)
+println("Direct Emax     AIC: ", round(aic(direct_fit), digits = 1))
+println("Effect Comp     AIC: ", round(aic(ecomp_fit), digits = 1))
+println("Indirect Type I AIC: ", round(aic(ind1_fit), digits = 1))
+```
+
+## Diagnostic Plots
+
+```{julia}
+#| label: fig-ch7-indirect-diag
+#| fig-cap: "Indirect Response Model Type I: GOF Diagnostics"
+
+ind_insp = inspect(ind1_fit)
+ind_insp_df = DataFrame(ind_insp)
+
+# PD observations only
+pd_obs = @rsubset(ind_insp_df, !ismissing(:dv_pd))
+
+fig = Figure(size = (800, 400))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV (PD)", title = "DV vs PRED")
+scatter!(ax1, pd_obs.dv_pd_pred, pd_obs.dv_pd, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV (PD)", title = "DV vs IPRED")
+scatter!(ax2, pd_obs.dv_pd_ipred, pd_obs.dv_pd, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax2, 0, 1, color = :black)
+
+fig
+```
+
+# K-PD Models: PD Without PK Data
+
+When PK data are unavailable (PD-only studies, retrospective analyses, sparse sampling), K-PD models use a **virtual compartment** to replace the PK model:
+
+$$\frac{dA}{dt} = -K_{DE} \cdot A$$
+
+where $A$ is the virtual drug amount and $K_{DE}$ is the apparent elimination rate ($= CL/V$). The drug effect is then driven by $K_{DE} \cdot A$ (analogous to $CL \cdot C_p$) rather than by concentration.
+
+**Key parameters:**
+
+- $K_{DE}$ = apparent elimination rate (replaces CL/V)
+- $EDK_{50}$ = apparent potency (replaces $EC_{50}$; $EDK_{50} = EC_{50} \cdot CL$)
+
+```{julia}
+#| label: kpd-model-example
+#| eval: false
+
+kpd_model = @model begin
+    @param begin
+        tvKDE   ∈ RealDomain(lower = 0.0, init = 0.1)
+        tvEmax  ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEDK50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0    ∈ RealDomain(init = 60.0)
+        Ω       ∈ PDiagDomain(2)
+        σ_pd    ∈ RealDomain(lower = 0.0, init = 5.0)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        KDE   = tvKDE * exp(η[1])
+        Emax  = tvEmax
+        EDK50 = tvEDK50 * exp(η[2])
+        E0    = tvE0
+    end
+    @dynamics begin
+        A' = -KDE * A  # virtual compartment
+    end
+    @derived begin
+        rate_out := @. KDE * A
+        effect := @. E0 + Emax * rate_out / (EDK50 + rate_out)
+        dv ~ @. Normal(effect, σ_pd)
+    end
+end
+```
+
+::: {.callout-warning}
+**K-PD limitations:**
+
+- Assumes linear PK (first-order elimination)
+- Cannot predict concentrations — only effects
+- May overestimate IIV (conflates PK and PD variability)
+- Requires ≥ 3 dose levels for identifiability
+- Not recommended for regulatory submissions where PK data exist
+:::
+
+# The Four PD Paradigms: Decision Framework
+
+When choosing a PD model structure, follow this decision tree:
+
+| Question | If Yes → | If No → |
+|----------|----------|---------|
+| Is there a measurable delay between Cp and effect? | Effect compartment or IDR | Direct response |
+| Does the drug affect a turnover process? | IDR (Types I–IV) | Effect compartment |
+| Is the CE plot loop counter-clockwise? | Effect compartment (ke0) | Direct, tolerance, or IDR |
+| Is PK data available? | PK-PD model | K-PD model |
+| Is the effect reversible and dose-dependent? | Standard Emax/IDR | Consider more complex models |
+
+# PK-PD Modeling Steps
+
+1. Develop and qualify the PK model first (using PK-only data)
+2. Fix PK parameters and estimate PD parameters (sequential approach)
+3. Or estimate PK and PD simultaneously (combined data approach — as shown above)
+4. Evaluate GOF diagnostics for both PK and PD
+5. Compare structural PD models (direct vs. effect compartment vs. indirect)
+
+::: {.callout-tip title="Sequential vs. Simultaneous Estimation"}
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Sequential** (fix PK, estimate PD) | Faster, PK model already validated | Ignores PK uncertainty, may bias PD estimates |
+| **Simultaneous** (estimate PK + PD together) | Full uncertainty propagation, optimal use of data | Slower, larger parameter space, harder to converge |
+
+**Recommendation:** Start sequential for model development (faster iteration), then switch to simultaneous for the final model.
+:::
+
+# Study Guide Questions
+
+1. What is the difference between a direct and indirect PK-PD model?
+2. When would you use an effect compartment model instead of a direct model?
+3. What are the four types of indirect response models and how do they differ?
+4. Why is Emax often fixed to 1 in indirect response models?
+5. What are the advantages of simultaneous PK-PD estimation vs. sequential?
+6. When would a K-PD model be appropriate instead of a full PK-PD model?
+7. How does turnover half-life affect the time course of an indirect response?
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: Intrinsic CL & Enzyme Kinetics** | [PK W7a](../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd) | Vmax/KM enzyme kinetics — the pharmacological foundation of the Emax model |
+| **Lecture: Clearance & Hepatic Extraction** | [PK W6](../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd) | Drug elimination physiology underlying PK-PD model structure |
+| **Lecture: Oral Absorption** | [PK W8](../lectures/pk/W8-extravascular-dosing-and-oral-absorption.qmd) | First-order absorption, bioavailability — the PK driving function for PD |
+| PD model overview | [Introduction to PD Models](https://tutorials.pumas.ai/html/PDModels/00-introduction-to-pd-models.html) | Four PD paradigms, Emax/Hill curves, potency vs efficacy, decision flowchart |
+| Direct response models | [Direct Response](https://tutorials.pumas.ai/html/PDModels/01-direct-response.html) | Stimulatory + inhibitory Emax, population simulation, full fitting workflow |
+| Effect compartment models | [Effect Compartment](https://tutorials.pumas.ai/html/PDModels/02-effect-compartment.html) | Hysteresis visualization, ke0 sensitivity analysis, Cp vs Ce comparison, clinical examples |
+| Indirect response models | [Indirect Response](https://tutorials.pumas.ai/html/PDModels/03-indirect-response.html) | All 4 IDR types with code, comparative simulation, turnover time sensitivity, clinical examples |
+| K-PD models | [K-PD Models](https://tutorials.pumas.ai/html/PDModels/04-kpd-models.html) | Virtual compartment concept, KDE/EDK50 parameterization, limitations, K-PD vs PK-PD decision framework |
+| Model selection | [PD Model Selection](https://tutorials.pumas.ai/html/PDModels/05-model-selection.html) | Systematic selection (EDA → mechanism → statistics), warfarin case study, common pitfalls |
+| HCV viral dynamics | [HCV GSA](https://tutorials.pumas.ai/html/pkpd/hcvgsa.html) | QSP-style PK-PD with viral kinetics and global sensitivity analysis |
+| TMDD models | [TMDD Foundations](https://tutorials.pumas.ai/html/tmdd/01-tmdd-foundations.html) → [TMDD Workflows](https://tutorials.pumas.ai/html/tmdd/05-tmdd-workflows.html) | Target-mediated drug disposition: full model, approximations, special cases |

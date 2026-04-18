@@ -1,0 +1,206 @@
+---
+title: "Week 9 Pharmacokinetics: IV Infusion Kinetics"
+subtitle: "Lecture Notes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Overview
+
+This lecture covers intravenous (IV) infusion pharmacokinetics, with a focus on the conceptual and mathematical framework governing drug input during constant-rate infusions, the relationship between infusion kinetics and multiple-dose pharmacokinetics, and the attainment of steady state.
+
+---
+
+## 1. Introduction to IV Infusion
+
+IV infusion is a route of administration in which drug is delivered into the body at a constant rate over a defined period of time. Understanding infusion kinetics provides the conceptual foundation for understanding multiple-dose pharmacokinetics.
+
+### 1.1 Dosing Rate: A Unifying Concept
+
+When a drug is administered at any route of administration with a defined frequency, the dose per unit time can be expressed as a **dosing rate**. For example, 100 mg administered orally every 24 hours corresponds to a dosing rate of:
+
+$$\text{Dosing Rate} = \frac{100 \text{ mg}}{24 \text{ h}}$$
+
+This concept applies regardless of route — oral, IV bolus, subcutaneous, intramuscular, or infusion.
+
+### 1.2 Infusion Rate and Duration
+
+For an IV infusion, the two most clinically important input parameters are:
+
+- **Infusion rate** — the speed at which the drug is administered (e.g., mg/min or mL/min)
+- **Infusion duration** — the total time over which drug is delivered
+
+**Example:** Suppose the goal is to deliver a 100 mg dose from an IV bag. The bag has a volume of 100 mL at a concentration of 5 mg/mL, giving a total drug content of 500 mg. Since only 100 mg is needed, only 20 mL of the bag needs to be infused. If the infusion pump is set to 1 mL/min, the infusion duration is 20 minutes.
+
+The clinician may choose any combination of rate and duration that delivers the required dose. This decision is influenced by clinical, pharmacological, and operational factors.
+
+---
+
+## 2. Steady State and the Concept of Rate Balance
+
+### 2.1 What is Steady State?
+
+Steady state is the condition at which the rate of drug input into the body equals the rate of drug elimination from the body:
+
+$$\text{Rate of Input} = \text{Rate of Elimination}$$
+
+At steady state, the net change in drug amount (or concentration) in the body is zero. This is analogous to a tank with a constant inflow and outflow of water reaching a stable level.
+
+### 2.2 Time to Steady State and Half-Life
+
+The time required to reach steady state is governed by the **elimination half-life** of the drug, regardless of the route of administration. It takes approximately **four to five half-lives** to reach approximately 97–99% of steady state.
+
+| Half-Life Number | Fraction Remaining |
+|---|---|
+| 1 | 50% |
+| 2 | 25% |
+| 3 | 12.5% |
+| 4 | 6.25% |
+| 5 | ~3% |
+
+This principle applies universally — for oral multiple-dose regimens, IV infusions, and any other route.
+
+### 2.3 What Determines the Dosing Rate?
+
+To achieve a target exposure at steady state, the dosing rate is determined by two quantities:
+
+1. **Clearance (CL)** — the fundamental pharmacokinetic parameter governing drug elimination
+2. **Target steady-state concentration (C_ss)** — the desired plasma concentration at steady state
+
+At steady state:
+
+$$\text{Rate of Input} = \text{Rate of Elimination} = CL \times C_{ss}$$
+
+Therefore:
+
+$$K_0 = CL \times C_{ss}$$
+
+where $K_0$ is the infusion rate (zero-order input rate). If clearance is known and a target $C_{ss}$ is defined, the required infusion rate can be calculated directly.
+
+### 2.4 Steady-State Concentration as an Exposure Metric
+
+A common clinical practice is to measure the **trough concentration** ($C_{trough}$, also denoted $C_{min}$) at steady state — the concentration just before the next dose. This is favored primarily for logistical reasons: patients return to the clinic for the next dose, making it operationally straightforward to collect a pre-dose sample. Depending on the drug and the pharmacodynamic relationship, the relevant exposure metric at steady state may be $C_{max}$, $C_{trough}$, or area under the curve (AUC). The selection is drug- and disease-specific.
+
+---
+
+## 3. Zero-Order Input and First-Order Elimination
+
+### 3.1 Nature of Infusion Input
+
+In oral dosing, drug absorption from the gastrointestinal tract is a **first-order** process — the rate of absorption depends on the amount of drug remaining at the absorption site (depot):
+
+$$\frac{dA_{depot}}{dt} = -k_a \cdot A_{depot}$$
+
+In an IV infusion, drug is delivered directly into the systemic circulation at a **preset, constant rate** that is independent of the amount of drug remaining in the IV bag. This is a **zero-order** input:
+
+$$\frac{dA}{dt}\bigg|_{\text{in}} = K_0$$
+
+### 3.2 Differential Equation for IV Infusion
+
+The rate of change of the amount of drug in the body during a constant-rate IV infusion is:
+
+$$\frac{dA}{dt} = K_0 - k_{el} \cdot A$$
+
+where:
+- $K_0$ = zero-order infusion rate (e.g., mg/h)
+- $k_{el}$ = first-order elimination rate constant (h⁻¹)
+- $A$ = amount of drug in the body at time $t$
+
+At steady state, $\frac{dA}{dt} = 0$, which gives:
+
+$$K_0 = k_{el} \cdot A_{ss} = k_{el} \cdot V \cdot C_{ss} = CL \cdot C_{ss}$$
+
+---
+
+## 4. Short Infusions vs. Long Infusions
+
+### 4.1 Short Infusions
+
+A **short infusion** is one where the drug is administered over a brief period and stopped before reaching steady state. After the infusion ends, the plasma concentration follows a simple exponential decline — identical to the post-dose decline observed with IV bolus administration:
+
+$$C(t) = C_0 \cdot e^{-k_{el} \cdot t}$$
+
+where $C_0$ is the concentration at the end of the infusion (equivalent to $C_{max}$ for a short infusion).
+
+Short infusions behave pharmacokinetically like any other single-dose route of administration once the input has stopped. Multiple short infusions given at defined intervals are analogous to multiple-dose oral regimens, approaching steady state over four to five half-lives.
+
+### 4.2 Long Infusions
+
+A **long infusion** is one that is continued until steady state is achieved. During the infusion, plasma concentration rises exponentially toward $C_{ss}$:
+
+$$C(t) = \frac{K_0}{CL} \cdot \left(1 - e^{-k_{el} \cdot t}\right) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$$
+
+This equation describes a **mirror image** of the post-infusion exponential decline. The approach to steady state is mono-exponential for a one-compartment model.
+
+Once the infusion is stopped (at time $T_{end}$), the concentration declines as:
+
+$$C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}$$
+
+### 4.3 General Concentration Equations During and After Infusion
+
+| Phase | Equation |
+|---|---|
+| During infusion | $C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$ |
+| At steady state (during continued infusion) | $C = C_{ss}$ |
+| After infusion stops | $C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}$ |
+
+---
+
+## 5. Measuring Concentrations During Infusion
+
+From a strictly mathematical standpoint, if the following are known:
+
+- The infusion rate ($K_0$)
+- The drug clearance ($CL$) and volume of distribution ($V$)
+- The target steady-state concentration ($C_{ss}$)
+
+Then plasma concentrations at any time point during the infusion can be **predicted** without measurement, using:
+
+$$C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$$
+
+Accordingly, if a truly constant-rate infusion is being administered and the pharmacokinetic parameters are already characterized, collecting samples during the infusion adds limited additional information. The post-infusion concentration–time data alone are sufficient to estimate the relevant parameters.
+
+---
+
+## 6. Loading Doses Combined with Maintenance Infusions
+
+### 6.1 Rationale
+
+The time required to reach steady state via a constant-rate infusion alone is four to five half-lives. For drugs with long half-lives, this delay may be clinically unacceptable. A **loading dose** (IV bolus) administered simultaneously at the start of the infusion allows the plasma concentration to reach $C_{ss}$ immediately.
+
+### 6.2 Combined Equation
+
+When an IV bolus (loading dose) and a constant-rate infusion are given simultaneously, the total plasma concentration is the sum of contributions from each:
+
+$$C(t) = \underbrace{C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)}_{\text{infusion}} + \underbrace{C_0 \cdot e^{-k_{el} \cdot t}}_{\text{bolus}}$$
+
+where $C_0 = \frac{\text{Loading Dose}}{V}$.
+
+### 6.3 Optimal Loading Dose
+
+If the loading dose is chosen such that $C_0 = C_{ss}$, the two exponential terms cancel:
+
+$$C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right) + C_{ss} \cdot e^{-k_{el} \cdot t} = C_{ss}$$
+
+The plasma concentration is constant at $C_{ss}$ from time zero onward — there is no transient approach phase. The required loading dose is therefore:
+
+$$\text{Loading Dose} = C_{ss} \cdot V$$
+
+### 6.4 Effect of Suboptimal Loading Dose
+
+If $C_0 \neq C_{ss}$, the concentration–time profile will show an initial transient that either rises toward $C_{ss}$ (if $C_0 < C_{ss}$) or falls toward $C_{ss}$ (if $C_0 > C_{ss}$) before converging to the steady-state plateau. The infusion component continues to drive the system toward $C_{ss}$ in either case; the loading dose only alters how quickly the apparent steady state is reached from the combined-dose perspective.
+
+---
+
+## 7. Summary of Key Concepts
+
+1. **Zero-order input, first-order elimination** characterizes IV infusion pharmacokinetics.
+2. **Steady state** is achieved when the rate of infusion equals the rate of elimination: $K_0 = CL \cdot C_{ss}$.
+3. **Time to steady state** depends on the elimination half-life and is independent of the infusion rate; it takes approximately four to five half-lives.
+4. **Short infusions** behave like IV bolus doses after the infusion ends; multiple short infusions accumulate to steady state similarly to multiple oral doses.
+5. **Long infusions** produce an exponential approach to $C_{ss}$, described by $C(t) = C_{ss}(1 - e^{-k_{el} t})$.
+6. **Concentration during infusion can be predicted** mathematically if $CL$, $V$, and $K_0$ are known; sampling during the infusion may not always add analytical value.
+7. **Loading doses** can be combined with maintenance infusions to achieve $C_{ss}$ immediately; the optimal loading dose is $C_{ss} \cdot V$.
+8. All infusion concepts reduce to the same mathematical framework as IV bolus kinetics — the post-infusion decline is $e^{-k_{el} t}$, and the approach to maximum is $1 - e^{-k_{el} t}$, its mirror image.

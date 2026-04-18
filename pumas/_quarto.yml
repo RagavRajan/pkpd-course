@@ -1,0 +1,95 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "MI-210: Essentials of Population PKPD M&S — Pumas Edition"
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Chapters
+        menu:
+          - text: "Ch 1: Intro to NLME"
+            href: ch1_intro_nlme/ch1_intro_nlme.qmd
+          - text: "Ch 2: Data Assembly"
+            href: ch2_data_assembly/ch2_data_assembly.qmd
+          - text: "Ch 3: Coding NLME Models"
+            href: ch3_nlme_models/ch3_coding_nlme.qmd
+          - text: "Ch 4: Covariates"
+            href: ch4_covariates/ch4_covariates.qmd
+          - text: "Ch 5: Simulation"
+            href: ch5_simulation/ch5_simulation.qmd
+          - text: "Ch 6: Model Evaluation"
+            href: ch6_model_evaluation/ch6_model_evaluation.qmd
+          - text: "Ch 7: PK-PD Models"
+            href: ch7_pkpd_models/ch7_pkpd_models.qmd
+      - text: Lectures
+        menu:
+          - text: "--- PK Course ---"
+          - text: "PK W1a: Terminology & Data"
+            href: lectures/pk/W1a-foundations-of-pk-terminology-and-data.qmd
+          - text: "PK W1b: Units & Rate Processes"
+            href: lectures/pk/W1b-units-dimensionality-and-rate-processes.qmd
+          - text: "PK W1c: Math Foundations"
+            href: lectures/pk/W1c-mathematical-foundations-of-pk.qmd
+          - text: "PK W2: 1-Cpt IV Bolus"
+            href: lectures/pk/W2-one-compartment-iv-bolus-model.qmd
+          - text: "PK W3: Transport & Distribution"
+            href: lectures/pk/W3-drug-transport-diffusion-and-distribution.qmd
+          - text: "PK W4: Volume of Distribution"
+            href: lectures/pk/W4-volume-of-distribution-and-protein-binding.qmd
+          - text: "PK W5: Vd Mechanisms"
+            href: lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.qmd
+          - text: "PK W6: Clearance & Hepatic CL"
+            href: lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd
+          - text: "PK W7a: Intrinsic CL & ER"
+            href: lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd
+          - text: "PK W7b: Well-Stirred & Renal CL"
+            href: lectures/pk/W7b-well-stirred-model-and-renal-elimination.qmd
+          - text: "PK W8: Oral Absorption"
+            href: lectures/pk/W8-extravascular-dosing-and-oral-absorption.qmd
+          - text: "PK W9: IV Infusion"
+            href: lectures/pk/W9-iv-infusion-kinetics.qmd
+          - text: "--- PKPD Modeling Course ---"
+          - text: "PKPD W1: Philosophy & Practice"
+            href: lectures/pkpd/W1-philosophy-principles-and-practice.qmd
+          - text: "PKPD W2: Structural Models"
+            href: lectures/pkpd/W2-structural-models-and-parameter-estimation.qmd
+          - text: "PKPD W4: PopPK Components & NLME"
+            href: lectures/pkpd/W4-population-pk-model-components-and-nlme.qmd
+          - text: "PKPD W5: Base Model & Diagnostics"
+            href: lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.qmd
+          - text: "PKPD W6: Graphical Diagnostics"
+            href: lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.qmd
+          - text: "PKPD W7: Error Models"
+            href: lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.qmd
+          - text: "PKPD W7.5: Covariate Fundamentals"
+            href: lectures/pkpd/W7.5-covariate-modeling-fundamentals.qmd
+          - text: "PKPD W8: Covariate Methodology"
+            href: lectures/pkpd/W8-covariate-diagnostics-and-methodology.qmd
+    right:
+      - text: "Sensei Progress"
+        href: sensei-progress.qmd
+        icon: mortarboard-fill
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - section: "Chapters"
+        contents:
+          - ch1_intro_nlme/ch1_intro_nlme.qmd
+          - ch2_data_assembly/ch2_data_assembly.qmd
+          - ch3_nlme_models/ch3_coding_nlme.qmd
+          - ch4_covariates/ch4_covariates.qmd
+          - ch5_simulation/ch5_simulation.qmd
+          - ch6_model_evaluation/ch6_model_evaluation.qmd
+          - ch7_pkpd_models/ch7_pkpd_models.qmd
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-tools: true

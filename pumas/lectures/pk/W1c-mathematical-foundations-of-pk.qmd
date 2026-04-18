@@ -1,0 +1,360 @@
+---
+title: "Week 1: Mathematical Foundations of Pharmacokinetics"
+subtitle: "Lecture Notes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Course Overview
+
+This 13–14 week program covers the first principles and fundamentals of pharmacokinetics, with an emphasis on mapping theoretical concepts to real-world applications. The course is designed to bridge the gap between understanding equations and applying them in practice.
+
+### Topics to Be Covered
+
+1. Basic mathematics for pharmacokinetics
+2. One-compartment models (IV bolus)
+3. Volume and clearance
+4. Constant-rate infusions
+5. Extravascular administration and biopharmaceutical considerations
+6. Multiple dosing concepts
+7. Nonlinear systems
+8. Non-compartmental analysis (NCA)
+9. Allometric scaling
+
+Population PK modeling will follow in a later phase, along with advanced statistics, before moving into full pharmacometric modeling.
+
+### Course Pedagogy
+
+All lecture material is provided as structured notes (HTML/Quarto markdown documents) with accompanying Julia tutorials. Practice problems are assigned weekly and are to be completed using computational tools — all graphing, slope calculations, and analyses should be performed programmatically (e.g., in Pumas), not by hand on graph paper.
+
+---
+
+## 1. Core Terminology: Variables, Parameters, and Constants
+
+### 1.1 Dependent and Independent Variables
+
+Consider the fundamental pharmacokinetic equation for a one-compartment IV bolus:
+
+$$C(t) = \frac{\text{Dose}}{V} \cdot e^{-K_e \cdot t}$$
+
+In any equation or dataset:
+
+- **Dependent variable** (y-axis): The quantity whose value is determined by the model or system. In PK, plasma concentration $C(t)$ is the dependent variable — it changes within the individual over time.
+- **Independent variable** (x-axis): The quantity whose value is set or predefined by the investigator. Time after drug administration is the independent variable; the sampling schedule is determined by the study design.
+
+### 1.2 Parameters
+
+A parameter is a numeric value that defines the relationship between independent and dependent variables within the context of a specific model. For the equation above, $K_e$ and $V$ are parameters. Within a given model fit to a given individual, parameters are treated as fixed (constant) values — they do not change with time.
+
+It is important to distinguish: a parameter is *derived from data* (it is estimated), but once estimated, it is held constant within that model context. For example, an estimated $K_e = 0.02\ \text{hr}^{-1}$ is a constant term that fully characterizes the elimination rate for that individual.
+
+### 1.3 Constants
+
+A constant is a value that is not measured or estimated within the current analysis — it is assumed known. For example, hepatic blood flow is often cited as $1.5\ \text{L/hr}$; this is treated as a physiological constant, though it was originally derived as a parameter from some prior experiment.
+
+**Key distinction for scientific communication:** A parameter *can* also function as a constant depending on context. Misuse of these terms is common in publications and should be avoided.
+
+### 1.4 Data
+
+Data consists of measured values in relationship to one another. A list of plasma concentrations without associated time points carries limited meaning; it is the pairing of concentration with time (and other covariates) that constitutes analyzable data. This distinction becomes especially important in physiologically-based pharmacokinetic (PBPK) modeling, where individual pieces of information require context to be interpretable.
+
+### 1.5 Errors
+
+In the context of modeling, **residual error** is the difference between an observed value and the value predicted by the model. However, the concept of error is broader:
+
+- Independent variables such as time carry measurement error (a nominal 2-hour sample may have been collected at 2 hours 5 minutes).
+- Dependent variables such as concentration carry analytical error, quantified by the bioanalytical method's standard curve precision.
+
+The magnitude of error must always be assessed relative to its impact on inference. **All data carry errors.** Being cognizant of data quality — before fitting any model — is a critical skill in pharmacokinetics.
+
+---
+
+## 2. Units and Dimensionality
+
+### 2.1 Why Units Matter
+
+An equation is only valid if the units on both sides are consistent. For example:
+
+$$\text{CL} = K_e \cdot V$$
+
+- $K_e$ has units of $\text{hr}^{-1}$
+- $V$ has units of $\text{L}$
+- Therefore $\text{CL}$ has units of $\text{L/hr}$ — consistent with the left-hand side.
+
+### 2.2 Two Fundamental Rules of Dimensionality
+
+1. **Addition and subtraction** are only valid between quantities that share the same units.
+2. **Multiplication and division** of quantities with different units produce a new composite unit.
+
+For example, $K_e + V$ is dimensionally invalid (one cannot add $\text{hr}^{-1}$ and $\text{L}$), whereas $K_e \times V$ produces $\text{L/hr}$, a physically meaningful quantity.
+
+### 2.3 Dimensionless Quantities
+
+Certain quantities in pharmacokinetics are dimensionless — they carry no units:
+
+- **Bioavailability ($F$)**: a fraction representing the ratio of absorbed drug to administered dose.
+- **Fraction unbound ($f_u$)**: similarly a ratio.
+- **Percentages**: when a percentage represents a fraction, it remains dimensionless (multiplying a dimensionless fraction by 100 does not introduce a dimension). Note, however, that percentages can sometimes be applied to quantities *with* dimensions (e.g., percent weight/volume concentrations used in dispensing pharmacy).
+- **Logarithms**: $\log(C)$ is dimensionless, regardless of the units of $C$. This is because a logarithm is fundamentally the logarithm of a ratio (discussed further in Section 4). Although it is conventional in PK to label log-concentration axes with concentration units as a communication aid, the mathematical quantity $\ln(C)$ itself is unitless. Publications that assign units to log-transformed values are technically imprecise.
+
+---
+
+## 3. Unit Conversions
+
+Correct unit conversions are essential before any pharmacokinetic analysis. The general strategy is to handle each dimension (mass, volume, time) separately.
+
+### 3.1 Single-Dimension Conversions
+
+**Example — dose conversion:**
+$$100\ \text{mg} \times 10^3\ \frac{\mu\text{g}}{\text{mg}} = 10^5\ \mu\text{g}$$
+
+**Example — concentration conversion (mass only):**
+
+To convert from $\text{ng/mL}$ to $\text{mg/mL}$, only the mass unit changes:
+$$C\ [\text{ng/mL}] \times 10^{-6}\ \frac{\text{mg}}{\text{ng}} = C\ [\text{mg/mL}]$$
+
+### 3.2 Multi-Dimensional Conversions
+
+**Example — clearance:**
+
+To convert $15\ \text{L/hr}$ to $\text{mL/min}$:
+$$15\ \frac{\text{L}}{\text{hr}} \times \frac{1000\ \text{mL}}{1\ \text{L}} \times \frac{1\ \text{hr}}{60\ \text{min}} = 250\ \text{mL/min}$$
+
+Each dimension is scaled independently.
+
+### 3.3 Molar Conversions
+
+Converting from mass-based to molar concentration units (e.g., $\text{ng/mL}$ to $\text{nM}$) requires knowledge of the drug's molecular weight (in $\text{g/mol}$). The steps are:
+
+1. Convert nanograms to milligrams (mass unit).
+2. Convert milligrams to grams.
+3. Convert grams to moles using molecular weight.
+4. Convert moles to nanomoles.
+5. Convert mL to liters (volume unit).
+
+Real-world datasets frequently present dose in milligrams and concentration in nanomolar, requiring multi-step conversions. Fluency in these conversions is a practical necessity.
+
+### 3.4 Machine Precision and Floating-Point Arithmetic
+
+When performing conversions computationally, results may appear with a large number of decimal places (e.g., $250.00000000000003$ instead of $250$). This is an artifact of **floating-point machine precision** — the way a computer's hardware represents real numbers internally. The result is mathematically correct to hardware precision but carries more decimal digits than are meaningful.
+
+This introduces the practical need to understand significant figures and rounding.
+
+---
+
+## 4. Significant Figures and Rounding
+
+### 4.1 Definitions
+
+- **Significant digits (significant figures):** The total number of meaningful digits in a number. Leading zeros are not significant; trailing zeros after a decimal point are significant.
+  - Example: $123.4$ has 4 significant digits.
+  - Example: $0.00234$ has 3 significant digits (the leading zeros are not counted).
+
+- **Decimal places (digits):** The number of digits to the right of the decimal point.
+  - Example: $12.345$ has 3 decimal places.
+
+### 4.2 Rounding Rules
+
+When rounding, if the digit immediately following the last retained digit is $\geq 5$, the last retained digit is incremented by one.
+
+### 4.3 When to Use Each
+
+- **Decimal places** are preferred when communicating precision in a specific numerical range — e.g., reporting a PK parameter to 2 decimal places conveys the precision of the estimate.
+- **Significant figures** are preferred when values span a wide range of magnitudes — e.g., setting all entries in a results table to 3 significant figures ensures consistency regardless of whether the value is $0.023$ or $980$.
+
+**Practical example — bioequivalence:** The 90% confidence interval limits of $80.00$–$125.00\%$ must not be rounded. A lower bound of $79.9357\%$ cannot be rounded up to $80\%$ to claim a passing result. Regulatory guidelines (e.g., FDA bioequivalence guidance) specify exactly how decimal places are to be handled in such assessments.
+
+### 4.4 Printing vs. Rounding in Code
+
+In literate programming environments (e.g., Quarto/R Markdown documents), it is often preferable to *display* a number with reduced precision without *altering* the underlying stored value. Formatting functions (e.g., `Printf.@sprintf` in Julia) print a formatted string while retaining the full-precision value in memory. By contrast, `round(x; digits=2)` creates a new variable with the rounded value. Both approaches are valid, but their distinction matters when the rounded value is subsequently used in further calculations.
+
+---
+
+## 5. Exponential and Logarithmic Functions
+
+### 5.1 Definitions
+
+The **logarithm** of a number is the power to which a base must be raised to produce that number.
+
+$$\log_b(x) = y \iff b^y = x$$
+
+Two bases are used in pharmacokinetics:
+
+- **Common logarithm** ($\log_{10}$): logarithm to base 10.
+- **Natural logarithm** ($\ln$): logarithm to base $e$, where $e \approx 2.718$.
+
+The relationship between the two:
+
+$$\ln(x) = 2.303 \cdot \log_{10}(x)$$
+
+**Important note for Julia:** The built-in `log()` function computes the natural logarithm. To compute a base-10 logarithm, use `log10()`.
+
+### 5.2 Why Logarithmic Transformation is Used in PK
+
+Two principal reasons:
+
+1. **Visualization:** Concentration data spanning several orders of magnitude are compressed onto a manageable scale, separating data points that would otherwise overlap.
+2. **Linearization:** An exponential decay curve becomes a straight line on a semi-logarithmic plot. Linear relationships are far easier to analyze, parameterize, and interpret than nonlinear ones. This is the foundation for graphical estimation of PK parameters (e.g., terminal slope estimation).
+
+**Example:** The log-linear PK equation
+
+$$\ln[C(t)] = \ln\left(\frac{\text{Dose}}{V}\right) - K_e \cdot t$$
+
+has the form $y = \text{intercept} + \text{slope} \times t$. The slope equals $-K_e$, and if $K_e = 0.38\ \text{hr}^{-1}$, the interpretation is that approximately 38% of the drug present in plasma is eliminated per hour (under first-order kinetics).
+
+### 5.3 Why Logarithms Are Dimensionless
+
+A logarithm is the logarithm of a ratio — the argument of a logarithm must be dimensionless. When we write $\ln[C(t)]$, we are implicitly computing $\ln[C(t)/C_{\text{ref}}]$ where $C_{\text{ref}}$ is a reference concentration of 1 (in whatever units $C$ is expressed). The result carries no units. This is why plotting log-concentration versus time yields a dimensionless y-axis, even though the original concentration had units.
+
+### 5.4 Fundamental Rules of Logarithms
+
+| Rule | Expression |
+|------|------------|
+| Product rule | $\log(xy) = \log(x) + \log(y)$ |
+| Quotient rule | $\log(x/y) = \log(x) - \log(y)$ |
+| Power rule | $\log(x^n) = n \cdot \log(x)$ |
+| Log of 1 | $\log(1) = 0$ |
+
+**PK application of the power rule:** Allometric scaling relationships take the form:
+
+$$\log(\text{CL}) = \log(a) + b \cdot \log(\text{BW})$$
+
+where body weight (BW) is the predictor. This is a log-log linear relationship arising directly from the power rule.
+
+### 5.5 Rules of Exponents
+
+Exponents are shorthand for repeated multiplication. The rules of exponents are used extensively in PK — particularly in model-building and parameter transformations:
+
+| Rule | Expression |
+|------|------------|
+| Product rule | $a^m \cdot a^n = a^{m+n}$ |
+| Power of a power | $(a^m)^n = a^{mn}$ |
+| Zero exponent | $a^0 = 1$ ($a \neq 0$) |
+| Negative exponent | $a^{-n} = 1/a^n$ |
+
+---
+
+## 6. Rates and Orders of Process
+
+### 6.1 Zero-Order Processes
+
+For a zero-order process, the rate of change of concentration is **constant** and **independent of the current concentration**:
+
+$$-\frac{dC}{dt} = K_0$$
+
+Integrating yields:
+
+$$C(t) = C_0 - K_0 \cdot t$$
+
+This is a linear function of time, yielding a straight line on a standard (linear) concentration–time plot.
+
+**Units of $K_0$:** Since concentration has units of (e.g.) $\text{ng/mL}$ and time has units of $\text{min}$, $K_0$ has units of $\text{ng/mL/min}$ (concentration per unit time).
+
+**Intuition:** The rate of elimination does not depend on how much drug remains. A canonical example from physiology is alcohol metabolism at saturating concentrations — the enzymatic machinery is fully occupied and processes a fixed amount of substrate per unit time regardless of how much substrate is present.
+
+### 6.2 First-Order Processes
+
+For a first-order process, the rate of change is **proportional to the current concentration**:
+
+$$-\frac{dC}{dt} = K_1 \cdot C$$
+
+The rate decreases as concentration decreases — a larger concentration drives a faster rate of elimination.
+
+**Units of $K_1$:** $\text{hr}^{-1}$ (or $\text{min}^{-1}$, etc.) — a pure rate constant with units of reciprocal time.
+
+**Intuition:** The fraction of drug eliminated per unit time is constant. If $K_1 = 0.38\ \text{hr}^{-1}$, then 38% of the drug present at any given moment is eliminated each hour.
+
+Most pharmacokinetic absorption and elimination processes are assumed to be first-order. Understanding the mechanistic basis for this assumption — rather than simply accepting it as convention — is essential for building correct PK models.
+
+---
+
+## 7. Differential Equations in Pharmacokinetics
+
+### 7.1 The Noyes–Whitney Equation
+
+The Noyes–Whitney equation describes the rate of dissolution of a solid drug in a medium:
+
+$$\frac{dA}{dt} = D \cdot S_A \cdot \frac{C_s - C}{h}$$
+
+where $D$ is the diffusion coefficient, $S_A$ is the effective surface area, $h$ is the boundary layer thickness, $C_s$ is the saturation concentration, and $C$ is the bulk concentration. This equation is the physical basis for understanding drug dissolution and permeability, which underlies all formulation design and in vitro–in vivo correlations.
+
+### 7.2 Rules for Writing Differential Equations for PK Compartmental Models
+
+Four rules govern the construction of differential equations for compartmental models:
+
+1. **Number of equations equals number of compartments.** Each compartment requires exactly one differential equation.
+
+2. **Number of terms on the right-hand side equals the number of arrows (transfer processes) connected to that compartment.**
+
+3. **Sign of each term is determined by the direction of the arrow:**
+   - Arrow pointing *into* the compartment → positive term.
+   - Arrow pointing *out of* the compartment → negative term.
+
+4. **Coefficient of each term is the associated rate constant** (flow constant).
+
+**Example — one-compartment model with IV bolus:**
+
+For a single compartment containing drug amount $X$, with elimination proceeding by first-order kinetics:
+
+$$\frac{dX}{dt} = -K_{10} \cdot X$$
+
+- Units check: $[X] = \text{mg}$; $[K_{10}] = \text{hr}^{-1}$; therefore $\frac{dX}{dt}$ has units of $\text{mg/hr}$. Both sides are consistent.
+- There is one arrow (elimination out of the compartment) → one term.
+- The arrow points outward → negative sign.
+- The subscript notation $K_{10}$ denotes transfer from compartment 1 to the outside (compartment 0).
+
+**Two-compartment extension:** Transfer between compartments 1 and 2 is denoted $K_{12}$ (from 1 to 2) and $K_{21}$ (from 2 to 1). Terminal elimination from compartment 1 is $K_{10}$.
+
+---
+
+## 8. Integration and the Area Under the Curve (AUC)
+
+Integration is the mathematical inverse of differentiation. In PK, integration is used to compute the area under the concentration–time curve (AUC), which represents total drug exposure.
+
+$$\text{AUC}_{0}^{t} = \int_0^t C(t')\ dt'$$
+
+The most common numerical method for computing AUC from discrete data is the **linear trapezoidal rule**:
+
+$$\text{AUC}_{t_i \to t_{i+1}} = \frac{C_i + C_{i+1}}{2} \cdot (t_{i+1} - t_i)$$
+
+The total AUC is the sum of all such trapezoids. This forms the computational basis of non-compartmental analysis (NCA). Extrapolation of AUC from the last observed concentration to infinity requires additional rules (covered in the NCA section).
+
+**Relationship to the analytical equation:** For a one-compartment IV bolus:
+
+$$\text{AUC}_{0}^{\infty} = \frac{\text{Dose}}{\text{CL}} = \frac{F \cdot \text{Dose}}{\text{CL}}$$
+
+where $F$ is bioavailability (dimensionless) and CL has units of $\text{L/hr}$.
+
+---
+
+## 9. Common PK Parameters: Symbols and Units
+
+| Parameter | Symbol | Typical Units |
+|-----------|--------|---------------|
+| Plasma concentration | $C$ | ng/mL, µg/L, nM |
+| Dose | $D$ | mg, µg |
+| Volume of distribution | $V$ | L, L/kg |
+| Clearance | CL | L/hr, mL/min |
+| Elimination rate constant | $K_e$ | hr⁻¹ |
+| Absorption rate constant | $K_a$ | hr⁻¹ |
+| Half-life | $t_{1/2}$ | hr, min |
+| Bioavailability | $F$ | dimensionless (fraction) |
+| AUC | AUC | ng·hr/mL, µg·hr/L |
+| Zero-order rate constant | $K_0$ | ng/mL/hr |
+
+---
+
+## Summary
+
+This lecture establishes the mathematical and conceptual foundation required for all subsequent pharmacokinetic work:
+
+- Precise use of the terms **variable**, **parameter**, and **constant** is essential for clear scientific communication.
+- **Dimensionality** governs the validity of all PK equations; units must balance, and one must always verify unit consistency when deriving or interpreting equations.
+- **Unit conversions** must be performed correctly before any analysis; computational tools assist but the analyst must understand the logic.
+- **Significant figures** and rounding must be applied appropriately, especially in regulatory contexts such as bioequivalence.
+- **Logarithms** linearize exponential PK data and are dimensionless by nature; the natural log is the default in Julia (`log()`).
+- **Zero-order** processes proceed at a rate independent of concentration; **first-order** processes proceed at a rate proportional to the remaining concentration. This distinction defines the structure of all PK differential equations.
+- **Differential equations** for compartmental models follow four simple rules; understanding these rules enables one to translate any pharmacokinetic diagram into a system of equations.
+- **Integration** (and specifically the trapezoidal rule) underlies NCA and AUC calculation.

@@ -1,0 +1,10 @@
+mi210_materials/
+PumasTutorials.jl/
+pumas/_site/
+pumas/.quarto/
+lectures/transcripts/raw/
+cookies.txt
+urls.txt
+*.vtt
+Manifest.toml
+.DS_Store

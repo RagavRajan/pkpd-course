@@ -1,0 +1,38 @@
+---
+title: "Lecture Notes"
+subtitle: "PK and PKPD Modeling Course Lectures"
+---
+
+## Pharmacokinetics (PK) Course
+
+Foundational pharmacokinetics lectures covering ADME, compartmental models, clearance, and dosing.
+
+| Week | Lecture | Topic |
+|------|---------|-------|
+| 1 | [Foundations of PK Terminology and Data](pk/W1a-foundations-of-pk-terminology-and-data.qmd) | Variables, parameters, constants, errors |
+| 1 | [Units, Dimensionality, and Rate Processes](pk/W1b-units-dimensionality-and-rate-processes.qmd) | Dimensional analysis, zero/first-order rates |
+| 1 | [Mathematical Foundations of PK](pk/W1c-mathematical-foundations-of-pk.qmd) | Exponentials, logarithms, calculus for PK |
+| 2 | [One-Compartment IV Bolus Model](pk/W2-one-compartment-iv-bolus-model.qmd) | Monoexponential decline, ke, half-life |
+| 3 | [Drug Transport, Diffusion, and Distribution](pk/W3-drug-transport-diffusion-and-distribution.qmd) | Membrane permeability, Fick's law, distribution |
+| 4 | [Volume of Distribution and Protein Binding](pk/W4-volume-of-distribution-and-protein-binding.qmd) | Vd, fu, tissue partitioning |
+| 5 | [Volume of Distribution — Mechanisms and Determinants](pk/W5-volume-of-distribution-mechanisms-and-determinants.qmd) | Vss, Vd derivations, physiological determinants |
+| 6 | [Clearance, Hepatic Extraction, and Intrinsic Clearance](pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd) | CL, ER, CLint, hepatic microanatomy |
+| 7 | [Hepatic Clearance — Intrinsic Clearance and Extraction Ratio](pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd) | Vmax/KM, high vs low ER drugs, DDIs |
+| 7 | [Well-Stirred Model and Renal Elimination](pk/W7b-well-stirred-model-and-renal-elimination.qmd) | Well-stirred model, GFR, renal CL |
+| 8 | [Extravascular Dosing and Oral Absorption](pk/W8-extravascular-dosing-and-oral-absorption.qmd) | First-order absorption, bioavailability, flip-flop |
+| 9 | [IV Infusion Kinetics](pk/W9-iv-infusion-kinetics.qmd) | Zero-order input, steady state, loading doses |
+
+## PKPD Modeling Course
+
+Population pharmacokinetic-pharmacodynamic modeling lectures covering NLME theory, diagnostics, and covariate analysis.
+
+| Week | Lecture | Topic |
+|------|---------|-------|
+| 1 | [Philosophy, Principles, and Practice](pkpd/W1-philosophy-principles-and-practice.qmd) | Modeling philosophy, two pillars, parsimony |
+| 2 | [Structural Models and Parameter Estimation](pkpd/W2-structural-models-and-parameter-estimation.qmd) | Model building, estimation approaches |
+| 4 | [Population PK Model Components and NLME](pkpd/W4-population-pk-model-components-and-nlme.qmd) | Structural/variability/covariate submodels, η, ε |
+| 5 | [Base Model Diagnostics and Likelihood Comparison](pkpd/W5-base-model-diagnostics-and-likelihood-comparison.qmd) | GOF, -2LL, LRT, AIC |
+| 6 | [Graphical Diagnostics and Residual Analysis](pkpd/W6-graphical-diagnostics-and-residual-analysis.qmd) | DV vs PRED/IPRED, CWRES interpretation |
+| 7 | [Residual Diagnostics and Error Model Specification](pkpd/W7-residual-diagnostics-and-error-model-specification.qmd) | Additive/proportional/combined error, RUV |
+| 7.5 | [Covariate Modeling Fundamentals](pkpd/W7.5-covariate-modeling-fundamentals.qmd) | Covariate types, functional forms, parameterization |
+| 8 | [Covariate Diagnostics and Methodology](pkpd/W8-covariate-diagnostics-and-methodology.qmd) | EBE screening, shrinkage, SCM/GAM/FFM |

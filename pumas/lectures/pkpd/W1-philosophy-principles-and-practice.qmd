@@ -1,0 +1,279 @@
+---
+title: "The Art of Pharmacometric Modeling: Philosophy, Principles, and Practice"
+subtitle: "Lecture Notes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Overview
+
+This lecture is philosophical in nature and is intended to set the conceptual foundation for the modeling work that follows in subsequent sessions. The central theme is understanding what pharmacometric modeling truly requires — not merely the technical act of running models, but the broader scientific and strategic thinking that transforms data into defensible, meaningful decisions.
+
+---
+
+## The Art of Modeling
+
+### What is Pharmacometrics?
+
+Pharmacometrics is not an easy field. It is not simply a matter of pressing buttons and running analyses. It requires deep subject matter expertise (SME) across multiple domains, including:
+
+- Disease state knowledge
+- Mathematics and statistics
+- Programming
+- Pharmacology
+
+Most practitioners enter the field from a pharmaceutical or engineering background and must accumulate expertise across all of these areas. The scientist performing pharmacometrics must wear multiple hats. The expectation is not mastery of every domain, but rather:
+
+1. **Deep expertise in at least one domain**, and
+2. **The ability to communicate fluently in all others** in order to collaborate effectively.
+
+For example, one need not know the inner workings of core optimization algorithms, but one should be able to communicate meaningfully with computational colleagues about trade-offs, challenges, and testing strategies. This communicative breadth is at the core of effective scientific collaboration.
+
+> A recommended reference is the first chapter of Peter Bonate's textbook on PKPD modeling, titled *"The Art of Modeling."* It addresses many of the concepts discussed here and is strongly recommended reading before proceeding further in this course.
+
+---
+
+## Ideality vs. Reality in Model Building
+
+### The Concept of Ideality
+
+Consider a simple example: fitting a regression line to a body weight versus age dataset. The initial assumption is:
+
+$$y = mx + b$$
+
+where $b$ is the intercept, $m$ is the slope, $x$ is age, and $y$ is body weight. This is a reasonable starting point. However, if the dataset spans an age range from 0 to 200 years and body weights from 3 kg to 250 kg — with only one or two subjects above 240 kg — the linear regression no longer fits adequately.
+
+The "ideality" of modeling is the assumption that one can go directly from problem statement to final model in a single, clean step. In reality, however, the process is far more iterative and tortuous.
+
+### The Reality: An Iterative Decision Paradigm
+
+What actually happens in practice is:
+
+- One starts with an initial model.
+- Diagnostic checks reveal shortcomings.
+- Subject matter expertise informs modifications.
+- Multiple model variants are tested at each decision node.
+- The final model is reached through a branching, non-linear path.
+
+This iterative process can be visualized as a **knowledge graph** — a decision tree that evolves as new information is incorporated. Two analysts working on the same dataset will likely arrive at different final models, because the path taken depends on experience, prior knowledge, and individual judgment.
+
+This is not a flaw in pharmacometrics — it is its nature. Unlike classical statistics, there is no rigid standardization of the modeling workflow. This should be viewed as an **opportunity**: the analyst is tasked with taking a deep dive into the dataset and constructing the solution that best explains the variance in the data.
+
+### Sources of Variance
+
+The variability in a dataset can arise from:
+
+- Disease state
+- Random biological variability
+- Experimental design
+- Pharmacological differences between subjects
+
+A skilled modeler attempts to account for all of these factors in the decision-making process.
+
+---
+
+## Developing Good Modeling Habits
+
+### Habits Must Be Your Own
+
+Every analyst will approach a modeling problem differently. The important thing is that one's habits are:
+
+1. Developed through personal experience
+2. Continuously adapted as learning deepens
+3. Aligned with the **analysis goal**, not merely the completion of a task
+
+If the goal is simply to complete deliverables, adaptation will not occur. If the goal is to **support the right final decision**, adaptation becomes natural — the analyst will explore the right opportunities and evaluate the right scenarios.
+
+### Avoiding Stagnation
+
+There is a risk of becoming a "number cruncher" — someone who follows instructions mechanically without applying scientific judgment. To avoid this:
+
+- Reflect regularly on what you are doing and why.
+- Invest in understanding the science behind the analysis.
+- Learn from mistakes and use them as calibration points.
+- Do not compare your progress to others; compare only to your past self.
+
+---
+
+## The Two Pillars of Pharmacometrics
+
+Pharmacometric analysis rests on two stacked components:
+
+| Pillar | Component | Approximate Weight |
+|---|---|---|
+| **Lower** | Technical expertise (stats, math, programming) | 20–30% |
+| **Upper** | Strategic expertise (scientific judgment, decision-making) | 70–80% |
+
+These components are not independent — they are **stacked**. Without a solid technical foundation, strategic thinking has no basis. The technical layer must be present for the strategic layer to be actionable.
+
+The implication: while technical skill alone is insufficient, it is absolutely necessary. A practitioner who lacks technical grounding cannot contribute meaningfully to the analytical process and can only report to someone else who can. The goal is to be proficient enough technically that more cognitive bandwidth is freed for scientific and strategic thinking.
+
+---
+
+## Checkpoints and the Modeling Analysis Plan (MAP)
+
+### The MAP as an Itinerary
+
+Before embarking on any modeling exercise, a **Modeling Analysis Plan (MAP)** should be written. This is analogous to a travel itinerary: it specifies the planned analytical path upfront, including:
+
+- The base model structure (e.g., one-compartment, first-order absorption)
+- Allometric scaling approach (e.g., fixed exponent)
+- Inter-individual variability (IIV) terms (e.g., on clearance and volume)
+- Residual error model (e.g., proportional)
+- Handling of below-quantification-limit (BQL) data (e.g., M3 method)
+
+### Checkpoints
+
+Within the MAP, checkpoints function as decision milestones — analogous to postcards sent from each city on a journey. When the modeling path deviates from the original plan (as it almost always does), new checkpoints must be established on the fly. These revised checkpoints allow reviewers to follow the analyst's decision-making process and understand why departures from the original plan were made.
+
+For example, if the proportion of BQL values is found to be less than 10%, the M3 method may be replaced by M1 (ignoring BQL values). From that decision point forward, the subsequent analysis branches accordingly.
+
+---
+
+## What Model Building Is and Is Not
+
+### What Model Building Is
+
+- A **repeated, iterative process** of testing a hypothesis
+- Checking assumptions through **graphical and numerical diagnostics** at each step
+- Modifying the model based on **physical, chemical, physiological, pharmacological, and prior data** considerations
+- Making important **statistical assumptions** at every step, accounting for missing information, variability, and study design
+- Drawing on **prior information** from experiments, literature, and prior modeling experience
+- Pursuing the principle of **parsimony**: the least complicated model that adequately describes the central tendency and variability of the data
+
+### What Model Building Is Not
+
+- Running a single pre-specified model
+- Performing a permutation of all possible models and selecting the one with the highest log-likelihood or lowest AIC
+- Blindly applying a previously published model without assessing its assumptions and limitations
+- Treating the change in objective function value (ΔOFV) as the sole criterion for model selection
+- Applying a stepwise procedure uniformly to every dataset, regardless of context
+
+### On Parsimony
+
+The principle of **parsimony** is central to model building. The goal is to arrive at the simplest model that adequately describes the data. Not every analysis requires a full population PK model, a model-based meta-analysis, or a quantitative systems pharmacology (QSP) approach. Some questions are best answered by non-compartmental analysis (NCA). The complexity of the model should be commensurate with the complexity of the question.
+
+---
+
+## Ethics in Pharmacometric Analysis
+
+The ethical dimension of pharmacometrics is often underemphasized but is critically important. Given the high volume of analytical work and the complexity of decision-making, there is a risk of glossing over incorrect decisions.
+
+Consider the following scenario: an analyst compares a one-compartment and a two-compartment model, selects the two-compartment model based on ΔOFV alone, and completes the analysis. If the analyst later realizes that this decision was made without considering other evidence — such as goodness-of-fit plots, individual fit diagnostics, and the predominance of one-compartment models in the prior literature — it is the analyst's ethical responsibility to:
+
+1. Acknowledge the potentially incorrect decision
+2. Discuss its implications with the team
+3. Challenge their own conclusions and invite scrutiny
+
+Scientific ethics require that the analyst work collaboratively, challenge both themselves and their colleagues, and communicate uncertainty transparently. Without this ethical foundation, the practitioner reduces to a technical number-cruncher rather than a contributing scientist.
+
+---
+
+## Practical Tips for Effective Modeling
+
+### 1. Exploratory Data Analysis (EDA)
+
+Every modeling exercise must begin with thorough EDA. To conduct effective EDA, the analyst must be deeply familiar with:
+
+- The drug and its class of action
+- The disease being modeled
+- The clinical pharmacology of related approved drugs in the same class
+- The study protocol and clinical study report (CSR)
+- The dataset structure
+
+Getting "intimate" with the data means being able to recall key parameters (e.g., half-life, mechanism of action) without reference. This depth of familiarity prevents decisions based on incomplete information.
+
+### 2. Organization
+
+Work must be organized systematically so that it can be retrieved efficiently when specific questions arise. Disorganized work wastes time and impedes reproducibility.
+
+### 3. Pseudocode and Prototype Workflows
+
+Before writing executable code, develop **pseudocode**: a written description of the intended analysis logic. Translating pseudocode into working code produces cleaner, more intentional implementations. Always maintain prototype codes and standard workflow templates that can serve as starting points.
+
+### 4. Do Not Work Alone
+
+Collaboration is not optional — it is essential. No single analyst is expected to be a master of every domain. Working in teams allows complementary expertise to be brought to bear on the problem. Colleagues are resources; use them.
+
+### 5. Reflect on Previous Experiences
+
+Self-reflection is a core professional habit. If the lessons of prior analyses are not internalized, the same mistakes will recur. Improvement requires conscious reflection on what was done, why it was done, and what could be done differently.
+
+---
+
+## The Role of Software Tools
+
+The tools commonly used in pharmacometric modeling include:
+
+- **Pumas** (Julia-based)
+- **NONMEM**
+- **Phoenix/NLME**
+- **Monolix**
+- **R**
+- **MATLAB**
+- **Python**
+
+Mastery of every tool is not required, but the ability to move between tools is an asset. More fundamentally: **the scientist must not be a slave to the software**. Software should serve the scientist, not the other way around. The analyst's cognitive resources should be directed toward scientific thinking, not toward working around software limitations.
+
+---
+
+## Asking the Right Questions
+
+A well-known aphorism from the statistician John Tukey is directly relevant here:
+
+> *"It is better to find an approximate answer to the right question than to find the right answer to an approximate question."*
+
+If the question being asked is itself imprecise or poorly defined, then even a technically correct answer is of limited value. Investing time in formulating the right question — grounded in scientific understanding of the drug, disease, and trial — is more valuable than technical precision applied to a poorly defined problem. Asking the right question is itself a strategic skill, one that develops in tandem with technical expertise.
+
+---
+
+## What is Rarely Shown in Published Models
+
+The models reported in the scientific literature represent the final product of a lengthy, iterative process involving substantial scientific judgment. What is rarely shown is:
+
+- The intermediate models that were tested and rejected
+- The diagnostic reasoning that led to each decision
+- The prior knowledge that shaped modeling choices
+
+The apparent simplicity of a published model should not be mistaken for simplicity in its derivation. Respect the work that has gone into published models, but do not adopt them uncritically. Always assess whether the assumptions and limitations of a prior model are compatible with the current study.
+
+---
+
+## Defending Your Model
+
+A model is only as credible as the analyst's ability to defend it. Decisions must be justifiable based on:
+
+- First principles (PK, PD, physiology, statistics)
+- Prior literature
+- Diagnostic evaluations (graphical and numerical)
+
+If a decision cannot be defended scientifically, the model cannot be trusted. The ability to defend modeling decisions grows directly from technical proficiency: the more efficient the analyst is with tools, the more cognitive bandwidth is available for scientific reasoning about model choices.
+
+---
+
+## Summary: Principles of the Art of Modeling
+
+1. Model building is an iterative process driven by hypothesis testing and diagnostic checking — not a single pre-specified workflow.
+2. Subject matter expertise is as important as technical skill. Both are required; neither alone is sufficient.
+3. The principle of parsimony guides model selection: use the simplest model that adequately describes the data.
+4. A Modeling Analysis Plan (MAP) should be written before analysis begins, with checkpoints defined and updated as the path evolves.
+5. Ethics in analysis — transparency, self-challenge, and scientific honesty — are non-negotiable.
+6. EDA, organization, pseudocode, collaboration, and self-reflection are the practical habits of effective modelers.
+7. Software is a tool; the scientist directs the analysis.
+8. Ask the right questions. An approximate answer to the right question is more valuable than a precise answer to the wrong one.
+9. Do not compare your progress to others. Your only benchmark is your past self.
+10. Enjoy the aha moments. They are the markers of genuine learning.
+
+---
+
+## Looking Ahead
+
+In subsequent sessions, the concepts introduced here will be operationalized through a structured, hands-on workflow. The course is designed to:
+
+1. Familiarize students with the end-to-end workflow of a population PK analysis using Pumas
+2. Build understanding of each step in that workflow through targeted instruction
+3. Develop technical fluency through repeated exposure to multiple scenarios and edge cases
+
+The first homework exercise is not about mastering code; it is about traversing the full workflow from beginning to end, engaging with the required readings, and developing familiarity with the terms and steps involved. From the next session, each section of that workflow will be expanded upon in detail.

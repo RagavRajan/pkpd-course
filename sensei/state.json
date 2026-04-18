@@ -1,0 +1,200 @@
+{
+  "course": "mi210-pkpd",
+  "course_title": "MI-210: Essentials of Population PKPD M&S (Pumas Edition)",
+  "nodes": [
+    {
+      "id": "mi210/ch1/nonlinear-regression",
+      "title": "Nonlinear Regression & MLE",
+      "chapter": 1,
+      "source_file": "pumas/ch1_intro_nlme/ch1_intro_nlme.qmd",
+      "line_start": 90,
+      "description": "Maximum likelihood, OLS/WLS/ELS objective functions, 1-cpt IV bolus fitting",
+      "prerequisites": [],
+      "mastery": 1,
+      "attempts": 1,
+      "hints_used": 5
+    },
+    {
+      "id": "mi210/ch1/diagnostic-plots",
+      "title": "Diagnostic Plots for Regression",
+      "chapter": 1,
+      "source_file": "pumas/ch1_intro_nlme/ch1_intro_nlme.qmd",
+      "line_start": 250,
+      "description": "PRED vs OBS, RES vs PRED, WRES vs PRED, residual patterns",
+      "prerequisites": ["mi210/ch1/nonlinear-regression"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch1/population-nlme-theory",
+      "title": "Population NLME Theory",
+      "chapter": 1,
+      "source_file": "pumas/ch1_intro_nlme/ch1_intro_nlme.qmd",
+      "line_start": 400,
+      "description": "Hierarchical models, IIV/RUV variance models, FO/FOCE/FOCEI, AIC/LRT",
+      "prerequisites": ["mi210/ch1/nonlinear-regression"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch2/data-formatting",
+      "title": "Data Formatting for Pumas",
+      "chapter": 2,
+      "source_file": "pumas/ch2_data_assembly/01_data_format_examples.jl",
+      "line_start": 1,
+      "description": "NMTRAN to Pumas data columns, read_pumas, EVID/AMT/CMT/SS/II/ADDL",
+      "prerequisites": [],
+      "mastery": 2,
+      "attempts": 3,
+      "hints_used": 4
+    },
+    {
+      "id": "mi210/ch3/pred-models",
+      "title": "Coding PRED Models in Pumas",
+      "chapter": 3,
+      "source_file": "pumas/ch3_nlme_models/ch3_coding_nlme.qmd",
+      "line_start": 30,
+      "description": "NONMEM-to-Pumas mapping, @model macro, @param/@random/@pre/@derived, no dynamics",
+      "prerequisites": ["mi210/ch1/population-nlme-theory", "mi210/ch2/data-formatting"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch3/predpp-models",
+      "title": "Compartmental PK Models (PREDPP)",
+      "chapter": 3,
+      "source_file": "pumas/ch3_nlme_models/ch3_coding_nlme.qmd",
+      "line_start": 120,
+      "description": "ADVAN to Pumas dynamics mapping, Central1, Depots1Central1, exponential IIV, proportional error",
+      "prerequisites": ["mi210/ch3/pred-models"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch3/fitting-inference",
+      "title": "Fitting & Inference in Pumas",
+      "chapter": 3,
+      "source_file": "pumas/ch3_nlme_models/ch3_coding_nlme.qmd",
+      "line_start": 200,
+      "description": "fit(), FO/FOCE/FOCEI, infer(), inspect(), coef(), aic(), interpreting output",
+      "prerequisites": ["mi210/ch3/predpp-models"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch4/covariate-parameterization",
+      "title": "Covariate Parameterizations",
+      "chapter": 4,
+      "source_file": "pumas/ch4_covariates/ch4_covariates.qmd",
+      "line_start": 30,
+      "description": "Power models, linear models, categorical covariates, centering on reference values",
+      "prerequisites": ["mi210/ch3/fitting-inference"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch4/covariate-selection",
+      "title": "Covariate Screening & Selection",
+      "chapter": 4,
+      "source_file": "pumas/ch4_covariates/ch4_covariates.qmd",
+      "line_start": 150,
+      "description": "EBE screening plots, forward/backward selection, LRT, AIC comparison",
+      "prerequisites": ["mi210/ch4/covariate-parameterization"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch5/simulation-basics",
+      "title": "Simulation in Pumas",
+      "chapter": 5,
+      "source_file": "pumas/ch5_simulation/ch5_simulation.qmd",
+      "line_start": 30,
+      "description": "simobs(), DosageRegimen, fixed/individual/population simulation, multiple dosing",
+      "prerequisites": ["mi210/ch3/fitting-inference"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch6/bootstrap-vpc",
+      "title": "Bootstrap & VPC",
+      "chapter": 6,
+      "source_file": "pumas/ch6_model_evaluation/ch6_model_evaluation.qmd",
+      "line_start": 30,
+      "description": "infer(fit, Bootstrap()), vpc(), vpc_plot(), model qualification",
+      "prerequisites": ["mi210/ch3/fitting-inference"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch7/direct-pkpd",
+      "title": "Direct PK-PD Models",
+      "chapter": 7,
+      "source_file": "pumas/ch7_pkpd_models/ch7_pkpd_models.qmd",
+      "line_start": 80,
+      "description": "Direct Emax, multi-DV data (wide format), simultaneous PK-PD estimation",
+      "prerequisites": ["mi210/ch3/predpp-models"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    },
+    {
+      "id": "mi210/ch7/indirect-response",
+      "title": "Indirect Response & ODE Models",
+      "chapter": 7,
+      "source_file": "pumas/ch7_pkpd_models/ch7_pkpd_models.qmd",
+      "line_start": 250,
+      "description": "Effect compartment, indirect response Types I-IV, @dynamics ODE blocks, @init",
+      "prerequisites": ["mi210/ch7/direct-pkpd"],
+      "mastery": 0,
+      "attempts": 0,
+      "hints_used": 0
+    }
+  ],
+  "sessions": [
+    {
+      "date": "2026-04-17",
+      "course": "mi210-pkpd",
+      "node_id": "mi210/ch1/nonlinear-regression",
+      "challenges_completed": 1,
+      "hints_used": 5,
+      "mastery_before": 0,
+      "mastery_after": 1
+    },
+    {
+      "date": "2026-04-18",
+      "course": "mi210-pkpd",
+      "node_id": "mi210/ch2/data-formatting",
+      "challenges_completed": 1,
+      "hints_used": 2,
+      "mastery_before": 0,
+      "mastery_after": 1
+    },
+    {
+      "date": "2026-04-18",
+      "course": "mi210-pkpd",
+      "node_id": "mi210/ch2/data-formatting",
+      "challenges_completed": 1,
+      "hints_used": 0,
+      "mastery_before": 1,
+      "mastery_after": 2
+    },
+    {
+      "date": "2026-04-18",
+      "course": "mi210-pkpd",
+      "node_id": "mi210/ch2/data-formatting",
+      "challenges_completed": 1,
+      "hints_used": 2,
+      "mastery_before": 2,
+      "mastery_after": 2
+    }
+  ]
+}

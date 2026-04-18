@@ -1,0 +1,231 @@
+# Hepatic Drug Clearance: Foundations, Intrinsic Clearance, and Extraction Ratio
+
+## Foundational Literature
+
+Two seminal papers form the conceptual backbone of hepatic drug clearance and are essential reading for anyone in this field.
+
+### Wilkinson and Shand (1975)
+
+The first is a commentary by Dr. Grant Wilkinson (Nashville, 1975) titled *"A Physiological Approach to Hepatic Drug Clearance."* This paper established the theoretical foundation for nearly everything currently understood about clearance — the extraction ratio, bioavailability, and the effects of hepatic blood flow and intrinsic clearance on systemic drug concentrations. The equations and abbreviations introduced in this paper remain the gold standard to this day. Every sentence in this article carries significant information; entire textbooks and research programs have been built upon it. No textbook or secondary source is required to learn clearance at its core — this paper alone suffices.
+
+### Pang and Rowland (1977)
+
+The second paper, by Sandy Pang and Malcolm Rowland (Toronto, 1977), is titled *"Hepatic Clearance of Drugs: Theoretical Concentrations of the Well-Stirred Model and the Parallel Tube Model — Influence of Hepatic Blood Flow, Plasma and Blood Cell Binding, and Hepatocellular Enzymatic Activity."* This paper introduced the concept of intrinsic clearance in detail and developed the mathematical treatment of the well-stirred and parallel tube models. It is more mathematically intensive but is equally essential. The concept of intrinsic clearance, the role of protein and blood cell binding, and the well-stirred model all originate here.
+
+Both papers are assigned reading. The 1977 paper is particularly recommended as a minimum. Multiple readings will be required before full comprehension is achieved — these are foundational texts that reveal deeper meaning with each successive pass.
+
+---
+
+## Recap: Elimination and Metabolism
+
+### Elimination vs. Excretion
+
+Elimination is a broad term encompassing all processes that remove a drug from the body. Excretion refers specifically to the physical removal of drug via bile, breath, kidneys, or skin. Metabolism also contributes to elimination through biotransformation, primarily in the liver.
+
+### Biotransformation
+
+Biotransformation occurs predominantly in the liver and proceeds in two phases:
+
+- **Phase I reactions**: Oxidation, reduction, and hydrolysis. These reactions increase polarity and render the drug susceptible to conjugation.
+- **Phase II reactions**: Conjugation reactions. Some drugs bypass Phase I entirely and undergo Phase II directly.
+
+The net effect of Phase I metabolism is increased polarity, facilitating subsequent conjugation and removal from the body.
+
+### Microsomal Enzymes
+
+Most biotransformations occur in the endoplasmic reticulum (ER) of hepatocytes. When organ tissue is homogenized during experimental extraction, the ER is disrupted and forms vesicular structures called **microsomes**. The enzymes contained within these structures are therefore referred to as **microsomal enzymes**, which is why DMPK studies routinely employ microsomal assays.
+
+### Major Enzyme Superfamilies
+
+Two major superfamilies of metabolizing enzymes are relevant:
+
+1. **CYP450 (Cytochrome P450)**: Organized into families (CYP1, CYP2, CYP3) and subfamilies (e.g., CYP1A, CYP1B, CYP3A, CYP2D), with individual isoforms designated by a trailing number.
+2. **UGT (UDP-glucuronosyltransferases)**: Responsible for glucuronidation in Phase II.
+
+Metabolite kinetics (i.e., the disposition of metabolites themselves) are outside the scope of this module.
+
+---
+
+## Rate of Elimination and Clearance
+
+The fundamental equation relating the rate of elimination to drug concentration is:
+
+$$\text{Rate of Elimination} = CL \times C$$
+
+Here, **clearance (CL)** is a proportionality constant that relates the rate of elimination to the concentration. From a strict mathematical standpoint, it is nothing more than a proportionality factor.
+
+### Mass Balance at the Organ Level
+
+Considering an eliminating organ with blood flow **Q**:
+
+- Drug enters with arterial blood flow **Q** and arterial concentration **C_A**
+- Drug exits with venous concentration **C_V**
+- Rate of extraction = Q × (C_A − C_V)
+
+Normalizing the rate of extraction by Q × C_A:
+
+$$E = \frac{C_A - C_V}{C_A} = 1 - \frac{C_V}{C_A}$$
+
+where **E** is the **extraction ratio**, a dimensionless parameter between 0 and 1.
+
+### Clearance Terminology
+
+Organ clearance can be categorized as:
+
+| Dimension | Categories |
+|---|---|
+| Organ | Renal, hepatic, pulmonary |
+| Process | Metabolic or excretory |
+| Fluid | Blood or plasma |
+
+Total systemic clearance is the sum of all contributing organ clearances.
+
+### Blood vs. Plasma Clearance
+
+The relationship between blood clearance and plasma clearance is:
+
+$$CL_{\text{blood}} = CL_{\text{total}} \times \frac{C_{\text{total}}}{C_{\text{unbound}}}$$
+
+Understanding this distinction is critical for correctly interpreting DMPK experiments. Confusing blood and plasma concentrations leads to fundamental errors in clearance estimation.
+
+---
+
+## Hepatic Clearance
+
+### Hepatic Blood Flow
+
+Hepatic blood flow (**Q_H**) is the sum of two components:
+
+$$Q_H = Q_{\text{portal vein}} + Q_{\text{hepatic artery}}$$
+
+- The **hepatic portal vein** drains blood directly from the gut into the liver.
+- The **hepatic artery** supplies oxygenated blood through the systemic circulation.
+
+The commonly accepted value for total hepatic blood flow is approximately **1.35 L/min**.
+
+### Hepatic Microanatomy
+
+The functional unit of the liver is the **acinus**, which contains two primary cell types:
+
+- **Hepatocytes**: The primary site of drug metabolism.
+- **Kupffer cells**: Resident macrophages (less relevant for PK purposes).
+
+Blood flows through the liver via specialized capillaries called **sinusoids**.
+
+---
+
+## Six Processes Governing Hepatic Drug Clearance
+
+Considering a single hepatocyte within a sinusoid, the fate of a drug is governed by six interrelated processes:
+
+1. **Blood flow (Q)**: Entry of blood carrying drug into the sinusoid.
+2. **Blood cell binding**: The drug may bind reversibly to blood cells; only the unbound fraction proceeds further.
+3. **Plasma protein binding**: The drug may bind reversibly to plasma proteins; again, only the unbound fraction is pharmacologically active.
+4. **Membrane permeation**: The unbound drug permeates the hepatocyte membrane, governed by physicochemical properties.
+5. **Intracellular disposition**: Inside the hepatocyte, the unbound drug may undergo **metabolism** or **biliary secretion** (via transporters).
+6. **Exit from the sinusoid**: The remaining drug exits with venous blood; entry and exit are generally assumed to be at equilibrium.
+
+### Clinical Factors Affecting Each Process
+
+| Process | Example Clinical Perturbation |
+|---|---|
+| Blood flow (1, 6) | Trauma, sepsis, hemorrhagic shock |
+| Protein binding (3) | Hypoalbuminemia (e.g., chronic kidney disease, acute-phase response) |
+| Membrane permeation (4) | Cirrhotic liver with collagen/fibrinogen deposition |
+| Intracellular metabolism (5) | Genetic polymorphisms; drug–drug interactions (induction, inhibition, competitive kinetics) |
+
+---
+
+## Intrinsic Clearance
+
+### Definition
+
+**Intrinsic clearance (CL_int)** is the inherent capacity of the hepatocyte to eliminate a drug, independent of blood flow or protein binding. It is intrinsic to the cell and is used as a surrogate for the observed rate of elimination.
+
+The rate of elimination within a hepatocyte is:
+
+$$\text{Rate of Elimination} = CL_{\text{int}} \times C_{\text{u,hepatocyte}}$$
+
+where **C_u,hepatocyte** is the intracellular unbound concentration.
+
+### Components of Hepatic Intrinsic Clearance
+
+$$CL_{\text{int,hepatic}} = \sum CL_{\text{int,metabolism}} + \sum CL_{\text{int,excretion}}$$
+
+- The metabolic component is the sum across all metabolic pathways.
+- The excretory component refers to biliary secretion via intracellular transporters.
+
+### Enzyme Kinetic Basis: Michaelis–Menten
+
+Intrinsic clearance is ultimately determined by enzyme kinetics:
+
+$$CL_{\text{int}} \propto \frac{V_{\max}}{K_M}$$
+
+- **V_max**: The maximum rate of substrate conversion; reflects the **capacity** of the enzyme (i.e., the total amount of enzyme available).
+- **K_M**: The Michaelis constant; the substrate concentration at which the reaction proceeds at 50% of V_max. K_M is the primary surrogate for **affinity** — a low K_M indicates high affinity of the drug for the enzyme.
+
+A drug with both low K_M (high affinity) and high V_max (high enzymatic capacity) will exhibit high intrinsic clearance.
+
+---
+
+## High vs. Low Extraction Ratio Drugs
+
+### High Extraction Ratio Drugs
+
+A drug is classified as a **high extraction ratio drug** when:
+
+- It is a small molecule with appropriate physicochemical properties (high lipophilicity, correct ionization state, appropriate size and charge) enabling efficient hepatocyte permeation.
+- It has **high intrinsic clearance** — driven by both high affinity (low K_M) and high enzymatic capacity (high V_max).
+
+For such drugs, essentially all drug presented to the hepatocyte is eliminated. The clearance is therefore primarily limited by **hepatic blood flow**, not by enzyme capacity.
+
+### Low Extraction Ratio Drugs
+
+Low extraction ratio drugs have limited intrinsic clearance (due to low V_max, low affinity, or poor permeation). For these drugs, clearance is primarily limited by **intrinsic clearance and protein binding**, not by blood flow.
+
+---
+
+## Drug–Drug Interactions in the Context of Extraction Ratio
+
+The susceptibility of a drug to drug–drug interactions (DDIs) depends on multiple factors simultaneously, not simply its extraction ratio class.
+
+DDIs can theoretically occur at any of the six hepatic processes described above:
+
+- **Enzyme-level interactions** (induction, inhibition, competitive kinetics) directly affect intracellular metabolism.
+- **Transporter-level interactions** affect permeation and biliary secretion.
+- **Protein binding displacement** alters the free fraction available for hepatic uptake.
+
+### Types of Competitive Kinetics
+
+At the enzyme level, drug–drug interactions may involve:
+
+- **Competitive agonism/antagonism**: Two drugs competing for the same enzyme active site.
+- The impact of competitive inhibition is limited by both the concentration of the inhibitor and the availability of free enzyme. When enzyme abundance is high, competition is minimal, which is why most co-administered drugs do not produce significant DDIs.
+
+### Covariates and Disease States
+
+Disease states substantially alter the PK landscape. For example, a tuberculosis patient receiving **rifampicin** experiences:
+
+- Auto-induction of metabolizing enzymes
+- Overexpression of both influx transporters (e.g., OATPs) and efflux transporters (e.g., P-gp)
+
+These changes shift the effective clearance of co-administered drugs. In pharmacometric modeling, such patient-specific factors are captured as **covariates** — a formal quantitative mechanism to account for inter-individual variability in clearance. Covariate relationships (e.g., clearance scaling with body weight via allometric principles) are not arbitrary statistical constructs; they reflect underlying physiological realities.
+
+---
+
+## Session Summary and Upcoming Topics
+
+This session provided a focused review of the following concepts:
+
+- The physiological basis of elimination, excretion, and biotransformation
+- The six processes governing hepatic drug clearance
+- Intrinsic clearance and its relationship to enzyme kinetics (V_max, K_M)
+- High vs. low extraction ratio drugs
+- Drug–drug interactions in the context of hepatic clearance processes
+
+### Upcoming Sessions
+
+- **Next session**: The **well-stirred model** (WSM) of hepatic clearance — the current gold standard — and the **parallel tube model**. Renal elimination will also be introduced.
+- **Final session**: Clearance as a modeling construct — physiological interpretation, mathematical frameworks, and why clearance is preferred over rate constants.
+
+The two assigned papers (Wilkinson & Shand 1975; Pang & Rowland 1977) should be read before the next session. A first read focused on the text and discussion sections — rather than the mathematics — is strongly recommended as a minimum.

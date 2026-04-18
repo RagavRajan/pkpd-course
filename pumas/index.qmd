@@ -1,0 +1,54 @@
+---
+title: "MI-210: Essentials of Population PKPD M&S"
+subtitle: "Pumas Edition"
+---
+
+## Overview
+
+Course materials for MI-210 adapted to the Pumas ecosystem. Select a chapter from the sidebar or navbar to get started.
+
+## Chapters
+
+| Chapter | Topic |
+|---------|-------|
+| 1 | [Introduction to Nonlinear Regression and NLME Models](ch1_intro_nlme/ch1_intro_nlme.qmd) |
+| 2 | [Population PK-PD Data Requirements and Formatting](ch2_data_assembly/ch2_data_assembly.qmd) |
+| 3 | [Coding Population Nonlinear Mixed Effects Models](ch3_nlme_models/ch3_coding_nlme.qmd) |
+| 4 | [Covariate Model Building](ch4_covariates/ch4_covariates.qmd) |
+| 5 | [Simulation](ch5_simulation/ch5_simulation.qmd) |
+| 6 | [Model Qualification](ch6_model_evaluation/ch6_model_evaluation.qmd) |
+| 7 | [Direct and Indirect Continuous Pop PK-PD Models](ch7_pkpd_models/ch7_pkpd_models.qmd) |
+
+## Lecture Notes
+
+Lecture notes from the PK and PKPD modeling courses provide the theoretical foundations behind the chapters above. Browse the full collection from the [Lectures index](lectures/index.qmd), or use the links below.
+
+### Pharmacokinetics (PK) Course
+
+| Week | Lecture |
+|------|---------|
+| 1 | [Foundations of PK Terminology and Data](lectures/pk/W1a-foundations-of-pk-terminology-and-data.qmd) |
+| 1 | [Units, Dimensionality, and Rate Processes](lectures/pk/W1b-units-dimensionality-and-rate-processes.qmd) |
+| 1 | [Mathematical Foundations of PK](lectures/pk/W1c-mathematical-foundations-of-pk.qmd) |
+| 2 | [One-Compartment IV Bolus Model](lectures/pk/W2-one-compartment-iv-bolus-model.qmd) |
+| 3 | [Drug Transport, Diffusion, and Distribution](lectures/pk/W3-drug-transport-diffusion-and-distribution.qmd) |
+| 4 | [Volume of Distribution and Protein Binding](lectures/pk/W4-volume-of-distribution-and-protein-binding.qmd) |
+| 5 | [Volume of Distribution — Mechanisms and Determinants](lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.qmd) |
+| 6 | [Clearance, Hepatic Extraction, and Intrinsic Clearance](lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd) |
+| 7 | [Hepatic Clearance — Intrinsic Clearance and Extraction Ratio](lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd) |
+| 7 | [Well-Stirred Model and Renal Elimination](lectures/pk/W7b-well-stirred-model-and-renal-elimination.qmd) |
+| 8 | [Extravascular Dosing and Oral Absorption](lectures/pk/W8-extravascular-dosing-and-oral-absorption.qmd) |
+| 9 | [IV Infusion Kinetics](lectures/pk/W9-iv-infusion-kinetics.qmd) |
+
+### PKPD Modeling Course
+
+| Week | Lecture |
+|------|---------|
+| 1 | [Philosophy, Principles, and Practice](lectures/pkpd/W1-philosophy-principles-and-practice.qmd) |
+| 2 | [Structural Models and Parameter Estimation](lectures/pkpd/W2-structural-models-and-parameter-estimation.qmd) |
+| 4 | [Population PK Model Components and NLME](lectures/pkpd/W4-population-pk-model-components-and-nlme.qmd) |
+| 5 | [Base Model Diagnostics and Likelihood Comparison](lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.qmd) |
+| 6 | [Graphical Diagnostics and Residual Analysis](lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.qmd) |
+| 7 | [Residual Diagnostics and Error Model Specification](lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.qmd) |
+| 7.5 | [Covariate Modeling Fundamentals](lectures/pkpd/W7.5-covariate-modeling-fundamentals.qmd) |
+| 8 | [Covariate Diagnostics and Methodology](lectures/pkpd/W8-covariate-diagnostics-and-methodology.qmd) |

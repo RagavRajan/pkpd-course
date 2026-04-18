@@ -1,0 +1,978 @@
+ ---
+title: "Chapter 2: Population PK-PD Data Requirements and Formatting"
+subtitle: "MI-210 Essentials of Population PKPD M&S — Pumas Edition"
+author: "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  error: false
+engine: julia
+---
+
+```{julia}
+#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Dates
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()
+```
+
+# Overview
+
+This chapter covers the data requirements and formatting conventions for population PK-PD modeling:
+
+- Data Terminology
+- Data Specification for the NONMEM System and Pumas
+- NMTRAN / `read_pumas` Data Requirements
+- Data Assembly Points to Consider and Best Practices
+- Practice Problems
+- Study Guide Questions
+
+# Data Terminology
+
+- **Dependent Variable (DV)** — Quantity to be modeled. May be multivariate (e.g. concentration and effect, parent and metabolite). Sometimes useful to use a transformation of observed scale (log, logit).
+
+- **Independent Variable(s)** — Known, observed or measurable quantities which serve as primary predictors of the dependent variable (e.g. Dose, Time). In regression models, independent variables are assumed to be known without error.
+
+- **Covariates** — Known, observed or measured variables which may be predictive of model parameters or response.
+
+- **Repeated Measures** — More than one observation per individual.
+
+- **Longitudinal** — Repeated measures over time.
+
+- **Sparse** — Too few samples to characterize the model accurately with data from only one individual.
+
+- **Extensive** — Enough samples to characterize the model accurately with data from only one individual.
+
+# Data Specification: NONMEM and Pumas
+
+Although this course is aimed at teaching population modeling methods in general, the data specification format developed as part of the NONMEM system is powerful and flexible and has been adopted by other population modeling software tools — including **Pumas**.
+
+## The NONMEM System
+
+- **Non**linear **M**ixed-**E**ffects **M**odeling Software
+- Comprised of multiple components:
+  - NONMEM Estimation Core
+  - PRED or user-supplied prediction routine
+  - NMTRAN (translator): converts control stream + data to NONMEM FORTRAN format
+    - **$PRED**: simple algebraic model specification
+    - **PREDPP**: library of PK models (compartmental, recursive)
+
+### NONMEM/NMTRAN Data Terminology
+
+- **Data Item** (column): value corresponding to a particular heading in the data set
+- **Data Record** (row): each row is a data record. With PREDPP, each event (dose, observation) is a data record.
+
+## The Pumas Approach
+
+In Pumas, data flows through two pathways:
+
+1. **From tabular data** (CSV, DataFrame) → `read_pumas()` → `Population` (vector of `Subject`s)
+2. **From code** (for simulation) → `DosageRegimen()` → `Subject()` → `Population`
+
+Both produce the same `Population` type that feeds into `fit()`, `simobs()`, and `inspect()`.
+
+```{julia}
+#| label: pumas-data-overview
+#| eval: false
+# Pathway 1: From data (estimation/analysis)
+df = CSV.read("pk_data.csv", DataFrame)
+population = read_pumas(df; observations = [:dv], covariates = [:WT, :AGE])
+
+# Pathway 2: From code (simulation)
+regimen = DosageRegimen(100, time = 0, addl = 6, ii = 24)
+subject = Subject(; id = 1, events = regimen, covariates = (WT = 70.0, AGE = 35.0))
+population = [subject]
+```
+
+## General Data Requirements
+
+### NMTRAN Requirements
+
+- Data records for an individual must be contiguous
+- Data file must be space- or comma-delimited ASCII text (no tabs!)
+- Each data record must have a value or placeholder (`.` or `0`) for every data item
+- Only numeric characters, comment indicators, and placeholders allowed
+
+### Pumas Requirements (PumasNDF Format)
+
+- DataFrame with one row per event (dose or observation)
+- **Lowercase** column names for reserved items: `id`, `time`, `dv`, `amt`, `evid`, `cmt`, `rate`, `ss`, `ii`, `addl`, `mdv`
+- `time` must be numeric (elapsed hours — no date strings)
+- `dv` uses `missing` for non-observation records (instead of NONMEM's `.` or `0`)
+- Records sorted by `id`, then `time`
+
+::: {.callout-note}
+Pumas runs NMTRAN-style compliance checks by default (`check=true` in `read_pumas`). This catches common issues like missing dose records, non-monotonic times, and invalid EVID/AMT combinations.
+:::
+
+## Required Data Items: NONMEM vs Pumas
+
+### For the Estimation Core (NONMEM) / `read_pumas` (Pumas)
+
+| NONMEM | Pumas | Description | Notes |
+|--------|-------|-------------|-------|
+| ID | `id` | Subject identifier | String or numeric |
+| DV | `dv` | Dependent variable | `missing` for non-obs (replaces MDV) |
+| MDV | `mdv` | Missing DV flag | Pumas can infer from `missing` in `dv` |
+| TIME | `time` | Time of event | Must be numeric elapsed time |
+| AMT | `amt` | Dose amount | Required when `event_data=true` |
+| EVID | `evid` | Event ID | Auto-imputed: 1 if `amt>0`, else 0 |
+| CMT | `cmt` | Compartment | Default: 1 |
+| RATE | `rate` | Infusion rate | 0=bolus, >0=infusion rate, -2=model-controlled |
+| SS | `ss` | Steady-state flag | 0=none, 1=SS (reset), 2=SS (superposition) |
+| II | `ii` | Inter-dose interval | Required with `addl` or `ss` |
+| ADDL | `addl` | Additional doses | Total doses = `addl` + 1 |
+
+### Default Imputation
+
+When columns are absent, `read_pumas` imputes defaults:
+
+| Column | Default |
+|--------|---------|
+| `evid` | 1 if `amt > 0`, else 0 |
+| `cmt` | 1 |
+| `ii` | 0 |
+| `addl` | 0 |
+| `rate` | 0 |
+| `ss` | 0 |
+
+## EVID Codes
+
+| EVID | Meaning | AMT | DV |
+|-----:|---------|-----|-----|
+| 0 | Observation | 0 or missing | Required |
+| 1 | Dose | Required (>0) | Ignored (`missing`) |
+| 2 | Other event (covariate change) | 0 | Ignored |
+| 3 | Reset (compartment amounts → 0) | 0 | Ignored |
+| 4 | Reset and dose | Required (>0) | Ignored |
+
+::: {.callout-tip}
+EVID codes are identical in NONMEM and Pumas. Use EVID=3 for washout between crossover periods. Use EVID=4 to reset and dose in a single record. Use EVID=2 for covariate-change events that are neither doses nor observations.
+:::
+
+# Examples: NONMEM Data → Pumas Data
+
+## Example 1: $PRED-Style Data (No Compartments)
+
+NMTRAN data set for a $PRED model: $C_t = \frac{Dose}{V} \cdot e^{-CL/V \cdot t}$
+
+Single-dose IV bolus (100mg) with concentration observations (mg/L) at 2 and 6 hours post dose.
+
+**NONMEM format:**
+
+| C | ID | TIME | DOSE | DV |
+|---|---:|-----:|-----:|---:|
+| . |  1 |    2 |  100 | 24 |
+| . |  1 |    6 |  100 | 18 |
+| . |  2 |    2 |  100 | 29 |
+| . |  2 |    6 |  100 | 21 |
+
+In Pumas, a model without `@dynamics` is the equivalent of a $PRED model. The dose is passed as a **covariate** rather than a dosing event, and `event_data=false` tells `read_pumas` to skip event data assertions.
+
+```{julia}
+#| label: example-1-pred
+
+ex1 = DataFrame(
+    id   = [1, 1, 2, 2],
+    time = [2.0, 6.0, 2.0, 6.0],
+    DOSE = [100.0, 100.0, 100.0, 100.0],
+    dv   = [24.0, 18.0, 29.0, 21.0],
+)
+
+pop_ex1 = read_pumas(
+    ex1;
+    observations = [:dv],
+    covariates = [:DOSE],
+    event_data = false,
+)
+println("Example 1 — PRED style: $(length(pop_ex1)) subjects")
+```
+
+::: {.callout-note}
+With `event_data=false`, Pumas does not require `amt`, `evid`, or other dosing columns. All model inputs come through `@covariates`.
+:::
+
+## Example 2: Single IV Bolus (PREDPP / Event Data)
+
+Same scenario, but using the PREDPP event-data format with explicit dosing records.
+
+**NONMEM format:**
+
+| C | ID | TIME | AMT | DV |
+|---|---:|-----:|----:|---:|
+| . |  1 |    0 | 100 |  . |
+| . |  1 |    2 |   . | 24 |
+| . |  1 |    6 |   . | 18 |
+| . |  2 |    0 | 100 |  . |
+| . |  2 |    2 |   . | 29 |
+| . |  2 |    6 |   . | 21 |
+
+```{julia}
+#| label: example-2-iv-bolus
+
+ex2 = DataFrame(
+    id   = [1, 1, 1, 2, 2, 2],
+    time = [0.0, 2.0, 6.0, 0.0, 2.0, 6.0],
+    amt  = [100.0, 0.0, 0.0, 100.0, 0.0, 0.0],
+    dv   = [missing, 24.0, 18.0, missing, 29.0, 21.0],
+    evid = [1, 0, 0, 1, 0, 0],
+    cmt  = [1, 1, 1, 1, 1, 1],
+)
+
+pop_ex2 = read_pumas(ex2)
+println("Example 2 — IV bolus PREDPP: $(length(pop_ex2)) subjects")
+```
+
+**Key differences from NONMEM:**
+
+- `missing` replaces `.` for DV on dosing records — Pumas uses Julia's native `missing` type
+- `evid` is auto-imputed (1 if `amt > 0`, else 0) if the column is absent, but explicit is clearer
+- No comment indicator column (`C`) needed
+
+**The same scenario via `DosageRegimen` (for simulation):**
+
+```{julia}
+#| label: example-2-dosage-regimen
+
+regimen = DosageRegimen(100.0; time = 0.0, cmt = 1)
+subj = Subject(; id = 1, events = regimen)
+println("Subject 1 events: ", subj.events)
+```
+
+## Example 3: Multiple Oral Dosing with ADDL/II and Covariates
+
+Multiple oral dosing (30 mg q8h for 2 days) with observational PK sampling.
+
+**New data items:**
+
+| Item | Pumas | Description |
+|------|-------|-------------|
+| ADDL | `addl` | Number of additional doses (total = addl + 1) |
+| II | `ii` | Inter-dose interval (same scale as `time`) |
+
+One dosing record specifies all 6 doses: 1 initial + 5 additional.
+
+**NONMEM format:**
+
+| C | ID | TIME | AMT | ADDL | II | DV  | WT | CLCR |
+|---|---:|-----:|----:|-----:|---:|----:|---:|-----:|
+| . |  1 |    0 |  30 |    5 |  8 |   . | 64 |   80 |
+| . |  1 |   18 |   . |    . |  . | 126 | 64 |   80 |
+| . |  1 | 23.8 |   . |    . |  . |  33 | 64 |   70 |
+| . |  2 |    0 |  30 |    5 |  8 |   . | 81 |  110 |
+| . |  2 |   10 |   . |    . |  . | 150 | 81 |  110 |
+| . |  2 |   42 |   . |    . |  . |  45 | 81 |  125 |
+
+```{julia}
+#| label: example-3-addl-ii
+
+ex3 = DataFrame(
+    id   = [1, 1, 1, 2, 2, 2],
+    time = [0.0, 18.0, 23.8, 0.0, 10.0, 42.0],
+    amt  = [30.0, 0.0, 0.0, 30.0, 0.0, 0.0],
+    addl = [5, 0, 0, 5, 0, 0],
+    ii   = [8.0, 0.0, 0.0, 8.0, 0.0, 0.0],
+    dv   = [missing, 126.0, 33.0, missing, 150.0, 45.0],
+    evid = [1, 0, 0, 1, 0, 0],
+    cmt  = [1, 1, 1, 1, 1, 1],
+    WT   = [64.0, 64.0, 64.0, 81.0, 81.0, 81.0],
+    CLCR = [80.0, 80.0, 70.0, 110.0, 110.0, 125.0],
+)
+
+pop_ex3 = read_pumas(ex3; covariates = [:WT, :CLCR])
+println("Example 3 — oral q8h with ADDL/II: $(length(pop_ex3)) subjects")
+```
+
+::: {.callout-note}
+**Time-varying covariates:** CLCR changes from 80 to 70 for subject 1. Pumas handles this via the `covariates_direction` keyword in `read_pumas`:
+
+- `:left` (default) = LOCF (Last Observation Carried Forward)
+- `:right` = NOCB (Next Observation Carried Backward)
+:::
+
+**The same dosing via `DosageRegimen`:**
+
+```{julia}
+#| label: example-3-dosage-regimen
+
+reg_ex3 = DosageRegimen(30.0; time = 0.0, cmt = 1, addl = 5, ii = 8.0)
+subj_ex3 = Subject(;
+    id = 1,
+    events = reg_ex3,
+    covariates = (WT = 64.0, CLCR = 80.0),
+)
+println("Subject 1: $(length(subj_ex3.events)) event records (expanded from ADDL)")
+```
+
+## Example 4: Steady-State Infusion with RATE and SS
+
+- Steady-state constant rate infusion (10 mg/hour)
+- PK observation at end of infusion
+- Second constant rate infusion (20 mg/hour) starts at 4 hours after termination, lasts 2 hours
+
+**New data items:**
+
+| Item | Pumas | Values |
+|------|-------|--------|
+| SS | `ss` | 0=regular dose, 1=SS (reset to SS amounts), 2=SS (superposition) |
+| RATE | `rate` | 0=bolus, >0=infusion rate (mass/time), -2=model-controlled duration |
+
+### Steady-State Dose Classes in Pumas
+
+| Class | Conditions | Requirement |
+|-------|-----------|-------------|
+| Constant infusion | `amt=0, rate>0` | `ii=0, addl=0` |
+| Multiple bolus doses | `amt>0, rate=0` | `ii>0` |
+| Multiple infusions | `amt>0, rate>0` | `ii>0` |
+
+**NONMEM format:**
+
+| C | ID | TIME | AMT | RATE | SS | DV    |
+|---|---:|-----:|----:|-----:|---:|------:|
+| 0 |  1 |    0 |   0 |   10 |  1 |     0 |
+| 0 |  1 |    0 |   0 |    0 |  0 | 124.9 |
+| 0 |  1 |    4 |  40 |   20 |  0 |     0 |
+| 0 |  1 |    6 |   0 |    0 |  0 | 135.6 |
+| 0 |  1 |   10 |   0 |    0 |  0 | 110.6 |
+
+```{julia}
+#| label: example-4-ss-infusion
+
+ex4 = DataFrame(
+    id   = [1, 1, 1, 1, 1],
+    time = [0.0, 0.0, 4.0, 6.0, 10.0],
+    amt  = [0.0, 0.0, 40.0, 0.0, 0.0],
+    rate = [10.0, 0.0, 20.0, 0.0, 0.0],
+    ss   = [1, 0, 0, 0, 0],
+    ii   = [0.0, 0.0, 0.0, 0.0, 0.0],
+    dv   = [missing, 124.9, missing, 135.6, 110.6],
+    evid = [1, 0, 1, 0, 0],
+    cmt  = [1, 1, 1, 1, 1],
+)
+
+pop_ex4 = read_pumas(ex4)
+println("Example 4 — SS infusion + 2nd infusion: $(length(pop_ex4)) subjects")
+```
+
+::: {.callout-important}
+**RATE = -1 and RATE = -2:** In NONMEM, `RATE=-1` estimates infusion rate and `RATE=-2` estimates infusion duration. In Pumas, model-controlled infusion parameters are specified via the **`@dosecontrol`** block — not through negative RATE values in the data.
+
+```julia
+@dosecontrol begin
+    duration = (; Central = tvDur)  # model estimates duration
+end
+```
+
+For data, use `rate = -2` only. Pumas interprets this as "rate determined by dose control parameters."
+:::
+
+**The same SS infusion via `DosageRegimen`:**
+
+```{julia}
+#| label: example-4-dosage-regimen
+
+# Steady-state constant infusion at 10 mg/hr
+ss_inf = DosageRegimen(0.0; time = 0.0, rate = 10.0, ss = 1, cmt = 1)
+# Second infusion: 40 mg at 20 mg/hr (= 2 hr duration)
+inf2 = DosageRegimen(40.0; time = 4.0, rate = 20.0, cmt = 1)
+combined = DosageRegimen(ss_inf, inf2)
+println("Combined regimen:\n", DataFrame(combined))
+```
+
+## Example 5: Crossover Oral to IV with DATE/TIME and CMT
+
+- Crossover from oral to IV dosing at steady-state
+- 1-compartment disposition model
+- Initialize steady-state oral dosing of 50 mg q12h
+- PK samples at trough and 3 hours post-dose
+- IV bolus dose (50 mg) at 12 hours after last oral dose
+
+**New data item:**
+
+| Item | Pumas | Values |
+|------|-------|--------|
+| CMT | `cmt` | Compartment number (model-specific) |
+
+### Compartment Mapping by Model Structure
+
+| Pumas Model | CMT 1 | CMT 2 | CMT 3 |
+|-------------|-------|-------|-------|
+| `Central1` | Central | — | — |
+| `Central1Periph1` | Central | Peripheral | — |
+| `Depots1Central1` | Depot | Central | — |
+| `Depots1Central1Periph1` | Depot | Central | Peripheral |
+
+For this example (`Depots1Central1`): CMT 1 = depot (oral), CMT 2 = central (IV & observations).
+
+```
+[1: Depot (p.o. dose)] --ka--> [2: Central (i.v. dose & obs.)]
+                                        |
+                                       CL/V
+                                        v
+```
+
+**NONMEM format (with DATE and clock TIME):**
+
+| C | ID | DATE       | TIME  | AMT | SS | II | DV     | CMT | AGE |
+|---|---:|------------|------:|----:|---:|---:|-------:|----:|----:|
+| 0 |  1 | 10/20/2001 |  8:00 |  50 |  1 | 12 |      0 |   1 |  42 |
+| 0 |  1 | 10/20/2001 | 19:52 |   0 |  0 |  0 | 124.97 |   2 |  42 |
+| 0 |  1 | 10/20/2001 | 19:53 |  50 |  0 |  0 |      0 |   1 |  42 |
+| 0 |  1 | 10/20/2001 | 22:45 |   0 |  0 |  0 |  135.6 |   2 |  42 |
+| 0 |  1 | 10/21/2001 |  8:06 |  50 |  0 |  0 |      0 |   2 |  42 |
+| 0 |  1 | 10/21/2001 |  9:12 |   0 |  0 |  0 |  150.9 |   2 |  42 |
+
+NONMEM/NMTRAN auto-converts DATE + TIME to elapsed time. In Pumas, you must **pre-convert** to elapsed numeric hours:
+
+```{julia}
+#| label: example-5-date-conversion
+
+# Step 1: Parse DATE + TIME to DateTime, then compute elapsed hours
+raw_ex5 = DataFrame(
+    id   = fill(1, 6),
+    DATE = ["10/20/2001", "10/20/2001", "10/20/2001", "10/20/2001", "10/21/2001", "10/21/2001"],
+    TIME = ["8:00", "19:52", "19:53", "22:45", "8:06", "9:12"],
+    amt  = [50.0, 0.0, 50.0, 0.0, 50.0, 0.0],
+    ss   = [1, 0, 0, 0, 0, 0],
+    ii   = [12.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    dv   = [missing, 124.97, missing, 135.6, missing, 150.9],
+    evid = [1, 0, 1, 0, 1, 0],
+    cmt  = [1, 2, 1, 2, 2, 2],
+    AGE  = fill(42.0, 6),
+)
+
+# Convert DATE + TIME strings to elapsed hours from first record
+ex5 = @chain raw_ex5 begin
+    @rtransform :datetime = DateTime(:DATE * " " * :TIME, dateformat"mm/dd/yyyy HH:MM")
+    @transform :time = Dates.value.(:datetime .- minimum(:datetime)) ./ (3600 * 1000)
+    select(Not([:DATE, :TIME, :datetime]))
+end
+ex5
+```
+
+```{julia}
+#| label: example-5-read-pumas
+
+pop_ex5 = read_pumas(ex5; covariates = [:AGE])
+println("Example 5 — crossover oral to IV: $(length(pop_ex5)) subjects")
+```
+
+**The same crossover via `DosageRegimen`:**
+
+```{julia}
+#| label: example-5-dosage-regimen
+
+# Steady-state oral 50 mg q12h into depot (cmt=1)
+ss_oral = DosageRegimen(50.0; time = 0.0, cmt = 1, ss = 1, ii = 12.0)
+# Next oral dose at ~11.88 hr
+oral2 = DosageRegimen(50.0; time = 11.883, cmt = 1)
+# IV bolus 50 mg at ~24.1 hr into central (cmt=2)
+iv_dose = DosageRegimen(50.0; time = 24.1, cmt = 2)
+crossover_reg = DosageRegimen(ss_oral, oral2, iv_dose)
+println("Crossover regimen:\n", DataFrame(crossover_reg))
+```
+
+## Reserved Data Item Names
+
+**NONMEM reserved:** ID, L1, L2, DV, MDV, RAW_, MRG_, TIME, DATE, DAT1, DAT2, DAT3, DROP, SKIP, EVID, AMT, RATE, SS, II, ADDL, CMT, PCMT, CALL, CONT
+
+**Pumas reserved (lowercase):** `id`, `time`, `dv`, `amt`, `evid`, `cmt`, `rate`, `ss`, `ii`, `addl`, `mdv`
+
+Do not use reserved parameter names for covariates (e.g. ETAn, CL, V, K, KA, S1, F0, R1, F1).
+
+User-defined covariate columns can be any case and up to 20 characters.
+
+## NMTRAN Control Records → Pumas `read_pumas`
+
+In NONMEM, data processing is specified via `$DATA` and `$INPUT`:
+
+```
+$DATA example_5.csv IGNORE=C WIDE
+$INPUT C ID DATE=DROP TIME AMT SS II DV=CONC CMT AGE
+```
+
+In Pumas, this is replaced by a `@chain` pipeline + `read_pumas`:
+
+```{julia}
+#| label: data-input-pumas
+#| eval: false
+
+# Equivalent of $DATA + $INPUT in Pumas
+population = @chain CSV.read("example_5.csv", DataFrame) begin
+    select(Not(:C))                     # DROP comment column
+    rename(:CONC => :dv)                # DV=CONC synonym
+    @transform :time = parse_elapsed_hours.(:DATE, :TIME)  # DATE/TIME → numeric
+    select(Not([:DATE]))                # DROP after conversion
+    read_pumas(_; covariates = [:AGE])
+end
+```
+
+| NONMEM Concept | Pumas Equivalent |
+|---------------|-----------------|
+| `$DATA filename` | `CSV.read("filename", DataFrame)` |
+| `IGNORE=C` | `@rsubset(:C != "C")` or skip header row |
+| `DV=CONC` | `rename(df, :CONC => :dv)` |
+| `DATE=DROP` | `select(Not(:DATE))` |
+| `$INPUT` column list | Column names in the DataFrame |
+
+# `read_pumas` API Reference
+
+```{julia}
+#| label: read-pumas-api
+#| eval: false
+
+population = read_pumas(
+    df::DataFrame;
+    id = :id,                    # Subject identifier column
+    time = :time,                # Time column
+    observations = [:dv],        # Dependent variable column(s)
+    covariates = Symbol[],       # Covariate column names
+    amt = :amt,                  # Dose amount column
+    evid = nothing,              # Event ID (auto-imputed if absent)
+    cmt = :cmt,                  # Compartment column
+    rate = :rate,                # Infusion rate column
+    addl = :addl,                # Additional doses column
+    ii = :ii,                    # Inter-dose interval column
+    ss = :ss,                    # Steady-state indicator column
+    mdv = nothing,               # Missing DV column
+    event_data = true,           # false for PRED-style (no dosing events)
+    covariates_direction = :left, # :left=LOCF, :right=NOCB
+    check = true,                # NMTRAN compliance validation
+)
+```
+
+::: {.callout-tip}
+`read_pumas` can also take a file path directly: `read_pumas("data.csv"; kwargs...)`. It uses `missingstring = ["", ".", "NA"]` by default, so NONMEM-style `.` placeholders are automatically converted to `missing`.
+:::
+
+# Data Assembly Best Practices
+
+## Common Data Assembly Issues
+
+- Imputing time-varying covariates
+- Imputing missing covariates
+- Correct order of records for events occurring at same time (dose before observation)
+- Missing samples, dose times, or observation times
+
+## Data Specification Document
+
+A data specification document should:
+
+- Identify ahead of time how data problems will be handled
+- Link data items to source databases
+- Specify format and plausible range of values for each data item
+- Identify special instructions for creation of analysis data set
+
+### Example Data Specification
+
+| Data Item | Description | Units | Range | Type | Comments |
+|-----------|-------------|-------|-------|------|----------|
+| ID | Subject identifier | N/A | 1–450 | categorical | Create from SID, start at 1 |
+| TIME | Clock time | N/A | 00:00–23:59 | N/A | Convert to elapsed hours |
+| DATE | Calendar date | N/A | — | N/A | Use 4-digit year |
+| AMT | Dose amount | mg | 0–1000 | continuous | `0` or `missing` for non-dosing |
+| DV | Drug concentration | mg/L | 0–2000 | continuous | `missing` for non-obs |
+| EVID | Event ID | N/A | 0–4 | categorical | 0=obs, 1=dose, 2=other, 3=reset, 4=reset+dose |
+| CMT | Compartment | N/A | 1–2 | categorical | 1=depot, 2=central |
+| SS | Steady-state | N/A | 0–1 | categorical | 0=non-SS, 1=SS |
+| II | Interdose interval | hr | 0–12 | categorical | Required with ADDL or SS |
+| ADDL | Additional doses | N/A | 0–20 | categorical | 0 for non-multiple dosing |
+| WT | Weight | kg | 20–200 | continuous | LOCF for time-varying |
+| AGE | Age | years | 18–95 | continuous | Baseline |
+| SEX | Sex | N/A | 0–1 | categorical | 0=male, 1=female |
+| SMK | Smoking status | N/A | 0–1 | categorical | 0=nonsmoker, 1=smoker |
+| CLCR | Creatinine clearance | mL/min | 20–150 | continuous | Cockcroft-Gault, truncate at 150 |
+
+**Assembly notes:**
+
+1. Back-fill covariate values when changing over time (Pumas: `covariates_direction = :left`)
+2. Use separate records for each event, even if simultaneous
+3. Sort data by ID, then TIME (dose records before observation records at same time)
+4. Use `missing` (not blank, not `.`) for absent DV values in Pumas
+5. Impute missing continuous covariates with population median by SEX; flag imputed values
+6. Impute missing categorical covariates with most common value; flag imputed values
+
+## Data Quality Diagnostics
+
+```{julia}
+#| label: fig-data-quality
+#| fig-cap: "Data Quality Diagnostic Plots (Example 3)"
+
+obs_ex3 = @rsubset(ex3, :evid == 0)
+obs_dv = collect(skipmissing(obs_ex3.dv))
+
+fig = Figure(size = (800, 600))
+
+# DV vs TIME by subject
+ax1 = Axis(fig[1, 1], xlabel = "Time (hr)", ylabel = "DV (mg/L)", title = "DV vs TIME")
+for gdf in groupby(obs_ex3, :id)
+    scatter!(ax1, gdf.time, coalesce.(gdf.dv, NaN), label = "ID $(gdf.id[1])", markersize = 8)
+end
+axislegend(ax1, position = :rt)
+
+# Histogram of DV
+ax2 = Axis(fig[1, 2], xlabel = "DV (mg/L)", ylabel = "Count", title = "DV Distribution")
+hist!(ax2, obs_dv, bins = 5, color = :steelblue)
+
+# WT by subject
+ax3 = Axis(fig[2, 1], xlabel = "Subject ID", ylabel = "Weight (kg)", title = "WT by Subject")
+barplot!(ax3, Float64.(obs_ex3.id), obs_ex3.WT, color = :steelblue)
+
+# CLCR vs TIME (time-varying covariate)
+ax4 = Axis(fig[2, 2], xlabel = "Time (hr)", ylabel = "CLCR (mL/min)", title = "CLCR vs TIME")
+for gdf in groupby(obs_ex3, :id)
+    scatterlines!(ax4, gdf.time, Float64.(gdf.CLCR), label = "ID $(gdf.id[1])", markersize = 8)
+end
+axislegend(ax4, position = :rt)
+
+fig
+```
+
+### Pre-Analysis Validation Checklist
+
+| Check | Julia / Pumas |
+|-------|--------------|
+| Missing DV | `@rsubset(df, ismissing(:dv) && :evid == 0)` |
+| Negative concentrations | `@rsubset(df, !ismissing(:dv) && :dv < 0)` |
+| Time before first dose | `@rsubset(df, :time < 0)` |
+| Duplicate records | Check unique per `:id`, `:time`, `:evid` |
+| Dose-observation order | Sort by `:id`, `:time`, reverse `:evid` |
+| Covariate ranges | `@rsubset(df, :WT < 20 || :WT > 200)` |
+
+```{julia}
+#| label: data-validation
+
+# Validate Example 3 data
+println("Records: ", nrow(ex3))
+println("Subjects: ", length(unique(ex3.id)))
+println("Dose records: ", nrow(@rsubset(ex3, :evid == 1)))
+println("Obs records: ", nrow(@rsubset(ex3, :evid == 0)))
+println("Missing DV on obs: ", nrow(@rsubset(ex3, :evid == 0 && ismissing(:dv))))
+println("WT range: ", extrema(ex3.WT))
+println("CLCR range: ", extrema(ex3.CLCR))
+```
+
+## Missing Data Handling in Pumas
+
+::: {.callout-note title="Julia's Missing Type"}
+Julia uses a single `missing` value (type `Missing`) for all absent data — unlike R which has `NA`, `NA_real_`, `NA_integer_`, etc. Key behaviors:
+
+- **Propagation:** `missing + 1 == missing`, `missing > 0 == missing` — operations propagate `missing` by default
+- **Filtering:** `dropmissing(df, :col)` removes rows; `@rsubset(df, !ismissing(:col))` for conditional filtering
+- **Filling:** `coalesce(val, default)` replaces `missing` with a default; broadcasts with `coalesce.(vec, default)`
+- **Skipping:** `sum(skipmissing(vec))` computes statistics ignoring `missing`
+- **Pass-through:** `@passmissing parse(Float64, x)` propagates `missing` without error in transformations
+:::
+
+### Missing Covariates
+
+```{julia}
+#| label: missing-imputation
+#| eval: false
+
+# Median imputation with flag
+imputed = @chain pk_data begin
+    @rtransform :WT_IMPUTED = ismissing(:WT)
+    @rtransform :WT = coalesce(:WT, 70.0)  # population median
+end
+
+# Complete case analysis
+complete = dropmissing(pk_data, [:WT, :AGE, :CLCR])
+
+# Group-wise median imputation (by SEX)
+imputed_by_sex = @chain pk_data begin
+    groupby(:SEX)
+    @transform :WT = coalesce.(:WT, median(skipmissing(:WT)))
+end
+```
+
+### Missing Concentration Strategies
+
+| Strategy | When to Use |
+|----------|------------|
+| Exclude (`missing`) | Standard for PopPK — mixed-effects models handle unbalanced data naturally |
+| BLQ handling (M1–M4) | Concentrations below LLOQ |
+| Impute (LOCF, mean) | Rarely appropriate for PK |
+
+## Data Assembly Audit Trail
+
+**Goals:** Trace data set to source. Reproduce data set assembly.
+
+**Julia/Pumas approach:**
+
+- Use `@chain` pipelines in `.jl` or `.qmd` scripts — fully reproducible and version-controllable
+- Document every transformation step with comments
+- Use `CSV.write()` to save intermediate datasets
+
+::: {.callout-tip}
+Julia's `@chain` pipelines + Git version control provide a superior audit trail compared to spreadsheet-based approaches. Every data manipulation step is explicit, reproducible, and diff-able.
+:::
+
+## Data Management Considerations
+
+- Source database files should link all data to study, subject ID, calendar date, and actual clock time
+- Use the same variable names and units across multiple data sets
+- A unique identifier should link each PK/PD sample with study, subject ID, date, and time
+- Dose amounts, dates, and times should be recorded in patient diary or CRF
+- CRF and database should not contain duplicate information in different areas
+
+# Practice Problems
+
+## Problem 1: $PRED-Style Data Set
+
+Create a Pumas-compatible data set for 2 subjects:
+
+- Multiple dosing (100 mg controlled-release oral tablet, q 12 hours for 2 days)
+- PK sampling after first dose and last dose at 2, 4, 6, 12 hours post-dose
+- Insert arbitrary values for concentrations
+- Estimate zero-order release/absorption rate
+- No `@dynamics` block (PRED-style model)
+
+```{julia}
+#| label: prob1-scaffold
+#| eval: false
+
+# Problem 1: PRED-style dataset
+# Hint: DOSE is a covariate. Include all time points with dose amount
+# on every row (model is non-recursive). Use event_data=false.
+
+prob1 = DataFrame(
+    id   = # 2 subjects, 8 obs each ...,
+    time = # [2, 4, 6, 12, 38, 40, 42, 48] for each subject ...,
+    DOSE = # 100.0 on every row ...,
+    dv   = # arbitrary concentration values ...,
+)
+
+pop_prob1 = read_pumas(prob1; observations = [:dv], covariates = [:DOSE], event_data = false)
+```
+
+## Problem 2: PREDPP Data Set with ADDL/II
+
+Same scenario as Problem 1, but with PREDPP event data:
+
+- Use `addl`/`ii` for repeated dosing
+- Use `rate = -2` on dose records + `@dosecontrol` to estimate absorption duration
+- Include explicit dosing and observation records
+
+```{julia}
+#| label: prob2-scaffold
+#| eval: false
+
+# Problem 2: PREDPP-style dataset
+# Hint: One dose record with addl=3, ii=12 covers 4 doses.
+# Use rate=-2 to signal model-controlled infusion duration (@dosecontrol).
+# Observation records have evid=0 with dv values.
+
+prob2 = DataFrame(
+    id   = # 2 subjects ...,
+    time = # dose times + observation times ...,
+    amt  = # 100.0 on dose records, 0.0 on obs ...,
+    rate = # -2.0 on dose records, 0.0 on obs ...,
+    addl = # additional doses ...,
+    ii   = # 12.0 on dose records, 0.0 on obs ...,
+    dv   = # missing on dose, values on obs ...,
+    evid = # 1 on dose, 0 on obs ...,
+    cmt  = # 1 for depot ...,
+)
+
+pop_prob2 = read_pumas(prob2)
+```
+
+## Problem 3: Phase III Study with IV-to-Oral and Dose Escalation
+
+Create a Pumas-compatible data set for this hypothetical study:
+
+- Multiple dosing (200 mg q 12 hours) Phase III study of Drug-X
+- First dose is IV infusion (over 1 hour), remaining doses are oral
+- At 3 weeks, a dose increase is allowed (increase to 400 mg bid)
+- Sparse PK sampling after first dose and at 1, 3, and 6 weeks (1, 6, 10 hours post AM dose)
+- 1-compartment disposition with $t_{1/2}$ = 8–10 hours
+- Covariates: AGE, WT, CLCR, SEX
+- 2 subjects: one with dose increase at week 3, one without
+
+```{julia}
+#| label: prob3-scaffold
+#| eval: false
+
+# Problem 3: Phase III study
+# Key decisions:
+#   - Use Depots1Central1: cmt=1 (depot/oral), cmt=2 (central/IV)
+#   - IV infusion: rate = 200.0 (= 200 mg / 1 hr), cmt=2
+#   - Oral doses: rate = 0.0, cmt=1
+#   - Use addl/ii for repeated oral dosing blocks
+#   - Subject 1: dose increase at week 3 (t=504 hr) → new dose record
+#   - Subject 2: continues at 200 mg through week 6
+
+# Also possible via DosageRegimen for simulation:
+iv_load = DosageRegimen(200.0; time = 0.0, cmt = 2, duration = 1.0)
+oral_wk1_3 = DosageRegimen(200.0; time = 12.0, cmt = 1, addl = 40, ii = 12.0)
+oral_wk3_6_escalated = DosageRegimen(400.0; time = 504.0, cmt = 1, addl = 41, ii = 12.0)
+regimen_escalated = DosageRegimen(iv_load, oral_wk1_3, oral_wk3_6_escalated)
+```
+
+# Reading Data from External Sources
+
+Beyond `CSV.read()`, Pumas/Julia supports multiple source formats common in pharmacometrics:
+
+## CSV Files
+
+```{julia}
+#| label: csv-reading-patterns
+#| eval: false
+
+using CSV
+
+# Basic read
+df = CSV.read("data.csv", DataFrame)
+
+# European-format CSV (semicolons, comma decimal)
+df = CSV.read("data.csv", DataFrame; delim=';', decimal=',')
+
+# Custom missing strings (NONMEM convention)
+df = CSV.read("data.csv", DataFrame; missingstring=[".", "", "NA", "-99"])
+
+# Select/drop columns at read time (efficient for large files)
+df = CSV.read("data.csv", DataFrame; select=[:ID, :TIME, :DV, :AMT, :EVID])
+df = CSV.read("data.csv", DataFrame; drop=[:COMMENT, :FLAG])
+
+# Force column types
+df = CSV.read("data.csv", DataFrame; types=Dict(:ID => Int, :DV => Float64))
+
+# Read multiple CSVs with source tracking
+dfs = map(["study1.csv", "study2.csv"]) do f
+    @rtransform CSV.read(f, DataFrame) :SOURCE = basename(f)
+end
+combined = vcat(dfs...)
+```
+
+## SAS Transport and SAS7BDAT Files
+
+```{julia}
+#| label: sas-reading
+#| eval: false
+
+using ReadStatTables
+
+# .xpt (SAS transport) — common for regulatory submissions
+df = DataFrame(readstat("sdtm_pk.xpt"))
+
+# .sas7bdat (SAS native)
+df = DataFrame(readstat("analysis.sas7bdat"))
+```
+
+## Excel Files
+
+```{julia}
+#| label: excel-reading
+#| eval: false
+
+using XLSX
+
+# Read specific sheet
+xf = XLSX.readxlsx("data.xlsx")
+df = DataFrame(XLSX.readtable("data.xlsx", "Sheet1"))
+```
+
+# DataFramesMeta.jl Quick Reference
+
+DataFramesMeta.jl macros are the primary tool for data manipulation in this course. Here is a reference for the most common operations:
+
+## Core Macros
+
+| Macro | Purpose | Row-wise variant |
+|-------|---------|-----------------|
+| `@select` | Choose/compute columns | `@rselect` |
+| `@transform` | Add/modify columns (keeps all) | `@rtransform` |
+| `@subset` | Filter rows | `@rsubset` |
+| `@orderby` | Sort rows | `@rorderby` |
+| `@combine` | Aggregate grouped data | — |
+| `@rename` | Rename columns | — |
+| `@by` | Group + combine in one step | — |
+
+::: {.callout-tip}
+Row-wise (`@r*`) macros operate on scalars per row — use them when your logic is naturally per-row (e.g., `ismissing`, `ifelse`, comparisons). Column-wise macros operate on vectors — use them for aggregations (e.g., `mean`, `maximum`, `sum`).
+:::
+
+## Common Patterns
+
+```{julia}
+#| label: dfmeta-patterns
+#| eval: false
+
+# Pipeline pattern with @chain
+analysis_df = @chain raw_df begin
+    @rtransform :TAD = :TIME - :LAST_DOSE_TIME
+    @rsubset :EVID == 0 && !ismissing(:DV)
+    @orderby :ID :TIME
+    @select :ID :TIME :TAD :DV :AMT :EVID :WT :AGE
+end
+
+# Grouped operations (e.g., baseline per subject)
+with_baseline = @chain df begin
+    groupby(:ID)
+    @transform :BL_DV = first(:DV)
+    @transform :CHG = :DV .- :BL_DV
+end
+
+# Column selectors
+@select df Not(:COMMENT, :FLAG)          # drop specific columns
+@select df Between(:ID, :DV)             # range of columns
+@select df Cols(r"^COV")                 # regex match
+```
+
+## Pivoting (Wide ↔ Long)
+
+Multi-DV data (e.g., PK + PD observations) often requires reshaping:
+
+```{julia}
+#| label: pivoting-patterns
+#| eval: false
+
+# Wide → Long (stack)
+long_df = stack(wide_df, [:PK_DV, :PD_DV]; variable_name=:DVID, value_name=:DV)
+
+# Long → Wide (unstack)
+wide_df = unstack(long_df, :TIME, :DVID, :DV)
+```
+
+# Study Guide Questions
+
+1. What are the core required data items for population models in NONMEM? For Pumas with `read_pumas`?
+2. When is it useful to use EVID = 3? EVID = 2? EVID = 4?
+3. What are acceptable field delimiters for NMTRAN data sets? How does Pumas handle this differently?
+4. Why is it good practice to use a data specification document?
+5. How does `read_pumas` map to the $DATA and $INPUT control records in NONMEM?
+6. What is the Pumas equivalent of NONMEM's MDV data item?
+
+# Supplementary Material
+
+| Topic | Tutorial | Key Additions |
+|-------|----------|---------------|
+| **Lecture: PK Terminology & Data** | [PK W1a](../lectures/pk/W1a-foundations-of-pk-terminology-and-data.qmd) | What constitutes PK data, dependent/independent variables, error sources |
+| **Lecture: Units & Dimensionality** | [PK W1b](../lectures/pk/W1b-units-dimensionality-and-rate-processes.qmd) | Unit consistency in PK data, dimensional analysis for catching data errors |
+| Julia data wrangling fundamentals | [Intro to Julia](https://tutorials.pumas.ai/html/DataWranglingInJulia/01-intro.html) | Why Julia for data science, performance benchmarks vs R/Python |
+| Reading CSV/Excel/SAS | [Reading Data](https://tutorials.pumas.ai/html/DataWranglingInJulia/04-read_data.html) | Detailed CSV.jl options, XLSX.jl, ReadStatTables.jl for .xpt/.sas7bdat |
+| DataFramesMeta macros | [Mutating with DataFramesMeta](https://tutorials.pumas.ai/html/DataWranglingInJulia/05-mutating-dfmeta.html) | Full macro reference with dplyr equivalents, @chain pipelines |
+| String manipulation | [Strings](https://tutorials.pumas.ai/html/DataWranglingInJulia/06-strings.html) | Regex, string parsing, cleaning text columns |
+| Pivoting wide/long | [Pivoting](https://tutorials.pumas.ai/html/DataWranglingInJulia/07-pivoting.html) | `stack()`/`unstack()`, split-apply-combine |
+| Categorical data | [Categorical Data](https://tutorials.pumas.ai/html/DataWranglingInJulia/08-categorical_data.html) | `CategoricalArrays.jl`, levels, ordering |
+| Missing data | [Missing Data](https://tutorials.pumas.ai/html/DataWranglingInJulia/09-missing_data.html) | Julia's `missing` type, `dropmissing`, `coalesce`, `skipmissing`, `@passmissing` |
+| Date/time handling | [Dates](https://tutorials.pumas.ai/html/DataWranglingInJulia/10-dates.html) | `Dates` module, parsing, elapsed time calculation |
+| XPT files | [XPT Files](https://tutorials.pumas.ai/html/DataWranglingInJulia/11-xpt.html) | ReadStatTables.jl for CDISC/SDTM transport files |
+7. How does Pumas handle model-controlled infusion rate/duration differently from NONMEM's `RATE=-1`/`RATE=-2`?
+8. What does the `covariates_direction` keyword in `read_pumas` control? When would you use `:right` instead of `:left`?

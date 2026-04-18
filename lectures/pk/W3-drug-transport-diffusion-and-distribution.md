@@ -1,0 +1,340 @@
+# Week 3 Pharmacokinetics: Drug Transport, Diffusion, and Rate of Distribution
+
+## Overview
+
+This lecture builds on the one-compartment IV bolus model covered in the previous session and the fundamental pharmacokinetic parameters — clearance and volume of distribution. The primary goal is to develop the conceptual and mathematical foundation required to understand volume of distribution. This session focuses on two major topics: (1) the mechanisms and mathematics of drug transport across membranes, and (2) the rate of distribution of drugs into tissues.
+
+---
+
+## 1. Drug Transport Across Membranes
+
+### 1.1 Structure of Biological Membranes
+
+Biological membranes are not simple barriers — they are layered, functional structures. The skin, for example, consists of multiple tissue layers, each composed of a collection of cells with their own cell membranes. The packing density and characteristics of these cells vary across tissue types:
+
+- Skin
+- Gastrointestinal (GI) tract
+- Muscle tissue
+- Brain (CNS)
+
+Each tissue type presents a unique set of membrane properties that governs how drugs traverse it. Consider the GI tract as an example: the drug must move from the intestinal lumen into the bloodstream. The tissue separating these two compartments determines the feasibility and rate of that movement.
+
+### 1.2 Mechanisms of Drug Transport
+
+There are two primary categories of transmembrane transport:
+
+#### Paracellular Transport
+
+Drugs pass through the gaps between adjacent cells. The tightness of these intercellular junctions — referred to as **tight junctions** — determines the ease of paracellular passage. Tissues with loose junctions permit more paracellular transport than those with tightly sealed junctions.
+
+#### Transcellular Transport
+
+Drugs pass through cells, i.e., across both the apical and basolateral membranes. There are two subtypes:
+
+- **Passive transcellular transport**: The drug moves down its concentration gradient without requiring energy. This includes simple diffusion and transporter-facilitated movement that does not consume ATP.
+- **Active (facilitated) transcellular transport**: Movement is mediated by a transporter and requires energy in the form of ATP. This mechanism can move drugs against a concentration gradient.
+
+---
+
+## 2. Passive Diffusion
+
+### 2.1 Definition and Governing Equation
+
+Passive diffusion is the movement of a drug across a membrane driven by a concentration gradient. For a membrane separating compartment 1 (unbound drug concentration $C_{u1}$) and compartment 2 (unbound drug concentration $C_{u2}$), the net rate of transport is:
+
+$$\text{Net Rate of Transport} = P \cdot SA \cdot (C_{u1} - C_{u2})$$
+
+where:
+- $P$ = permeability (cm/min) — a measure of the ease of drug penetration through the membrane
+- $SA$ = surface area of the membrane (cm²)
+- $(C_{u1} - C_{u2})$ = concentration gradient (amount/volume)
+
+#### Dimensional Analysis
+
+- $P$ has units of cm/min (velocity)
+- $SA$ has units of cm²
+- $P \cdot SA$ therefore has units of cm³/min = volume/time
+- Concentration has units of amount/volume
+
+$$\frac{\text{volume}}{\text{time}} \times \frac{\text{amount}}{\text{volume}} = \frac{\text{amount}}{\text{time}} = \text{rate of transport}$$
+
+As surface area increases, the net rate of transport increases proportionally. As permeability increases — i.e., as the drug more easily penetrates the membrane — the rate increases as well.
+
+### 2.2 Drug Properties Determining Permeability
+
+Three properties of the drug determine its permeability across a given membrane:
+
+1. **Molecular size**: Smaller molecules penetrate more easily. For the same lipophilicity, doubling molecular weight can reduce permeability by approximately 300-fold, illustrating the strong interdependence between size and lipophilicity in determining permeability.
+
+2. **Lipophilicity**: Defined as the octanol-to-water partition coefficient ($K_{ow}$). Lipophilic drugs can dissolve into and traverse the lipid bilayer of cell membranes. Higher lipophilicity generally increases permeability.
+
+3. **Charge (ionization state)**: Determined by the drug's $\text{p}K_a$ and the local pH.
+
+### 2.3 The pH Partition Hypothesis
+
+The pH partition hypothesis describes the role of ionization state in membrane permeability. It has two key rules:
+
+1. Only **un-ionized, non-polar** drugs cross membranes passively.
+2. At equilibrium, the concentration of the **un-ionized** species is equal on both sides of the membrane.
+
+The relationship between ionization and pH is described by the **Henderson–Hasselbalch equation**:
+
+- For a weak **acid**:
+$$\text{pH} = \text{p}K_a + \log_{10}\left(\frac{[\text{ionized}]}{[\text{un-ionized}]}\right)$$
+
+- For a weak **base**:
+$$\text{pH} = \text{p}K_a + \log_{10}\left(\frac{[\text{un-ionized}]}{[\text{ionized}]}\right)$$
+
+#### Key Implication: pH Equals p$K_a$
+
+When $\text{pH} = \text{p}K_a$:
+
+$$\text{pH} - \text{p}K_a = 0 \implies \log_{10}\left(\frac{[\text{ionized}]}{[\text{un-ionized}]}\right) = 0 \implies \frac{[\text{ionized}]}{[\text{un-ionized}]} = 1$$
+
+This means the concentration of the ionized and un-ionized forms are equal — the definition of equilibrium in this context. The $\text{p}K_a$ can therefore be defined as the pH at which the ionized and un-ionized fractions of the drug are present in equal concentrations.
+
+#### Clinical Application: Oral Absorption Across the GI Tract
+
+The pH along the GI tract changes progressively:
+- Stomach: pH ≈ 1–2 (acidic)
+- Small intestine: pH increases progressively
+- Large intestine: pH ≈ 6–7
+
+For a drug with $\text{p}K_a = 5$ (a weak acid), the degree of ionization — and hence permeability — changes substantially along this pH gradient. This information is directly applied in formulation design to target optimal absorption regions. If a drug's $\text{p}K_a$ is fixed, formulators may increase lipophilicity or use microenvironment modifiers (acidifying or alkalinizing agents) to promote solubilization and absorption in the desired GI segment.
+
+Additionally, gastric residence time in the fasting state is approximately 15–30 minutes, which limits the extent of absorption from the stomach regardless of ionization state. All these factors must be considered together when designing oral formulations.
+
+---
+
+## 3. Fick's Law of Diffusion
+
+### 3.1 General Flux Equation
+
+The rate at which a drug diffuses passively across a membrane is described by **Fick's first law of diffusion**:
+
+$$J = D \cdot K_{ow} \cdot \frac{C_{out} - C_{in}}{H}$$
+
+where:
+- $J$ = flux (rate of diffusion per unit surface area)
+- $D$ = diffusion coefficient of the drug in the membrane
+- $K_{ow}$ = octanol-to-water partition coefficient (lipophilicity)
+- $C_{out}$ = drug concentration outside the membrane
+- $C_{in}$ = drug concentration inside the membrane
+- $H$ = membrane thickness
+
+### 3.2 Rate of Absorption Derived from Fick's Law
+
+The general flux relationship is:
+
+$$J = \frac{dX/dt}{SA} \implies \frac{dX}{dt} = J \cdot SA$$
+
+Substituting Fick's law for $J$:
+
+$$\frac{dX}{dt} = D \cdot K_{ow} \cdot \frac{C_{out} - C_{in}}{H} \cdot SA$$
+
+This expression for the rate of absorption reveals its dependence on:
+- Diffusion coefficient ($D$)
+- Lipophilicity ($K_{ow}$)
+- Concentration gradient ($C_{out} - C_{in}$)
+- Membrane thickness ($H$)
+- Available surface area ($SA$)
+
+#### Simplification for Oral Absorption
+
+During oral absorption, the concentration in the gut lumen ($C_{out} = C_{GI}$) greatly exceeds the concentration in the blood ($C_{in} \approx 0$). The equation simplifies to:
+
+$$\frac{dX}{dt} = \frac{D \cdot SA \cdot K_{ow}}{H} \cdot C_{GI}$$
+
+The rate of absorption is directly proportional to the gut concentration — a **first-order kinetic process**. This is consistent with the commonly used first-order absorption rate constant $k_a$ in compartmental models:
+
+$$\frac{dX}{dt} = -k_a \cdot X$$
+
+The term $k_a$ is therefore not simply an empirical constant; it encodes the physical properties of the drug and the absorbing membrane.
+
+### 3.3 Passive vs. Facilitated Diffusion: Rate Comparison
+
+- **Passive diffusion**: The rate of absorption increases proportionally with increasing gut concentration — no saturation occurs.
+- **Facilitated diffusion**: As gut concentration increases, the rate plateaus once the transporter system is saturated. The relationship between concentration and absorption rate is nonlinear.
+
+### 3.4 Carrier-Mediated Transport Systems
+
+In carrier-mediated transport, the drug moves across the membrane via specific transporter proteins located on the **apical membrane** (facing the lumen) and **basolateral membrane** (facing the blood).
+
+Two classes of transporters exist:
+
+1. **Equilibrating transporters**: Facilitate movement down the concentration gradient; no ATP required.
+2. **Concentrating (active) transporters**: ATP-dependent; can move drugs against a concentration gradient; present on both apical and basolateral membranes.
+
+---
+
+## 4. Rate of Drug Distribution into Tissues
+
+### 4.1 Definition of Distribution
+
+Distribution is a **reversible** process of drug transfer to and from the blood. Blood serves as the primary site of measurement and is used as a surrogate to infer the behavior of drug throughout the body.
+
+An important convention: if a drug leaves the blood compartment and does not return, it is assumed to have undergone **elimination**.
+
+### 4.2 Determinants of Drug Distribution
+
+Three factors govern the rate and extent of distribution:
+
+1. **Perfusion** — how well the tissue is supplied with blood
+2. **Binding** — the extent of drug binding to plasma proteins and tissue components
+3. **Permeability** — the ability of drugs to cross tissue membranes
+
+This session covers the **rate** of distribution; the **extent** of distribution (i.e., volume of distribution) will be addressed in the next session.
+
+---
+
+## 5. Perfusion Rate-Limited Distribution
+
+### 5.1 Concept of Tissue Perfusion
+
+**Perfusion** is defined as the blood flow to a tissue per unit volume of tissue:
+
+$$\text{Perfusion} = \frac{Q}{V_T}$$
+
+where:
+- $Q$ = blood flow to the tissue (mL/min)
+- $V_T$ = volume of the tissue (mL)
+
+Units: mL/min per mL of tissue = min⁻¹
+
+Perfusion varies dramatically across tissues:
+- Lung: ~10 mL/min per mL of tissue (highly perfused)
+- Fat: ~0.003 mL/min per mL of tissue (poorly perfused)
+
+Well-perfused tissues (e.g., lung, kidney, liver) take up drugs much more rapidly than poorly perfused tissues (e.g., fat, muscle).
+
+### 5.2 Fundamental Assumption
+
+In **perfusion rate-limited distribution**, it is assumed that the tissue membrane presents **no barrier** to drug penetration. This assumption holds when:
+
+- The tissue has leaky membranes (e.g., muscle capillary walls), or
+- The drug is small and highly lipophilic
+
+Under this assumption, the rate of drug entry into the tissue is limited solely by blood flow — not by membrane permeability.
+
+### 5.3 Mass Balance at Steady State
+
+Consider a tissue receiving arterial blood (concentration $C_A$, flow $Q$) and draining venous blood (concentration $C_V$, flow $Q$). Drug accumulates in the tissue at concentration $C_T$, which can be resolved into extracellular and intracellular components.
+
+At equilibrium, the **tissue-to-blood equilibrium distribution ratio** is:
+
+$$K_P = \frac{C_T}{C_V}$$
+
+The **amount of drug in the tissue** is:
+
+$$A_T = V_T \cdot C_T = V_T \cdot K_P \cdot C_V$$
+
+### 5.4 Fractional Rate of Exit from Tissue
+
+The **fractional rate of exit** from a tissue, $K_T$, is defined analogously to the elimination rate constant $K_{el}$ for the whole body:
+
+$$K_T = \frac{\text{Rate of exit}}{A_T}$$
+
+The rate of exit is $Q \cdot C_V$ (blood flow times venous concentration), so:
+
+$$K_T = \frac{Q \cdot C_V}{V_T \cdot K_P \cdot C_V} = \frac{Q}{V_T \cdot K_P}$$
+
+This parallels the whole-body relationship:
+
+$$K_{el} = \frac{CL}{V_d}$$
+
+where clearance $CL$ maps to blood flow $Q$, and the volume term includes the $K_P$ scaling for tissue affinity.
+
+$K_T$ has units of time⁻¹, confirming it is a first-order rate constant.
+
+### 5.5 Distribution Half-Life
+
+By analogy with the elimination half-life:
+
+$$t_{1/2,\text{dist}} = \frac{0.693}{K_T} = \frac{0.693 \cdot K_P \cdot V_T}{Q}$$
+
+The **distribution half-life** is defined as the time required for the tissue concentration to reach half of its equilibrium concentration.
+
+Key dependencies:
+- **Increasing $Q$** (blood flow) → shorter $t_{1/2,\text{dist}}$ → faster equilibration
+- **Decreasing $K_P$** (lower tissue affinity) → shorter $t_{1/2,\text{dist}}$ → faster equilibration
+- **Increasing $K_P$** (higher tissue affinity) → longer $t_{1/2,\text{dist}}$ → drug is retained in tissue longer
+
+### 5.6 Numerical Example: Effect of Perfusion on Equilibration Time
+
+For the same $K_P$, tissues with higher perfusion reach equilibrium faster:
+
+| Tissue | Perfusion ($Q/V_T$, mL/min/mL) | Time to 50% equilibrium |
+|--------|-------------------------------|--------------------------|
+| Kidney | 4.0                           | Short                    |
+| Muscle | 0.025                         | Longer                   |
+| Fat    | ~0.003                        | Very long                |
+
+When $K_P$ is large (e.g., $K_P = 1000$ for fat due to high lipophilicity), the time to reach equilibrium becomes very long even if perfusion is moderate.
+
+---
+
+## 6. The Equilibrium Distribution Ratio $K_P$
+
+$K_P$ is defined as:
+
+$$K_P = \frac{C_T}{C_{\text{blood}}} \bigg|_{\text{equilibrium}}$$
+
+It is a measure of the **affinity** of the tissue for the drug. $K_P$ is determined by:
+
+1. **Tissue binding** (non-specific binding to tissue proteins or phospholipids)
+2. **Lipophilicity** ($K_{ow}$)
+3. **Ionization state** ($\text{p}K_a$ and local pH)
+
+Higher $K_P$ means the drug strongly partitions into the tissue, resulting in:
+- Longer distribution half-life
+- Delayed achievement of equilibrium between blood and tissue
+- Prolonged tissue residency
+
+#### Clinical Implications
+
+- **Obesity**: If a drug is highly lipophilic (high $K_P$ for fat), it will distribute extensively into adipose tissue. This prolongs the time to achieve equilibrium and increases the effective volume of distribution, which has direct implications for dosing decisions (e.g., loading doses, dose adjustments in obese patients).
+- **Multiphasic concentration-time profiles**: When a drug has high affinity for and is taken up rapidly into tissues (high $K_P$ and high perfusion), the plasma concentration falls sharply early on. As tissues slowly re-release drug back into circulation, the plasma profile flattens, producing a biphasic or multiphasic curve — the classic distribution and elimination phases observed in multi-compartment pharmacokinetics.
+
+---
+
+## 7. Permeability Rate-Limited Distribution
+
+In contrast to perfusion rate-limited distribution, **permeability rate-limited distribution** occurs when:
+
+$$P \cdot SA \ll \frac{Q}{V_T}$$
+
+Here, blood flow is not the limiting factor — rather, the drug's poor ability to penetrate the tissue membrane limits distribution. This can arise when:
+
+- Lipophilicity ($K_{ow}$) of the un-ionized drug is low
+- The drug is predominantly ionized at physiological pH (unfavorable $\text{p}K_a$ relative to tissue pH)
+- The tissue has tight membranes (e.g., the blood-brain barrier in the CNS)
+
+In permeability rate-limited systems, even adequate blood flow cannot compensate for the drug's intrinsic inability to cross the membrane. This concept will be explored further in subsequent sessions.
+
+---
+
+## 8. Connection to Physiologically-Based Pharmacokinetic (PBPK) Modeling
+
+The concepts developed in this lecture form the mechanistic foundation of PBPK modeling:
+
+- Each organ or tissue is represented by its perfusion ($Q/V_T$) and drug-specific $K_P$ value.
+- The overall pharmacokinetic behavior of a drug is the integration of individual tissue-level processes.
+- $K_P$ values are typically determined experimentally using tissue concentration-time profiles from preclinical studies, or sourced from curated databases within PBPK software platforms.
+- Moving from empirical compartmental models to full PBPK models requires this tissue-level understanding.
+
+---
+
+## Summary
+
+| Concept | Key Equation / Relationship |
+|---|---|
+| Net rate of transport (diffusion) | $\text{Rate} = P \cdot SA \cdot \Delta C$ |
+| Fick's law of diffusion (flux) | $J = D \cdot K_{ow} \cdot \Delta C / H$ |
+| Rate of oral absorption (simplified) | $dX/dt \approx (D \cdot SA \cdot K_{ow} / H) \cdot C_{GI}$ |
+| Henderson–Hasselbalch (weak acid) | $\text{pH} = \text{p}K_a + \log_{10}([\text{ionized}]/[\text{un-ionized}])$ |
+| Tissue perfusion | $Q / V_T$ |
+| Amount of drug in tissue | $A_T = V_T \cdot K_P \cdot C_V$ |
+| Fractional rate of tissue exit | $K_T = Q / (V_T \cdot K_P)$ |
+| Distribution half-life | $t_{1/2,\text{dist}} = 0.693 \cdot K_P \cdot V_T / Q$ |
+
+The progression from membrane transport mechanisms → diffusion laws → perfusion rate limitation → distribution half-life provides the conceptual scaffolding for understanding **volume of distribution**, which will be covered in the next session as the extent of distribution.

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensei | MI-210: Essentials of Population PKPD M&S (Pumas Edition)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         background: #1a1a2e; color: #e0e0e0; padding: 2rem; }
+  h1 { font-size: 1.8rem; color: #fff; margin-bottom: 0.5rem; }
+  .subtitle { color: #aaa; margin-bottom: 2rem; font-size: 0.95rem; }
+  .progress-bar { background: #333; border-radius: 12px; height: 24px; margin-bottom: 2rem; overflow: hidden; position: relative; }
+  .progress-fill { height: 100%; border-radius: 12px; transition: width 0.5s; }
+  .progress-started { background: linear-gradient(90deg, #ef5350, #ffcc02); }
+  .progress-mastered { background: linear-gradient(90deg, #388e3c, #66bb6a); }
+  .progress-label { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600; color: #fff; }
+  .stats { display: flex; gap: 2rem; margin-bottom: 2rem; }
+  .stat { background: #16213e; padding: 1rem 1.5rem; border-radius: 10px; text-align: center; }
+  .stat-value { font-size: 2rem; font-weight: 700; color: #ffcc02; }
+  .stat-label { font-size: 0.8rem; color: #aaa; }
+  .chapter { margin-bottom: 2rem; }
+  .chapter h2 { font-size: 1.2rem; color: #ffcc02; margin-bottom: 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid #333; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .card { background: #16213e; border-radius: 10px; padding: 1rem; transition: transform 0.2s; }
+  .card:hover { transform: translateY(-2px); }
+  .card-icon { font-size: 1.2rem; margin-bottom: 0.3rem; }
+  .card-title { font-weight: 600; font-size: 1rem; color: #fff; margin-bottom: 0.4rem; }
+  .card-desc { font-size: 0.8rem; color: #aaa; margin-bottom: 0.6rem; line-height: 1.4; }
+  .card-meta { display: flex; gap: 0.8rem; font-size: 0.75rem; color: #888; align-items: center; }
+  .badge { padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; color: #1a1a2e; }
+  .click-hint { font-size: 0.7rem; color: #666; transition: transform 0.3s; display: inline-block; }
+  .click-hint.open { transform: rotate(180deg); }
+  .notes-panel { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #333; }
+  .notes-exercise { margin-bottom: 0.8rem; }
+  .notes-exercise-title { font-size: 0.85rem; font-weight: 600; color: #ffcc02; margin-bottom: 0.3rem; text-transform: capitalize; }
+  .notes-line { font-size: 0.8rem; color: #ccc; line-height: 1.6; padding-left: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th { text-align: left; padding: 0.6rem; background: #16213e; color: #ffcc02; font-size: 0.85rem; }
+  td { padding: 0.6rem; border-bottom: 1px solid #333; font-size: 0.85rem; }
+  .sessions { margin-top: 2rem; }
+  .sessions h2 { font-size: 1.2rem; color: #ffcc02; margin-bottom: 0.5rem; }
+  .legend { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; font-size: 0.8rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>&#x1F94B; Sensei Progress</h1>
+<div class="subtitle">MI-210: Essentials of Population PKPD M&S (Pumas Edition)</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-value">2</div><div class="stat-label">Started</div></div>
+  <div class="stat"><div class="stat-value">0</div><div class="stat-label">Mastered</div></div>
+  <div class="stat"><div class="stat-value">13</div><div class="stat-label">Total Nodes</div></div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-fill progress-mastered" style="width: 0.0%;"></div>
+  <div class="progress-fill progress-started" style="width: 15.4%; position: absolute; top: 0; opacity: 0.5;"></div>
+  <div class="progress-label">0/13 mastered</div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: #e0e0e0;"></div> Not Started</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #ef5350;"></div> Started</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #ffcc02;"></div> Practicing</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #66bb6a;"></div> Mastered</div>
+</div>
+
+<div class="chapter">
+  <h2>Chapter 1</h2>
+  <div class="cards"><div class="card" style="border: 3px solid #ef5350; background: #ef535020; cursor: pointer;" onclick="toggleNotes('card-ch1-1')">
+  <div class="card-icon">&#9733;</div>
+  <div class="card-title">Nonlinear Regression & MLE <span class='click-hint'>&#9660;</span></div>
+  <div class="card-desc">Maximum likelihood, OLS/WLS/ELS objective functions, 1-cpt IV bolus fitting</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #ef5350;">Started</span>
+    <span>Attempts: 1</span>
+    <span>Hints: 5</span>
+  </div>
+  <div class="notes-panel" id="card-ch1-1" style="display:none;"><div class="notes-exercise"><div class="notes-exercise-title">nonlinear regression</div><div class="notes-line">&#8226; Nonlinear regression: minimize sum of squared residuals (OLS) to estimate parameters</div><div class="notes-line">&#8226; 1-cmt IV bolus model: Ct = Dose/V * exp(-CL/V * t)</div><div class="notes-line">&#8226; Initial estimates matter — C0 = Dose/V gives a starting V; half-life guides CL</div><div class="notes-line">&#8226; Half-life: t½ = 0.693 * V / CL</div><div class="notes-line">&#8226; NelderMead() is a derivative-free optimizer — works for simple problems</div><div class="notes-line">&#8226; This is what fit() in Pumas does under the hood (with more sophistication)</div></div></div>
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Diagnostic Plots for Regression</div>
+  <div class="card-desc">PRED vs OBS, RES vs PRED, WRES vs PRED, residual patterns</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Population NLME Theory</div>
+  <div class="card-desc">Hierarchical models, IIV/RUV variance models, FO/FOCE/FOCEI, AIC/LRT</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 2</h2>
+  <div class="cards"><div class="card" style="border: 3px solid #f9a825; background: #ffcc0220; cursor: pointer;" onclick="toggleNotes('card-ch2-1')">
+  <div class="card-icon">&#9733;&#9733;</div>
+  <div class="card-title">Data Formatting for Pumas <span class='click-hint'>&#9660;</span></div>
+  <div class="card-desc">NMTRAN to Pumas data columns, read_pumas, EVID/AMT/CMT/SS/II/ADDL</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #ffcc02;">Practicing</span>
+    <span>Attempts: 3</span>
+    <span>Hints: 4</span>
+  </div>
+  <div class="notes-panel" id="card-ch2-1" style="display:none;"><div class="notes-exercise"><div class="notes-exercise-title">iv bolus dataset</div><div class="notes-line">&#8226; CMT in data = where the dose lands / where you observe (not total compartments in model)</div><div class="notes-line">&#8226; IV bolus: both dosing and observation rows are CMT = 1 (central)</div><div class="notes-line">&#8226; EVID: 1 = dosing event, 0 = observation (same as NONMEM)</div><div class="notes-line">&#8226; DV on dosing rows should be `missing` — Pumas infers mdv from this</div><div class="notes-line">&#8226; vcat(..., cols=:union) naturally makes DV missing on dose rows (clean trick)</div><div class="notes-line">&#8226; Standard lowercase column names (id, time, amt, evid, cmt, dv) need no kwargs in read_pumas</div><div class="notes-line">&#8226; Custom names (USUBJIDN, AFRLT) require explicit kwargs: id=:USUBJIDN, time=:AFRLT, ...</div><div class="notes-line">&#8226; `route` is NOT a standard data column — CMT determines where the dose goes</div></div><div class="notes-exercise"><div class="notes-exercise-title">oral multi dose addl ii</div><div class="notes-line">&#8226; ADDL/II encode repeated dosing in a single row (no need for separate dose rows)</div><div class="notes-line">&#8226; addl=5, ii=12 → 1 initial + 5 additional doses every 12h = 6 total doses over 3 days</div><div class="notes-line">&#8226; Oral dosing: dose enters CMT 1 (depot), observations from CMT 2 (central/plasma)</div><div class="notes-line">&#8226; Covariates (WT, CLCR, etc.) are passed via covariates=[:wt, :crcl] in read_pumas</div><div class="notes-line">&#8226; Covariates must be present on ALL rows for a subject (constant per row)</div></div><div class="notes-exercise"><div class="notes-exercise-title">ss infusion oral crossover</div><div class="notes-line">&#8226; Crossover (IV + oral) CMT mapping: CMT 1 = depot (oral), CMT 2 = central (IV)</div><div class="notes-line">&#8226; IV infusion at SS: rate=10, ss=1, amt=0, ii=0 (continuous, no discrete interval)</div><div class="notes-line">&#8226; Oral dose: amt=100, cmt=1 (depot) — drug absorbs into central</div><div class="notes-line">&#8226; ALL observations are always CMT 2 (central/plasma) regardless of dosing route</div><div class="notes-line">&#8226; You never observe from depot — you measure plasma concentration</div><div class="notes-line">&#8226; Sort with dosing events before observations at same time: order(:evid, rev=true)</div><div class="notes-line">&#8226; SS flag (ss=1) tells Pumas to assume steady-state concentrations at that time point</div><div class="notes-line">&#8226; RATE &gt; 0 encodes zero-order infusion rate (mg/hr)</div></div></div>
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 3</h2>
+  <div class="cards"><div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Coding PRED Models in Pumas</div>
+  <div class="card-desc">NONMEM-to-Pumas mapping, @model macro, @param/@random/@pre/@derived, no dynamics</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Compartmental PK Models (PREDPP)</div>
+  <div class="card-desc">ADVAN to Pumas dynamics mapping, Central1, Depots1Central1, exponential IIV, proportional error</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Fitting & Inference in Pumas</div>
+  <div class="card-desc">fit(), FO/FOCE/FOCEI, infer(), inspect(), coef(), aic(), interpreting output</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 4</h2>
+  <div class="cards"><div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Covariate Parameterizations</div>
+  <div class="card-desc">Power models, linear models, categorical covariates, centering on reference values</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Covariate Screening & Selection</div>
+  <div class="card-desc">EBE screening plots, forward/backward selection, LRT, AIC comparison</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 5</h2>
+  <div class="cards"><div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Simulation in Pumas</div>
+  <div class="card-desc">simobs(), DosageRegimen, fixed/individual/population simulation, multiple dosing</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 6</h2>
+  <div class="cards"><div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Bootstrap & VPC</div>
+  <div class="card-desc">infer(fit, Bootstrap()), vpc(), vpc_plot(), model qualification</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+<div class="chapter">
+  <h2>Chapter 7</h2>
+  <div class="cards"><div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Direct PK-PD Models</div>
+  <div class="card-desc">Direct Emax, multi-DV data (wide format), simultaneous PK-PD estimation</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+<div class="card" style="border: 2px solid #ccc; background: #e0e0e020; " >
+  <div class="card-icon">&#9744;</div>
+  <div class="card-title">Indirect Response & ODE Models</div>
+  <div class="card-desc">Effect compartment, indirect response Types I-IV, @dynamics ODE blocks, @init</div>
+  <div class="card-meta">
+    <span class="badge" style="background: #e0e0e0;">Not Started</span>
+    <span>Attempts: 0</span>
+    <span>Hints: 0</span>
+  </div>
+  
+</div>
+</div>
+</div>
+
+
+<div class="sessions">
+  <h2>Session Log</h2>
+  <table>
+    <tr><th>Date</th><th>Node</th><th>Challenges</th><th>Hints</th><th>Mastery</th></tr>
+    <tr>
+  <td>2026-04-17</td>
+  <td>mi210/ch1/nonlinear-regression</td>
+  <td>1</td>
+  <td>5</td>
+  <td>0 &rarr; 1</td>
+</tr>
+<tr>
+  <td>2026-04-18</td>
+  <td>mi210/ch2/data-formatting</td>
+  <td>1</td>
+  <td>2</td>
+  <td>0 &rarr; 1</td>
+</tr>
+<tr>
+  <td>2026-04-18</td>
+  <td>mi210/ch2/data-formatting</td>
+  <td>1</td>
+  <td>0</td>
+  <td>1 &rarr; 2</td>
+</tr>
+<tr>
+  <td>2026-04-18</td>
+  <td>mi210/ch2/data-formatting</td>
+  <td>1</td>
+  <td>2</td>
+  <td>2 &rarr; 2</td>
+</tr>
+
+  </table>
+</div>
+
+<div style="margin-top: 2rem; font-size: 0.75rem; color: #555;">
+  Generated 2026-04-18 17:18
+</div>
+
+<script>
+function toggleNotes(id) {
+  var panel = document.getElementById(id);
+  var card = panel.parentElement;
+  var hint = card.querySelector('.click-hint');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    if (hint) hint.classList.add('open');
+  } else {
+    panel.style.display = 'none';
+    if (hint) hint.classList.remove('open');
+  }
+}
+</script>
+</body>
+</html>

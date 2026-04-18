@@ -1,0 +1,137 @@
+---
+title: "Sensei Progress"
+subtitle: "MI-210 Learning Dashboard"
+format:
+  html:
+    toc: false
+    number-sections: false
+    page-layout: full
+---
+
+```{=html}
+<script>
+async function loadProgress() {
+  const resp = await fetch('sensei-state.json');
+  const state = await resp.json();
+  const nodes = state.nodes;
+  const sessions = state.sessions;
+
+  const total = nodes.length;
+  const mastered = nodes.filter(n => n.mastery >= 3).length;
+  const inProgress = nodes.filter(n => n.mastery > 0 && n.mastery < 3).length;
+  const notStarted = nodes.filter(n => n.mastery === 0).length;
+  const totalAttempts = nodes.reduce((s, n) => s + n.attempts, 0);
+  const totalHints = nodes.reduce((s, n) => s + n.hints_used, 0);
+  const pctMastered = Math.round(mastered / total * 100);
+  const pctStarted = Math.round((mastered + inProgress) / total * 100);
+
+  document.getElementById('sensei-dash').innerHTML = `
+    <div style="max-width:900px; margin:auto;">
+      <!-- Overall progress bar -->
+      <div style="background:#e9ecef; border-radius:12px; height:28px; margin-bottom:1.5rem; overflow:hidden; position:relative;">
+        <div style="width:${pctMastered}%; height:100%; background:linear-gradient(90deg,#198754,#20c997); border-radius:12px 0 0 12px; position:absolute;"></div>
+        <div style="width:${pctStarted}%; height:100%; background:linear-gradient(90deg,#fd7e14,#ffc107); border-radius:12px 0 0 12px; opacity:0.5; position:absolute;"></div>
+        <div style="position:absolute; width:100%; text-align:center; line-height:28px; font-weight:600; font-size:0.85rem; color:#333;">
+          ${pctStarted}% started &middot; ${pctMastered}% mastered
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+        <div style="flex:1; min-width:120px; background:#f8f9fa; padding:1rem; border-radius:10px; text-align:center; border:1px solid #dee2e6;">
+          <div style="font-size:2rem; font-weight:700; color:#198754;">${mastered}</div>
+          <div style="font-size:0.8rem; color:#666;">Mastered</div>
+        </div>
+        <div style="flex:1; min-width:120px; background:#f8f9fa; padding:1rem; border-radius:10px; text-align:center; border:1px solid #dee2e6;">
+          <div style="font-size:2rem; font-weight:700; color:#fd7e14;">${inProgress}</div>
+          <div style="font-size:0.8rem; color:#666;">In Progress</div>
+        </div>
+        <div style="flex:1; min-width:120px; background:#f8f9fa; padding:1rem; border-radius:10px; text-align:center; border:1px solid #dee2e6;">
+          <div style="font-size:2rem; font-weight:700; color:#6c757d;">${notStarted}</div>
+          <div style="font-size:0.8rem; color:#666;">Not Started</div>
+        </div>
+        <div style="flex:1; min-width:120px; background:#f8f9fa; padding:1rem; border-radius:10px; text-align:center; border:1px solid #dee2e6;">
+          <div style="font-size:2rem; font-weight:700; color:#0d6efd;">${totalAttempts}</div>
+          <div style="font-size:0.8rem; color:#666;">Attempts</div>
+        </div>
+        <div style="flex:1; min-width:120px; background:#f8f9fa; padding:1rem; border-radius:10px; text-align:center; border:1px solid #dee2e6;">
+          <div style="font-size:2rem; font-weight:700; color:#6f42c1;">${totalHints}</div>
+          <div style="font-size:0.8rem; color:#666;">Hints Used</div>
+        </div>
+      </div>
+
+      <!-- Node grid by chapter -->
+      ${buildChapterGrid(nodes)}
+
+      <!-- Session history -->
+      ${buildSessionTable(sessions)}
+    </div>
+  `;
+}
+
+function masteryBadge(m) {
+  const colors = ['#6c757d', '#fd7e14', '#ffc107', '#198754', '#0d6efd'];
+  const labels = ['Not Started', 'Beginner', 'Developing', 'Proficient', 'Mastered'];
+  const icons  = ['&#9675;', '&#9681;', '&#9680;', '&#9679;', '&#11088;'];
+  const i = Math.min(m, 4);
+  return `<span style="background:${colors[i]}; color:#fff; padding:2px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">${icons[i]} ${labels[i]}</span>`;
+}
+
+function buildChapterGrid(nodes) {
+  const chapters = {};
+  nodes.forEach(n => {
+    const ch = n.chapter;
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push(n);
+  });
+
+  let html = '';
+  for (const [ch, ns] of Object.entries(chapters)) {
+    html += `<h3 style="margin:1.5rem 0 0.8rem; color:#495057; border-bottom:1px solid #dee2e6; padding-bottom:0.3rem;">Chapter ${ch}</h3>`;
+    html += `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:0.8rem;">`;
+    for (const n of ns) {
+      html += `
+        <div style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:8px; padding:0.8rem;">
+          <div style="font-weight:600; font-size:0.95rem; margin-bottom:0.3rem;">${n.title}</div>
+          <div style="font-size:0.8rem; color:#666; margin-bottom:0.5rem; line-height:1.3;">${n.description}</div>
+          <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+            ${masteryBadge(n.mastery)}
+            <span style="font-size:0.75rem; color:#888;">${n.attempts} attempts</span>
+            <span style="font-size:0.75rem; color:#888;">${n.hints_used} hints</span>
+          </div>
+        </div>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+
+function buildSessionTable(sessions) {
+  if (!sessions || sessions.length === 0) return '';
+  let rows = sessions.map(s => `
+    <tr>
+      <td>${s.date}</td>
+      <td>${s.node_id.split('/').pop()}</td>
+      <td>${s.challenges_completed}</td>
+      <td>${s.hints_used}</td>
+      <td>${s.mastery_before} &rarr; ${s.mastery_after}</td>
+    </tr>`).join('');
+
+  return `
+    <h3 style="margin:2rem 0 0.8rem; color:#495057; border-bottom:1px solid #dee2e6; padding-bottom:0.3rem;">Session History</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <thead><tr style="background:#f8f9fa;">
+        <th style="padding:0.5rem; text-align:left; border-bottom:2px solid #dee2e6;">Date</th>
+        <th style="padding:0.5rem; text-align:left; border-bottom:2px solid #dee2e6;">Node</th>
+        <th style="padding:0.5rem; text-align:left; border-bottom:2px solid #dee2e6;">Challenges</th>
+        <th style="padding:0.5rem; text-align:left; border-bottom:2px solid #dee2e6;">Hints</th>
+        <th style="padding:0.5rem; text-align:left; border-bottom:2px solid #dee2e6;">Mastery</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+loadProgress();
+</script>
+<div id="sensei-dash"><p style="color:#999;">Loading progress...</p></div>
+```
