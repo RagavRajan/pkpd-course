@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute)">
+<meta name="dcterms.date" content="2026-04-18">
+
+<title>Chapter 7: Direct and Indirect Continuous Pop PK-PD Models – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch7_pkpd_models/ch7_pkpd_models.html">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2</span> Background</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">3</span> Data</a></li>
+  <li><a href="#base-pk-model" id="toc-base-pk-model" class="nav-link" data-scroll-target="#base-pk-model"><span class="header-section-number">4</span> Base PK Model</a></li>
+  <li><a href="#direct-pk-pd" id="toc-direct-pk-pd" class="nav-link" data-scroll-target="#direct-pk-pd"><span class="header-section-number">5</span> Direct PK-PD</a></li>
+  <li><a href="#effect-compartment-pk-pd" id="toc-effect-compartment-pk-pd" class="nav-link" data-scroll-target="#effect-compartment-pk-pd"><span class="header-section-number">6</span> Effect Compartment PK-PD</a></li>
+  <li><a href="#indirect-response-models" id="toc-indirect-response-models" class="nav-link" data-scroll-target="#indirect-response-models"><span class="header-section-number">7</span> Indirect Response Models</a>
+  <ul class="collapse">
+  <li><a href="#indirect-response-type-i-inhibition-of-kin" id="toc-indirect-response-type-i-inhibition-of-kin" class="nav-link" data-scroll-target="#indirect-response-type-i-inhibition-of-kin"><span class="header-section-number">7.1</span> Indirect Response Type I: Inhibition of Kin</a></li>
+  <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">7.2</span> Model Comparison</a></li>
+  <li><a href="#diagnostic-plots" id="toc-diagnostic-plots" class="nav-link" data-scroll-target="#diagnostic-plots"><span class="header-section-number">7.3</span> Diagnostic Plots</a></li>
+  </ul></li>
+  <li><a href="#k-pd-models-pd-without-pk-data" id="toc-k-pd-models-pd-without-pk-data" class="nav-link" data-scroll-target="#k-pd-models-pd-without-pk-data"><span class="header-section-number">8</span> K-PD Models: PD Without PK Data</a></li>
+  <li><a href="#the-four-pd-paradigms-decision-framework" id="toc-the-four-pd-paradigms-decision-framework" class="nav-link" data-scroll-target="#the-four-pd-paradigms-decision-framework"><span class="header-section-number">9</span> The Four PD Paradigms: Decision Framework</a></li>
+  <li><a href="#pk-pd-modeling-steps" id="toc-pk-pd-modeling-steps" class="nav-link" data-scroll-target="#pk-pd-modeling-steps"><span class="header-section-number">10</span> PK-PD Modeling Steps</a></li>
+  <li><a href="#study-guide-questions" id="toc-study-guide-questions" class="nav-link" data-scroll-target="#study-guide-questions"><span class="header-section-number">11</span> Study Guide Questions</a></li>
+  <li><a href="#supplementary-material" id="toc-supplementary-material" class="nav-link" data-scroll-target="#supplementary-material"><span class="header-section-number">12</span> Supplementary Material</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch7_pkpd_models/ch7_pkpd_models.html">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 18, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<pre class="{julia}"><code>#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()</code></pre>
+<section id="overview" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<p>This chapter covers continuous PK-PD models linking drug concentrations to pharmacodynamic response:</p>
+<ul>
+<li>Direct PK-PD (Emax)</li>
+<li>Effect Compartment PK-PD</li>
+<li>Non-Parametric Effect Compartment</li>
+<li>PK-PD with Tolerance</li>
+<li>Indirect Response Models (Types I-IV)</li>
+</ul>
+</section>
+<section id="background" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Background</h1>
+<p>PK-PD models link the pharmacokinetic profile to an observed pharmacodynamic response. The approach depends on the relationship between drug concentration and effect:</p>
+<ul>
+<li><strong>Direct PK-PD:</strong> Effect is an instantaneous function of concentration</li>
+<li><strong>Indirect PK-PD:</strong> Effect is mediated through a rate process (production or loss)</li>
+<li><strong>Effect Compartment:</strong> Accounts for temporal delay between concentration and effect</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Pharmacological Basis: Why Emax Models Work">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pharmacological Basis: Why Emax Models Work
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Most drugs exert their effects by binding to receptors, inhibiting enzymes, or modulating ion channels. The concentration-effect relationship follows the <strong>law of mass action</strong>: at low concentrations, the effect increases approximately linearly with concentration; at high concentrations, binding sites saturate and the effect plateaus. This saturable behavior is captured by the <span class="math inline">\(E_{max}\)</span> model:</p>
+<p><span class="math display">\[E = \frac{E_{max} \cdot C}{EC_{50} + C}\]</span></p>
+<p>which is mathematically identical to the <strong>Michaelis-Menten</strong> equation for enzyme kinetics. Here, <span class="math inline">\(EC_{50}\)</span> is the concentration producing 50% of maximum effect (analogous to <span class="math inline">\(K_M\)</span>), and <span class="math inline">\(E_{max}\)</span> is the maximum achievable effect (analogous to <span class="math inline">\(V_{max}\)</span>). The sigmoid (Hill) extension introduces a shape parameter <span class="math inline">\(\gamma\)</span> that controls the steepness of the curve: <span class="math inline">\(E = E_{max} \cdot C^{\gamma} / (EC_{50}^{\gamma} + C^{\gamma})\)</span>. When <span class="math inline">\(\gamma &gt; 1\)</span>, the curve is steeper (switch-like behavior); when <span class="math inline">\(\gamma &lt; 1\)</span>, it is shallower. This pharmacological foundation — grounded in receptor occupancy theory — is why the <span class="math inline">\(E_{max}\)</span> model is the fundamental building block of virtually all PD modeling.</p>
+</div>
+</div>
+</section>
+<section id="data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data</h1>
+<p>The exercises use three datasets:</p>
+<ul>
+<li><code>ch7_pk.csv</code> — PK-only data (TYPE=0)</li>
+<li><code>ch7_pkpd.csv</code> — Combined PK+PD data (TYPE=0 for PK, TYPE=1 for PD)</li>
+<li><code>ch7_indirect_pkpd.csv</code> — Combined PK+PD with indirect response endpoint</li>
+</ul>
+<pre class="{julia}"><code>#| label: load-data
+
+pk_df = CSV.read(joinpath(data_dir, "ch7_pk.csv"), DataFrame)
+pkpd_df = CSV.read(joinpath(data_dir, "ch7_pkpd.csv"), DataFrame)
+ind_df = CSV.read(joinpath(data_dir, "ch7_indirect_pkpd.csv"), DataFrame)
+
+println("PK data: ", nrow(pk_df), " rows, ", length(unique(pk_df.ID)), " subjects")
+println("PKPD data: ", nrow(pkpd_df), " rows")
+println("Indirect data: ", nrow(ind_df), " rows")</code></pre>
+</section>
+<section id="base-pk-model" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Base PK Model</h1>
+<p>All PK-PD models build on a 1-compartment oral PK model (ADVAN2 TRANS2):</p>
+<pre class="{julia}"><code>#| label: pk-data-prep
+
+# Prepare PK-only data
+pk_only = @rsubset(pk_df, :TYPE == 0 || :AMT &gt; 0)
+rename!(pk_only, :ID =&gt; :id, :AMT =&gt; :amt, :TIME =&gt; :time, :DV =&gt; :dv, :CMT =&gt; :cmt)
+pk_only.evid = ifelse.(pk_only.amt .&gt; 0, 1, 0)
+pk_only.dv = ifelse.(pk_only.evid .== 1, missing, pk_only.dv)
+
+pop_pk = read_pumas(pk_only)
+println("PK subjects: ", length(pop_pk))</code></pre>
+<pre class="{julia}"><code>#| label: pk-base-model
+
+pk_base = @model begin
+    @metadata begin
+        desc = "Base PK: 1-Cpt Oral (ADVAN2 TRANS2)"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        ω²_Ka  ∈ RealDomain(lower = 0.0, init = 0.04)
+        Ω_pk   ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 1.41)
+    end
+    @random begin
+        η_Ka ~ Normal(0.0, sqrt(ω²_Ka))
+        η_pk ~ MvNormal(Ω_pk)
+    end
+    @pre begin
+        Ka = tvKa * exp(η_Ka)
+        CL = tvCL * exp(η_pk[1])
+        Vc = tvV  * exp(η_pk[2])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, sqrt((cp * σ_prop)^2 + σ_add^2))
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: pk-base-fit
+
+pk_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0,
+    ω²_Ka = 0.04,
+    Ω_pk = [0.04 0.01; 0.01 0.04],
+    σ_prop = 0.2, σ_add = sqrt(2.0),
+)
+pk_fit = fit(pk_base, pop_pk, pk_params, Pumas.FOCEI())
+pk_fit</code></pre>
+</section>
+<section id="direct-pk-pd" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Direct PK-PD</h1>
+<p>In the direct model, effect is an instantaneous function of plasma concentration:</p>
+<p><span class="math display">\[E = E_0 + \frac{E_{max} \cdot C_p}{EC_{50} + C_p}\]</span></p>
+<p>This requires no additional dynamics — the PD is computed directly from the PK prediction in the error block.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">NONMEM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Pumas</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<pre><code>$ERROR
+EMAX=THETA(4)*EXP(ETA(4))
+EC50=THETA(5)*EXP(ETA(5))
+E0=THETA(6)*EXP(ETA(6))
+EFF=E0+EMAX*F/(EC50+F)+ERR(2)
+CONC=F + F*ERR(1)
+Y=EFF*TYPE + CONC*(1-TYPE)</code></pre>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<pre class="{julia}"><code>#| label: direct-pkpd-model
+
+# Prepare combined PK+PD data — pivot to wide format for multi-DV
+# PK and PD observations at same times need to be on same row
+pkpd_dose = @rsubset(pkpd_df, :AMT &gt; 0)
+pkpd_pk = @rsubset(pkpd_df, :TYPE == 0, :AMT == 0)
+pkpd_pd = @rsubset(pkpd_df, :TYPE == 1)
+
+pk_w = select(pkpd_pk, :ID, :TIME, :DV =&gt; :dv_pk)
+pd_w = select(pkpd_pd, :ID, :TIME, :DV =&gt; :dv_pd)
+obs_w = outerjoin(pk_w, pd_w, on = [:ID, :TIME])
+obs_w.AMT .= 0; obs_w.CMT .= 2; obs_w.evid .= 0
+
+dose_w = select(pkpd_dose, :ID, :TIME, :AMT, :CMT)
+dose_w.dv_pk .= missing; dose_w.dv_pd .= missing; dose_w.evid .= 1
+
+pkpd_combined = vcat(dose_w, obs_w, cols = :union)
+pkpd_combined.AMT = coalesce.(pkpd_combined.AMT, 0)
+pkpd_combined.evid = coalesce.(pkpd_combined.evid, 0)
+pkpd_combined.CMT = coalesce.(pkpd_combined.CMT, 2)
+sort!(pkpd_combined, [:ID, :TIME, order(:evid, rev = true)])
+
+rename!(pkpd_combined, :ID =&gt; :id, :TIME =&gt; :time, :AMT =&gt; :amt, :CMT =&gt; :cmt)
+pop_pkpd = read_pumas(pkpd_combined; observations = [:dv_pk, :dv_pd])
+println("PKPD subjects: ", length(pop_pkpd))</code></pre>
+</div>
+</div>
+</div>
+<pre class="{julia}"><code>#| label: direct-pkpd-def
+
+direct_pkpd = @model begin
+    @metadata begin
+        desc = "Direct Emax PK-PD"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.7)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 4.7)
+        tvV    ∈ RealDomain(lower = 0.0, init = 38.0)
+        tvEmax ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0   ∈ RealDomain(lower = 0.0, init = 60.0)
+        Ω      ∈ PDiagDomain(6)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 2.24)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Emax = tvEmax * exp(η[4])
+        EC50 = tvEC50 * exp(η[5])
+        E0   = tvE0 * exp(η[6])
+    end
+    @dynamics Depots1Central1
+    @derived begin
+        cp := @. Central / Vc
+        # PK observation (proportional error)
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        # PD observation (direct Emax + additive error)
+        eff := @. E0 + Emax * cp / (EC50 + cp)
+        dv_pd ~ @. Normal(eff, σ_pd)
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: direct-pkpd-fit
+
+direct_params = (
+    tvKa = 1.7, tvCL = 4.7, tvV = 38.0,
+    tvEmax = 100.0, tvEC50 = 5.0, tvE0 = 60.0,
+    Ω = Diagonal(fill(0.04, 6)),
+    σ_prop = 0.2, σ_pd = sqrt(5.0),
+)
+direct_fit = fit(direct_pkpd, pop_pkpd, direct_params, Pumas.FOCEI())
+direct_fit</code></pre>
+</section>
+<section id="effect-compartment-pk-pd" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Effect Compartment PK-PD</h1>
+<p>When there is a temporal delay between plasma concentration and effect, an effect compartment links the PK to PD:</p>
+<p><span class="math display">\[\frac{dC_e}{dt} = K_{e0} \cdot (C_p - C_e)\]</span></p>
+<p><span class="math display">\[E = E_0 + \frac{E_{max} \cdot C_e}{EC_{50} + C_e}\]</span></p>
+<p>In NONMEM, this uses ADVAN4 TRANS1 with a negligible-mass trick (K23 very small). In Pumas, we write the ODE explicitly:</p>
+<pre class="{julia}"><code>#| label: ecomp-model
+
+ecomp_pkpd = @model begin
+    @metadata begin
+        desc = "Effect Compartment PK-PD (Emax)"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        tvKe0  ∈ RealDomain(lower = 0.0, init = 0.07)
+        tvEmax ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0   ∈ RealDomain(lower = 0.0, init = 60.0)
+        Ω      ∈ PDiagDomain(7)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 4.47)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Ke0  = tvKe0 * exp(η[4])
+        Emax = tvEmax * exp(η[5])
+        EC50 = tvEC50 * exp(η[6])
+        E0   = tvE0 * exp(η[7])
+    end
+    @dynamics begin
+        Depot'   = -Ka * Depot
+        Central' =  Ka * Depot - (CL / Vc) * Central
+        Ce'      =  Ke0 * (Central / Vc - Ce)  # effect compartment
+    end
+    @derived begin
+        cp := @. Central / Vc
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        eff := @. E0 + Emax * Ce / (EC50 + Ce)
+        dv_pd ~ @. Normal(eff, σ_pd)
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: ecomp-fit
+
+ecomp_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0, tvKe0 = 0.07,
+    tvEmax = 100.0, tvEC50 = 5.0, tvE0 = 60.0,
+    Ω = Diagonal(fill(0.04, 7)),
+    σ_prop = 0.2, σ_pd = sqrt(20.0),
+)
+ecomp_fit = fit(ecomp_pkpd, pop_pkpd, ecomp_params, Pumas.FOCEI())
+ecomp_fit</code></pre>
+</section>
+<section id="indirect-response-models" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Indirect Response Models</h1>
+<p>Indirect response models describe drug effects on the production or loss of a response variable. The core concept is <strong>turnover</strong>: at steady state, the rate of production (<span class="math inline">\(K_{in}\)</span>) equals the rate of loss (<span class="math inline">\(K_{out} \cdot R\)</span>), giving baseline <span class="math inline">\(R_0 = K_{in} / K_{out}\)</span>.</p>
+<p><span class="math display">\[\frac{dR}{dt} = K_{in} \cdot S(C_p) - K_{out} \cdot R\]</span></p>
+<p>where <span class="math inline">\(S(C_p)\)</span> is a stimulation or inhibition function applied to either <span class="math inline">\(K_{in}\)</span> or <span class="math inline">\(K_{out}\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 37%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Target</th>
+<th>Function</th>
+<th>Equation</th>
+<th>Response Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>I</strong></td>
+<td>Inhibit <span class="math inline">\(K_{in}\)</span></td>
+<td><span class="math inline">\(1 - \frac{I_{max} \cdot C}{IC_{50} + C}\)</span></td>
+<td><span class="math inline">\(\frac{dR}{dt} = K_{in}(1-E) - K_{out} \cdot R\)</span></td>
+<td>↓ Decrease</td>
+</tr>
+<tr class="even">
+<td><strong>II</strong></td>
+<td>Inhibit <span class="math inline">\(K_{out}\)</span></td>
+<td><span class="math inline">\(1 - \frac{I_{max} \cdot C}{IC_{50} + C}\)</span></td>
+<td><span class="math inline">\(\frac{dR}{dt} = K_{in} - K_{out}(1-E) \cdot R\)</span></td>
+<td>↑ Increase</td>
+</tr>
+<tr class="odd">
+<td><strong>III</strong></td>
+<td>Stimulate <span class="math inline">\(K_{in}\)</span></td>
+<td><span class="math inline">\(1 + \frac{E_{max} \cdot C}{EC_{50} + C}\)</span></td>
+<td><span class="math inline">\(\frac{dR}{dt} = K_{in}(1+E) - K_{out} \cdot R\)</span></td>
+<td>↑ Increase</td>
+</tr>
+<tr class="even">
+<td><strong>IV</strong></td>
+<td>Stimulate <span class="math inline">\(K_{out}\)</span></td>
+<td><span class="math inline">\(1 + \frac{E_{max} \cdot C}{EC_{50} + C}\)</span></td>
+<td><span class="math inline">\(\frac{dR}{dt} = K_{in} - K_{out}(1+E) \cdot R\)</span></td>
+<td>↓ Decrease</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled" title="Key IDR Characteristics">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key IDR Characteristics
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Turnover half-life:</strong> <span class="math inline">\(t_{1/2} = \ln(2) / K_{out}\)</span> — determines how quickly the response changes</li>
+<li><strong>Effect persistence:</strong> Response continues to change after drug is eliminated (because the turnover system takes time to re-equilibrate)</li>
+<li><strong>Types I &amp; IV</strong> decrease the response; <strong>Types II &amp; III</strong> increase it — but through different mechanisms</li>
+<li><strong>Distinguishing Types I vs IV (or II vs III):</strong> Requires dense PD sampling at early time points — the onset/offset kinetics differ</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="The Turnover Concept: Why Biological Responses Have Inherent Delays">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Turnover Concept: Why Biological Responses Have Inherent Delays
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Most biological responses — blood pressure, clotting factors, cholesterol, blood glucose, cortisol — exist in a <strong>dynamic equilibrium</strong> where a production process (<span class="math inline">\(K_{in}\)</span>) is balanced by a degradation or loss process (<span class="math inline">\(K_{out}\)</span>). At baseline, this equilibrium satisfies <span class="math inline">\(K_{in} = K_{out} \times R_0\)</span>, where <span class="math inline">\(R_0\)</span> is the baseline response. Drugs perturb this equilibrium by altering either the production or the loss rate, but the response cannot change instantaneously because the existing pool of response variable must <strong>turn over</strong>. The characteristic time scale for this process is the turnover half-life:</p>
+<p><span class="math display">\[t_{1/2,\text{turnover}} = \frac{\ln 2}{K_{out}}\]</span></p>
+<p>This delay is fundamentally different from a distributional delay modeled by an effect compartment (<span class="math inline">\(k_{e0}\)</span>). The effect compartment delay arises from the time required for drug to equilibrate between plasma and the biophase; the turnover delay arises from the time required for the <strong>biological system itself</strong> to respond to the perturbation. Distinguishing these two mechanisms — pharmacokinetic delay vs.&nbsp;pharmacodynamic (systems-level) delay — is essential for selecting the appropriate model structure and for making correct predictions about the time course of drug effect.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Clinical Examples by IDR Type">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Clinical Examples by IDR Type
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Clinical Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Type I</strong> (↓ Kin)</td>
+<td>Corticosteroid suppression of cortisol, warfarin inhibition of clotting factor synthesis</td>
+</tr>
+<tr class="even">
+<td><strong>Type II</strong> (↓ Kout)</td>
+<td>Heparin reducing factor Xa clearance, EPO reducing RBC destruction</td>
+</tr>
+<tr class="odd">
+<td><strong>Type III</strong> (↑ Kin)</td>
+<td>EPO stimulating RBC production, GH stimulating IGF-1 synthesis</td>
+</tr>
+<tr class="even">
+<td><strong>Type IV</strong> (↑ Kout)</td>
+<td>Diuretics increasing sodium excretion, furosemide increasing urine output</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="indirect-response-type-i-inhibition-of-kin" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="indirect-response-type-i-inhibition-of-kin"><span class="header-section-number">7.1</span> Indirect Response Type I: Inhibition of Kin</h2>
+<pre class="{julia}"><code>#| label: indirect-data
+
+# Prepare indirect PK-PD data — pivot to wide format for multi-DV
+# PK and PD observations are at the same time points, so we merge them into one row
+
+dose_rows = @rsubset(ind_df, :AMT &gt; 0)
+pk_rows = @rsubset(ind_df, :TYPE == 0, :AMT == 0)
+pd_rows = @rsubset(ind_df, :TYPE == 1)
+
+# Merge PK + PD at same (ID, TIME) into wide format
+pk_wide = select(pk_rows, :ID, :TIME, :DV =&gt; :dv_pk)
+pd_wide = select(pd_rows, :ID, :TIME, :DV =&gt; :dv_pd)
+obs_wide = outerjoin(pk_wide, pd_wide, on = [:ID, :TIME])
+obs_wide.AMT .= 0
+obs_wide.CMT .= 2
+obs_wide.evid .= 0
+
+# Dose rows
+dose_prep = select(dose_rows, :ID, :TIME, :AMT, :CMT)
+dose_prep.dv_pk .= missing
+dose_prep.dv_pd .= missing
+dose_prep.evid .= 1
+
+# Combine and sort
+combined = vcat(dose_prep, obs_wide, cols = :union)
+combined.AMT = coalesce.(combined.AMT, 0)
+combined.evid = coalesce.(combined.evid, 0)
+combined.CMT = coalesce.(combined.CMT, 2)
+sort!(combined, [:ID, :TIME, order(:evid, rev = true)])
+
+rename!(combined, :ID =&gt; :id, :TIME =&gt; :time, :AMT =&gt; :amt, :CMT =&gt; :cmt)
+pop_ind = read_pumas(combined; observations = [:dv_pk, :dv_pd])
+println("Indirect PKPD subjects: ", length(pop_ind))</code></pre>
+<pre class="{julia}"><code>#| label: ind1-model
+
+# Type I: Inhibit Kin
+# From ind1_pkpd.ctl: ADVAN6, $DES with DADT(3) = KIN*(1-E) - KOUT*A(3)
+ind1_model = @model begin
+    @metadata begin
+        desc = "Indirect Response Type I: Inhibit Kin"
+    end
+    @param begin
+        tvKa   ∈ RealDomain(lower = 0.0, init = 1.5)
+        tvCL   ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 35.0)
+        tvKin  ∈ RealDomain(lower = 0.0, init = 10.0)
+        tvKout ∈ RealDomain(lower = 0.0, init = 0.05)
+        tvIC50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        Ω      ∈ PDiagDomain(3)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_pd   ∈ RealDomain(lower = 0.0, init = 4.47)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        Ka   = tvKa * exp(η[1])
+        CL   = tvCL * exp(η[2])
+        Vc   = tvV  * exp(η[3])
+        Kin  = tvKin
+        Kout = tvKout
+        IC50 = tvIC50
+        # Emax fixed at 1 (as in ctl: THETA(6) = 1 FIX)
+    end
+    @init begin
+        Response = Kin / Kout  # steady-state baseline
+    end
+    @dynamics begin
+        Depot'    = -Ka * Depot
+        Central'  =  Ka * Depot - (CL / Vc) * Central
+        Response' =  Kin * (1 - Central / Vc / (IC50 + Central / Vc)) - Kout * Response
+    end
+    @derived begin
+        cp := @. Central / Vc
+        dv_pk ~ @. Normal(cp, abs(cp) * σ_prop)
+        dv_pd ~ @. Normal(Response, σ_pd)
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: ind1-fit
+
+ind1_params = (
+    tvKa = 1.5, tvCL = 5.0, tvV = 35.0,
+    tvKin = 10.0, tvKout = 0.05, tvIC50 = 5.0,
+    Ω = Diagonal([0.04, 0.04, 0.04]),
+    σ_prop = 0.2, σ_pd = sqrt(20.0),
+)
+ind1_fit = fit(ind1_model, pop_ind, ind1_params, Pumas.FOCEI())
+ind1_fit</code></pre>
+</section>
+<section id="model-comparison" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">7.2</span> Model Comparison</h2>
+<pre class="{julia}"><code>#| label: pkpd-compare
+
+println("PK-PD Model Comparison")
+println("=" ^ 50)
+println("Direct Emax     AIC: ", round(aic(direct_fit), digits = 1))
+println("Effect Comp     AIC: ", round(aic(ecomp_fit), digits = 1))
+println("Indirect Type I AIC: ", round(aic(ind1_fit), digits = 1))</code></pre>
+</section>
+<section id="diagnostic-plots" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="diagnostic-plots"><span class="header-section-number">7.3</span> Diagnostic Plots</h2>
+<pre class="{julia}"><code>#| label: fig-ch7-indirect-diag
+#| fig-cap: "Indirect Response Model Type I: GOF Diagnostics"
+
+ind_insp = inspect(ind1_fit)
+ind_insp_df = DataFrame(ind_insp)
+
+# PD observations only
+pd_obs = @rsubset(ind_insp_df, !ismissing(:dv_pd))
+
+fig = Figure(size = (800, 400))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV (PD)", title = "DV vs PRED")
+scatter!(ax1, pd_obs.dv_pd_pred, pd_obs.dv_pd, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV (PD)", title = "DV vs IPRED")
+scatter!(ax2, pd_obs.dv_pd_ipred, pd_obs.dv_pd, color = :navy, markersize = 5, alpha = 0.6)
+ablines!(ax2, 0, 1, color = :black)
+
+fig</code></pre>
+</section>
+</section>
+<section id="k-pd-models-pd-without-pk-data" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> K-PD Models: PD Without PK Data</h1>
+<p>When PK data are unavailable (PD-only studies, retrospective analyses, sparse sampling), K-PD models use a <strong>virtual compartment</strong> to replace the PK model:</p>
+<p><span class="math display">\[\frac{dA}{dt} = -K_{DE} \cdot A\]</span></p>
+<p>where <span class="math inline">\(A\)</span> is the virtual drug amount and <span class="math inline">\(K_{DE}\)</span> is the apparent elimination rate (<span class="math inline">\(= CL/V\)</span>). The drug effect is then driven by <span class="math inline">\(K_{DE} \cdot A\)</span> (analogous to <span class="math inline">\(CL \cdot C_p\)</span>) rather than by concentration.</p>
+<p><strong>Key parameters:</strong></p>
+<ul>
+<li><span class="math inline">\(K_{DE}\)</span> = apparent elimination rate (replaces CL/V)</li>
+<li><span class="math inline">\(EDK_{50}\)</span> = apparent potency (replaces <span class="math inline">\(EC_{50}\)</span>; <span class="math inline">\(EDK_{50} = EC_{50} \cdot CL\)</span>)</li>
+</ul>
+<pre class="{julia}"><code>#| label: kpd-model-example
+#| eval: false
+
+kpd_model = @model begin
+    @param begin
+        tvKDE   ∈ RealDomain(lower = 0.0, init = 0.1)
+        tvEmax  ∈ RealDomain(lower = 0.0, init = 100.0)
+        tvEDK50 ∈ RealDomain(lower = 0.0, init = 5.0)
+        tvE0    ∈ RealDomain(init = 60.0)
+        Ω       ∈ PDiagDomain(2)
+        σ_pd    ∈ RealDomain(lower = 0.0, init = 5.0)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @pre begin
+        KDE   = tvKDE * exp(η[1])
+        Emax  = tvEmax
+        EDK50 = tvEDK50 * exp(η[2])
+        E0    = tvE0
+    end
+    @dynamics begin
+        A' = -KDE * A  # virtual compartment
+    end
+    @derived begin
+        rate_out := @. KDE * A
+        effect := @. E0 + Emax * rate_out / (EDK50 + rate_out)
+        dv ~ @. Normal(effect, σ_pd)
+    end
+end</code></pre>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>K-PD limitations:</strong></p>
+<ul>
+<li>Assumes linear PK (first-order elimination)</li>
+<li>Cannot predict concentrations — only effects</li>
+<li>May overestimate IIV (conflates PK and PD variability)</li>
+<li>Requires ≥ 3 dose levels for identifiability</li>
+<li>Not recommended for regulatory submissions where PK data exist</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="the-four-pd-paradigms-decision-framework" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> The Four PD Paradigms: Decision Framework</h1>
+<p>When choosing a PD model structure, follow this decision tree:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 34%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>If Yes →</th>
+<th>If No →</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Is there a measurable delay between Cp and effect?</td>
+<td>Effect compartment or IDR</td>
+<td>Direct response</td>
+</tr>
+<tr class="even">
+<td>Does the drug affect a turnover process?</td>
+<td>IDR (Types I–IV)</td>
+<td>Effect compartment</td>
+</tr>
+<tr class="odd">
+<td>Is the CE plot loop counter-clockwise?</td>
+<td>Effect compartment (ke0)</td>
+<td>Direct, tolerance, or IDR</td>
+</tr>
+<tr class="even">
+<td>Is PK data available?</td>
+<td>PK-PD model</td>
+<td>K-PD model</td>
+</tr>
+<tr class="odd">
+<td>Is the effect reversible and dose-dependent?</td>
+<td>Standard Emax/IDR</td>
+<td>Consider more complex models</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pk-pd-modeling-steps" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> PK-PD Modeling Steps</h1>
+<ol type="1">
+<li>Develop and qualify the PK model first (using PK-only data)</li>
+<li>Fix PK parameters and estimate PD parameters (sequential approach)</li>
+<li>Or estimate PK and PD simultaneously (combined data approach — as shown above)</li>
+<li>Evaluate GOF diagnostics for both PK and PD</li>
+<li>Compare structural PD models (direct vs.&nbsp;effect compartment vs.&nbsp;indirect)</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Sequential vs. Simultaneous Estimation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sequential vs.&nbsp;Simultaneous Estimation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 27%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Sequential</strong> (fix PK, estimate PD)</td>
+<td>Faster, PK model already validated</td>
+<td>Ignores PK uncertainty, may bias PD estimates</td>
+</tr>
+<tr class="even">
+<td><strong>Simultaneous</strong> (estimate PK + PD together)</td>
+<td>Full uncertainty propagation, optimal use of data</td>
+<td>Slower, larger parameter space, harder to converge</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation:</strong> Start sequential for model development (faster iteration), then switch to simultaneous for the final model.</p>
+</div>
+</div>
+</section>
+<section id="study-guide-questions" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Study Guide Questions</h1>
+<ol type="1">
+<li>What is the difference between a direct and indirect PK-PD model?</li>
+<li>When would you use an effect compartment model instead of a direct model?</li>
+<li>What are the four types of indirect response models and how do they differ?</li>
+<li>Why is Emax often fixed to 1 in indirect response models?</li>
+<li>What are the advantages of simultaneous PK-PD estimation vs.&nbsp;sequential?</li>
+<li>When would a K-PD model be appropriate instead of a full PK-PD model?</li>
+<li>How does turnover half-life affect the time course of an indirect response?</li>
+</ol>
+</section>
+<section id="supplementary-material" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Supplementary Material</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Topic</th>
+<th>Tutorial</th>
+<th>Key Additions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Lecture: Intrinsic CL &amp; Enzyme Kinetics</strong></td>
+<td><a href="../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">PK W7a</a></td>
+<td>Vmax/KM enzyme kinetics — the pharmacological foundation of the Emax model</td>
+</tr>
+<tr class="even">
+<td><strong>Lecture: Clearance &amp; Hepatic Extraction</strong></td>
+<td><a href="../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">PK W6</a></td>
+<td>Drug elimination physiology underlying PK-PD model structure</td>
+</tr>
+<tr class="odd">
+<td><strong>Lecture: Oral Absorption</strong></td>
+<td><a href="../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">PK W8</a></td>
+<td>First-order absorption, bioavailability — the PK driving function for PD</td>
+</tr>
+<tr class="even">
+<td>PD model overview</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/00-introduction-to-pd-models.html">Introduction to PD Models</a></td>
+<td>Four PD paradigms, Emax/Hill curves, potency vs efficacy, decision flowchart</td>
+</tr>
+<tr class="odd">
+<td>Direct response models</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/01-direct-response.html">Direct Response</a></td>
+<td>Stimulatory + inhibitory Emax, population simulation, full fitting workflow</td>
+</tr>
+<tr class="even">
+<td>Effect compartment models</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/02-effect-compartment.html">Effect Compartment</a></td>
+<td>Hysteresis visualization, ke0 sensitivity analysis, Cp vs Ce comparison, clinical examples</td>
+</tr>
+<tr class="odd">
+<td>Indirect response models</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/03-indirect-response.html">Indirect Response</a></td>
+<td>All 4 IDR types with code, comparative simulation, turnover time sensitivity, clinical examples</td>
+</tr>
+<tr class="even">
+<td>K-PD models</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/04-kpd-models.html">K-PD Models</a></td>
+<td>Virtual compartment concept, KDE/EDK50 parameterization, limitations, K-PD vs PK-PD decision framework</td>
+</tr>
+<tr class="odd">
+<td>Model selection</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/05-model-selection.html">PD Model Selection</a></td>
+<td>Systematic selection (EDA → mechanism → statistics), warfarin case study, common pitfalls</td>
+</tr>
+<tr class="even">
+<td>HCV viral dynamics</td>
+<td><a href="https://tutorials.pumas.ai/html/pkpd/hcvgsa.html">HCV GSA</a></td>
+<td>QSP-style PK-PD with viral kinetics and global sensitivity analysis</td>
+</tr>
+<tr class="odd">
+<td>TMDD models</td>
+<td><a href="https://tutorials.pumas.ai/html/tmdd/01-tmdd-foundations.html">TMDD Foundations</a> → <a href="https://tutorials.pumas.ai/html/tmdd/05-tmdd-workflows.html">TMDD Workflows</a></td>
+<td>Target-mediated drug disposition: full model, approximations, special cases</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb18" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chapter 7: Direct and Indirect Continuous Pop PK-PD Models"</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition"</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> today</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-width: 8</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-height: 5</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">  error: false</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pumas</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">"../data"</span>)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="fu">set_aog_theme!</span>()</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="fu"># Overview</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>This chapter covers continuous PK-PD models linking drug concentrations to pharmacodynamic response:</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Direct PK-PD (Emax)</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Effect Compartment PK-PD</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Non-Parametric Effect Compartment</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>PK-PD with Tolerance</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Indirect Response Models (Types I-IV)</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a><span class="fu"># Background</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>PK-PD models link the pharmacokinetic profile to an observed pharmacodynamic response. The approach depends on the relationship between drug concentration and effect:</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Direct PK-PD:** Effect is an instantaneous function of concentration</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Indirect PK-PD:** Effect is mediated through a rate process (production or loss)</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Effect Compartment:** Accounts for temporal delay between concentration and effect</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Pharmacological Basis: Why Emax Models Work"}</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>Most drugs exert their effects by binding to receptors, inhibiting enzymes, or modulating ion channels. The concentration-effect relationship follows the **law of mass action**: at low concentrations, the effect increases approximately linearly with concentration; at high concentrations, binding sites saturate and the effect plateaus. This saturable behavior is captured by the $E_{max}$ model:</span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>$$E = \frac{E_{max} \cdot C}{EC_{50} + C}$$</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>which is mathematically identical to the **Michaelis-Menten** equation for enzyme kinetics. Here, $EC_{50}$ is the concentration producing 50% of maximum effect (analogous to $K_M$), and $E_{max}$ is the maximum achievable effect (analogous to $V_{max}$). The sigmoid (Hill) extension introduces a shape parameter $\gamma$ that controls the steepness of the curve: $E = E_{max} \cdot C^{\gamma} / (EC_{50}^{\gamma} + C^{\gamma})$. When $\gamma &gt; 1$, the curve is steeper (switch-like behavior); when $\gamma &lt; 1$, it is shallower. This pharmacological foundation — grounded in receptor occupancy theory — is why the $E_{max}$ model is the fundamental building block of virtually all PD modeling.</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data</span></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>The exercises use three datasets:</span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ch7_pk.csv`</span> — PK-only data (TYPE=0)</span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ch7_pkpd.csv`</span> — Combined PK+PD data (TYPE=0 for PK, TYPE=1 for PD)</span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ch7_indirect_pkpd.csv`</span> — Combined PK+PD with indirect response endpoint</span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-data</span></span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>pk_df <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="fu">joinpath</span>(data_dir, <span class="st">"ch7_pk.csv"</span>), DataFrame)</span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>pkpd_df <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="fu">joinpath</span>(data_dir, <span class="st">"ch7_pkpd.csv"</span>), DataFrame)</span>
+<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>ind_df <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="fu">joinpath</span>(data_dir, <span class="st">"ch7_indirect_pkpd.csv"</span>), DataFrame)</span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"PK data: "</span>, <span class="fu">nrow</span>(pk_df), <span class="st">" rows, "</span>, <span class="fu">length</span>(<span class="fu">unique</span>(pk_df.ID)), <span class="st">" subjects"</span>)</span>
+<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"PKPD data: "</span>, <span class="fu">nrow</span>(pkpd_df), <span class="st">" rows"</span>)</span>
+<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Indirect data: "</span>, <span class="fu">nrow</span>(ind_df), <span class="st">" rows"</span>)</span>
+<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a><span class="fu"># Base PK Model</span></span>
+<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>All PK-PD models build on a 1-compartment oral PK model (ADVAN2 TRANS2):</span>
+<span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-91"><a href="#cb18-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-92"><a href="#cb18-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: pk-data-prep</span></span>
+<span id="cb18-93"><a href="#cb18-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare PK-only data</span></span>
+<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a>pk_only <span class="op">=</span> <span class="pp">@rsubset</span>(pk_df, <span class="op">:</span>TYPE <span class="op">==</span> <span class="fl">0</span> <span class="op">||</span> <span class="op">:</span>AMT <span class="op">&gt;</span> <span class="fl">0</span>)</span>
+<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a><span class="fu">rename!</span>(pk_only, <span class="op">:</span>ID <span class="op">=&gt;</span> <span class="op">:</span>id, <span class="op">:</span>AMT <span class="op">=&gt;</span> <span class="op">:</span>amt, <span class="op">:</span>TIME <span class="op">=&gt;</span> <span class="op">:</span>time, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv, <span class="op">:</span>CMT <span class="op">=&gt;</span> <span class="op">:</span>cmt)</span>
+<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a>pk_only.evid <span class="op">=</span> <span class="fu">ifelse</span>.(pk_only.amt <span class="op">.&gt;</span> <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>)</span>
+<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a>pk_only.dv <span class="op">=</span> <span class="fu">ifelse</span>.(pk_only.evid <span class="op">.==</span> <span class="fl">1</span>, <span class="cn">missing</span>, pk_only.dv)</span>
+<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a>pop_pk <span class="op">=</span> <span class="fu">read_pumas</span>(pk_only)</span>
+<span id="cb18-101"><a href="#cb18-101" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"PK subjects: "</span>, <span class="fu">length</span>(pop_pk))</span>
+<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-103"><a href="#cb18-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: pk-base-model</span></span>
+<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a>pk_base <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb18-110"><a href="#cb18-110" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb18-111"><a href="#cb18-111" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Base PK: 1-Cpt Oral (ADVAN2 TRANS2)"</span></span>
+<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a>        tvKa   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.5</span>)</span>
+<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">35.0</span>)</span>
+<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a>        ω²_Ka  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.04</span>)</span>
+<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>        Ω_pk   <span class="op">∈</span> <span class="fu">PSDDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb18-119"><a href="#cb18-119" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb18-120"><a href="#cb18-120" aria-hidden="true" tabindex="-1"></a>        σ_add  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.41</span>)</span>
+<span id="cb18-121"><a href="#cb18-121" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a>        η_Ka <span class="op">~</span> <span class="fu">Normal</span>(<span class="fl">0.0</span>, <span class="fu">sqrt</span>(ω²_Ka))</span>
+<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a>        η_pk <span class="op">~</span> <span class="fu">MvNormal</span>(Ω_pk)</span>
+<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-126"><a href="#cb18-126" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a>        Ka <span class="op">=</span> tvKa <span class="op">*</span> <span class="fu">exp</span>(η_Ka)</span>
+<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a>        CL <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η_pk[<span class="fl">1</span>])</span>
+<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a>        Vc <span class="op">=</span> tvV  <span class="op">*</span> <span class="fu">exp</span>(η_pk[<span class="fl">2</span>])</span>
+<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Depots1Central1</span>
+<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">sqrt</span>((cp <span class="op">*</span> σ_prop)<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> σ_add<span class="op">^</span><span class="fl">2</span>))</span>
+<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-136"><a href="#cb18-136" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-141"><a href="#cb18-141" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-142"><a href="#cb18-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: pk-base-fit</span></span>
+<span id="cb18-143"><a href="#cb18-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-144"><a href="#cb18-144" aria-hidden="true" tabindex="-1"></a>pk_params <span class="op">=</span> (</span>
+<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a>    tvKa <span class="op">=</span> <span class="fl">1.5</span>, tvCL <span class="op">=</span> <span class="fl">5.0</span>, tvV <span class="op">=</span> <span class="fl">35.0</span>,</span>
+<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a>    ω²_Ka <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span id="cb18-147"><a href="#cb18-147" aria-hidden="true" tabindex="-1"></a>    Ω_pk <span class="op">=</span> [<span class="fl">0.04</span> <span class="fl">0.01</span>; <span class="fl">0.01</span> <span class="fl">0.04</span>],</span>
+<span id="cb18-148"><a href="#cb18-148" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>, σ_add <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">2.0</span>),</span>
+<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a>pk_fit <span class="op">=</span> <span class="fu">fit</span>(pk_base, pop_pk, pk_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a>pk_fit</span>
+<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-154"><a href="#cb18-154" aria-hidden="true" tabindex="-1"></a><span class="fu"># Direct PK-PD</span></span>
+<span id="cb18-155"><a href="#cb18-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-156"><a href="#cb18-156" aria-hidden="true" tabindex="-1"></a>In the direct model, effect is an instantaneous function of plasma concentration:</span>
+<span id="cb18-157"><a href="#cb18-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-158"><a href="#cb18-158" aria-hidden="true" tabindex="-1"></a>$$E = E_0 + \frac{E_{max} \cdot C_p}{EC_{50} + C_p}$$</span>
+<span id="cb18-159"><a href="#cb18-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-160"><a href="#cb18-160" aria-hidden="true" tabindex="-1"></a>This requires no additional dynamics — the PD is computed directly from the PK prediction in the error block.</span>
+<span id="cb18-161"><a href="#cb18-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-162"><a href="#cb18-162" aria-hidden="true" tabindex="-1"></a>::: {.panel-tabset}</span>
+<span id="cb18-163"><a href="#cb18-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-164"><a href="#cb18-164" aria-hidden="true" tabindex="-1"></a><span class="fu">### NONMEM</span></span>
+<span id="cb18-165"><a href="#cb18-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-166"><a href="#cb18-166" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-167"><a href="#cb18-167" aria-hidden="true" tabindex="-1"></a><span class="in">$ERROR</span></span>
+<span id="cb18-168"><a href="#cb18-168" aria-hidden="true" tabindex="-1"></a><span class="in">EMAX=THETA(4)*EXP(ETA(4))</span></span>
+<span id="cb18-169"><a href="#cb18-169" aria-hidden="true" tabindex="-1"></a><span class="in">EC50=THETA(5)*EXP(ETA(5))</span></span>
+<span id="cb18-170"><a href="#cb18-170" aria-hidden="true" tabindex="-1"></a><span class="in">E0=THETA(6)*EXP(ETA(6))</span></span>
+<span id="cb18-171"><a href="#cb18-171" aria-hidden="true" tabindex="-1"></a><span class="in">EFF=E0+EMAX*F/(EC50+F)+ERR(2)</span></span>
+<span id="cb18-172"><a href="#cb18-172" aria-hidden="true" tabindex="-1"></a><span class="in">CONC=F + F*ERR(1)</span></span>
+<span id="cb18-173"><a href="#cb18-173" aria-hidden="true" tabindex="-1"></a><span class="in">Y=EFF*TYPE + CONC*(1-TYPE)</span></span>
+<span id="cb18-174"><a href="#cb18-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-175"><a href="#cb18-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pumas</span></span>
+<span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-180"><a href="#cb18-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: direct-pkpd-model</span></span>
+<span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare combined PK+PD data — pivot to wide format for multi-DV</span></span>
+<span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a><span class="co"># PK and PD observations at same times need to be on same row</span></span>
+<span id="cb18-185"><a href="#cb18-185" aria-hidden="true" tabindex="-1"></a>pkpd_dose <span class="op">=</span> <span class="pp">@rsubset</span>(pkpd_df, <span class="op">:</span>AMT <span class="op">&gt;</span> <span class="fl">0</span>)</span>
+<span id="cb18-186"><a href="#cb18-186" aria-hidden="true" tabindex="-1"></a>pkpd_pk <span class="op">=</span> <span class="pp">@rsubset</span>(pkpd_df, <span class="op">:</span>TYPE <span class="op">==</span> <span class="fl">0</span>, <span class="op">:</span>AMT <span class="op">==</span> <span class="fl">0</span>)</span>
+<span id="cb18-187"><a href="#cb18-187" aria-hidden="true" tabindex="-1"></a>pkpd_pd <span class="op">=</span> <span class="pp">@rsubset</span>(pkpd_df, <span class="op">:</span>TYPE <span class="op">==</span> <span class="fl">1</span>)</span>
+<span id="cb18-188"><a href="#cb18-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-189"><a href="#cb18-189" aria-hidden="true" tabindex="-1"></a>pk_w <span class="op">=</span> <span class="fu">select</span>(pkpd_pk, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv_pk)</span>
+<span id="cb18-190"><a href="#cb18-190" aria-hidden="true" tabindex="-1"></a>pd_w <span class="op">=</span> <span class="fu">select</span>(pkpd_pd, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv_pd)</span>
+<span id="cb18-191"><a href="#cb18-191" aria-hidden="true" tabindex="-1"></a>obs_w <span class="op">=</span> <span class="fu">outerjoin</span>(pk_w, pd_w, on <span class="op">=</span> [<span class="op">:</span>ID, <span class="op">:</span>TIME])</span>
+<span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a>obs_w.AMT <span class="op">.=</span> <span class="fl">0</span>; obs_w.CMT <span class="op">.=</span> <span class="fl">2</span>; obs_w.evid <span class="op">.=</span> <span class="fl">0</span></span>
+<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-194"><a href="#cb18-194" aria-hidden="true" tabindex="-1"></a>dose_w <span class="op">=</span> <span class="fu">select</span>(pkpd_dose, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>AMT, <span class="op">:</span>CMT)</span>
+<span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a>dose_w.dv_pk <span class="op">.=</span> <span class="cn">missing</span>; dose_w.dv_pd <span class="op">.=</span> <span class="cn">missing</span>; dose_w.evid <span class="op">.=</span> <span class="fl">1</span></span>
+<span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-197"><a href="#cb18-197" aria-hidden="true" tabindex="-1"></a>pkpd_combined <span class="op">=</span> <span class="fu">vcat</span>(dose_w, obs_w, cols <span class="op">=</span> <span class="op">:</span>union)</span>
+<span id="cb18-198"><a href="#cb18-198" aria-hidden="true" tabindex="-1"></a>pkpd_combined.AMT <span class="op">=</span> <span class="fu">coalesce</span>.(pkpd_combined.AMT, <span class="fl">0</span>)</span>
+<span id="cb18-199"><a href="#cb18-199" aria-hidden="true" tabindex="-1"></a>pkpd_combined.evid <span class="op">=</span> <span class="fu">coalesce</span>.(pkpd_combined.evid, <span class="fl">0</span>)</span>
+<span id="cb18-200"><a href="#cb18-200" aria-hidden="true" tabindex="-1"></a>pkpd_combined.CMT <span class="op">=</span> <span class="fu">coalesce</span>.(pkpd_combined.CMT, <span class="fl">2</span>)</span>
+<span id="cb18-201"><a href="#cb18-201" aria-hidden="true" tabindex="-1"></a><span class="fu">sort!</span>(pkpd_combined, [<span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="fu">order</span>(<span class="op">:</span>evid, rev <span class="op">=</span> <span class="cn">true</span>)])</span>
+<span id="cb18-202"><a href="#cb18-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-203"><a href="#cb18-203" aria-hidden="true" tabindex="-1"></a><span class="fu">rename!</span>(pkpd_combined, <span class="op">:</span>ID <span class="op">=&gt;</span> <span class="op">:</span>id, <span class="op">:</span>TIME <span class="op">=&gt;</span> <span class="op">:</span>time, <span class="op">:</span>AMT <span class="op">=&gt;</span> <span class="op">:</span>amt, <span class="op">:</span>CMT <span class="op">=&gt;</span> <span class="op">:</span>cmt)</span>
+<span id="cb18-204"><a href="#cb18-204" aria-hidden="true" tabindex="-1"></a>pop_pkpd <span class="op">=</span> <span class="fu">read_pumas</span>(pkpd_combined; observations <span class="op">=</span> [<span class="op">:</span>dv_pk, <span class="op">:</span>dv_pd])</span>
+<span id="cb18-205"><a href="#cb18-205" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"PKPD subjects: "</span>, <span class="fu">length</span>(pop_pkpd))</span>
+<span id="cb18-206"><a href="#cb18-206" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-207"><a href="#cb18-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-208"><a href="#cb18-208" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-209"><a href="#cb18-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-212"><a href="#cb18-212" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-213"><a href="#cb18-213" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: direct-pkpd-def</span></span>
+<span id="cb18-214"><a href="#cb18-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-215"><a href="#cb18-215" aria-hidden="true" tabindex="-1"></a>direct_pkpd <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb18-216"><a href="#cb18-216" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb18-217"><a href="#cb18-217" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Direct Emax PK-PD"</span></span>
+<span id="cb18-218"><a href="#cb18-218" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-219"><a href="#cb18-219" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb18-220"><a href="#cb18-220" aria-hidden="true" tabindex="-1"></a>        tvKa   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.7</span>)</span>
+<span id="cb18-221"><a href="#cb18-221" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">4.7</span>)</span>
+<span id="cb18-222"><a href="#cb18-222" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">38.0</span>)</span>
+<span id="cb18-223"><a href="#cb18-223" aria-hidden="true" tabindex="-1"></a>        tvEmax <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">100.0</span>)</span>
+<span id="cb18-224"><a href="#cb18-224" aria-hidden="true" tabindex="-1"></a>        tvEC50 <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-225"><a href="#cb18-225" aria-hidden="true" tabindex="-1"></a>        tvE0   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">60.0</span>)</span>
+<span id="cb18-226"><a href="#cb18-226" aria-hidden="true" tabindex="-1"></a>        Ω      <span class="op">∈</span> <span class="fu">PDiagDomain</span>(<span class="fl">6</span>)</span>
+<span id="cb18-227"><a href="#cb18-227" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb18-228"><a href="#cb18-228" aria-hidden="true" tabindex="-1"></a>        σ_pd   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">2.24</span>)</span>
+<span id="cb18-229"><a href="#cb18-229" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-230"><a href="#cb18-230" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb18-231"><a href="#cb18-231" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb18-232"><a href="#cb18-232" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-233"><a href="#cb18-233" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb18-234"><a href="#cb18-234" aria-hidden="true" tabindex="-1"></a>        Ka   <span class="op">=</span> tvKa <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb18-235"><a href="#cb18-235" aria-hidden="true" tabindex="-1"></a>        CL   <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb18-236"><a href="#cb18-236" aria-hidden="true" tabindex="-1"></a>        Vc   <span class="op">=</span> tvV  <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">3</span>])</span>
+<span id="cb18-237"><a href="#cb18-237" aria-hidden="true" tabindex="-1"></a>        Emax <span class="op">=</span> tvEmax <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">4</span>])</span>
+<span id="cb18-238"><a href="#cb18-238" aria-hidden="true" tabindex="-1"></a>        EC50 <span class="op">=</span> tvEC50 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">5</span>])</span>
+<span id="cb18-239"><a href="#cb18-239" aria-hidden="true" tabindex="-1"></a>        E0   <span class="op">=</span> tvE0 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">6</span>])</span>
+<span id="cb18-240"><a href="#cb18-240" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-241"><a href="#cb18-241" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Depots1Central1</span>
+<span id="cb18-242"><a href="#cb18-242" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb18-243"><a href="#cb18-243" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a>        <span class="co"># PK observation (proportional error)</span></span>
+<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a>        dv_pk <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb18-246"><a href="#cb18-246" aria-hidden="true" tabindex="-1"></a>        <span class="co"># PD observation (direct Emax + additive error)</span></span>
+<span id="cb18-247"><a href="#cb18-247" aria-hidden="true" tabindex="-1"></a>        eff <span class="op">:=</span> @. E0 <span class="op">+</span> Emax <span class="op">*</span> cp <span class="op">/</span> (EC50 <span class="op">+</span> cp)</span>
+<span id="cb18-248"><a href="#cb18-248" aria-hidden="true" tabindex="-1"></a>        dv_pd <span class="op">~</span> @. <span class="fu">Normal</span>(eff, σ_pd)</span>
+<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: direct-pkpd-fit</span></span>
+<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-258"><a href="#cb18-258" aria-hidden="true" tabindex="-1"></a>direct_params <span class="op">=</span> (</span>
+<span id="cb18-259"><a href="#cb18-259" aria-hidden="true" tabindex="-1"></a>    tvKa <span class="op">=</span> <span class="fl">1.7</span>, tvCL <span class="op">=</span> <span class="fl">4.7</span>, tvV <span class="op">=</span> <span class="fl">38.0</span>,</span>
+<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a>    tvEmax <span class="op">=</span> <span class="fl">100.0</span>, tvEC50 <span class="op">=</span> <span class="fl">5.0</span>, tvE0 <span class="op">=</span> <span class="fl">60.0</span>,</span>
+<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> <span class="fu">Diagonal</span>(<span class="fu">fill</span>(<span class="fl">0.04</span>, <span class="fl">6</span>)),</span>
+<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>, σ_pd <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">5.0</span>),</span>
+<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-264"><a href="#cb18-264" aria-hidden="true" tabindex="-1"></a>direct_fit <span class="op">=</span> <span class="fu">fit</span>(direct_pkpd, pop_pkpd, direct_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb18-265"><a href="#cb18-265" aria-hidden="true" tabindex="-1"></a>direct_fit</span>
+<span id="cb18-266"><a href="#cb18-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a><span class="fu"># Effect Compartment PK-PD</span></span>
+<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a>When there is a temporal delay between plasma concentration and effect, an effect compartment links the PK to PD:</span>
+<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-272"><a href="#cb18-272" aria-hidden="true" tabindex="-1"></a>$$\frac{dC_e}{dt} = K_{e0} \cdot (C_p - C_e)$$</span>
+<span id="cb18-273"><a href="#cb18-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-274"><a href="#cb18-274" aria-hidden="true" tabindex="-1"></a>$$E = E_0 + \frac{E_{max} \cdot C_e}{EC_{50} + C_e}$$</span>
+<span id="cb18-275"><a href="#cb18-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-276"><a href="#cb18-276" aria-hidden="true" tabindex="-1"></a>In NONMEM, this uses ADVAN4 TRANS1 with a negligible-mass trick (K23 very small). In Pumas, we write the ODE explicitly:</span>
+<span id="cb18-277"><a href="#cb18-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-280"><a href="#cb18-280" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-281"><a href="#cb18-281" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ecomp-model</span></span>
+<span id="cb18-282"><a href="#cb18-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-283"><a href="#cb18-283" aria-hidden="true" tabindex="-1"></a>ecomp_pkpd <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb18-284"><a href="#cb18-284" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb18-285"><a href="#cb18-285" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Effect Compartment PK-PD (Emax)"</span></span>
+<span id="cb18-286"><a href="#cb18-286" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-287"><a href="#cb18-287" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb18-288"><a href="#cb18-288" aria-hidden="true" tabindex="-1"></a>        tvKa   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.5</span>)</span>
+<span id="cb18-289"><a href="#cb18-289" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-290"><a href="#cb18-290" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">35.0</span>)</span>
+<span id="cb18-291"><a href="#cb18-291" aria-hidden="true" tabindex="-1"></a>        tvKe0  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.07</span>)</span>
+<span id="cb18-292"><a href="#cb18-292" aria-hidden="true" tabindex="-1"></a>        tvEmax <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">100.0</span>)</span>
+<span id="cb18-293"><a href="#cb18-293" aria-hidden="true" tabindex="-1"></a>        tvEC50 <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-294"><a href="#cb18-294" aria-hidden="true" tabindex="-1"></a>        tvE0   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">60.0</span>)</span>
+<span id="cb18-295"><a href="#cb18-295" aria-hidden="true" tabindex="-1"></a>        Ω      <span class="op">∈</span> <span class="fu">PDiagDomain</span>(<span class="fl">7</span>)</span>
+<span id="cb18-296"><a href="#cb18-296" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb18-297"><a href="#cb18-297" aria-hidden="true" tabindex="-1"></a>        σ_pd   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">4.47</span>)</span>
+<span id="cb18-298"><a href="#cb18-298" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-299"><a href="#cb18-299" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb18-300"><a href="#cb18-300" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb18-301"><a href="#cb18-301" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-302"><a href="#cb18-302" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb18-303"><a href="#cb18-303" aria-hidden="true" tabindex="-1"></a>        Ka   <span class="op">=</span> tvKa <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb18-304"><a href="#cb18-304" aria-hidden="true" tabindex="-1"></a>        CL   <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb18-305"><a href="#cb18-305" aria-hidden="true" tabindex="-1"></a>        Vc   <span class="op">=</span> tvV  <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">3</span>])</span>
+<span id="cb18-306"><a href="#cb18-306" aria-hidden="true" tabindex="-1"></a>        Ke0  <span class="op">=</span> tvKe0 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">4</span>])</span>
+<span id="cb18-307"><a href="#cb18-307" aria-hidden="true" tabindex="-1"></a>        Emax <span class="op">=</span> tvEmax <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">5</span>])</span>
+<span id="cb18-308"><a href="#cb18-308" aria-hidden="true" tabindex="-1"></a>        EC50 <span class="op">=</span> tvEC50 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">6</span>])</span>
+<span id="cb18-309"><a href="#cb18-309" aria-hidden="true" tabindex="-1"></a>        E0   <span class="op">=</span> tvE0 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">7</span>])</span>
+<span id="cb18-310"><a href="#cb18-310" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-311"><a href="#cb18-311" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> <span class="cf">begin</span></span>
+<span id="cb18-312"><a href="#cb18-312" aria-hidden="true" tabindex="-1"></a>        Depot<span class="op">'</span>   <span class="op">=</span> <span class="op">-</span>Ka <span class="op">*</span> Depot</span>
+<span id="cb18-313"><a href="#cb18-313" aria-hidden="true" tabindex="-1"></a>        Central<span class="op">'</span> <span class="op">=</span>  Ka <span class="op">*</span> Depot <span class="op">-</span> (CL <span class="op">/</span> Vc) <span class="op">*</span> Central</span>
+<span id="cb18-314"><a href="#cb18-314" aria-hidden="true" tabindex="-1"></a>        Ce<span class="op">'</span>      <span class="op">=</span>  Ke0 <span class="op">*</span> (Central <span class="op">/</span> Vc <span class="op">-</span> Ce)  <span class="co"># effect compartment</span></span>
+<span id="cb18-315"><a href="#cb18-315" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-316"><a href="#cb18-316" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb18-317"><a href="#cb18-317" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb18-318"><a href="#cb18-318" aria-hidden="true" tabindex="-1"></a>        dv_pk <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb18-319"><a href="#cb18-319" aria-hidden="true" tabindex="-1"></a>        eff <span class="op">:=</span> @. E0 <span class="op">+</span> Emax <span class="op">*</span> Ce <span class="op">/</span> (EC50 <span class="op">+</span> Ce)</span>
+<span id="cb18-320"><a href="#cb18-320" aria-hidden="true" tabindex="-1"></a>        dv_pd <span class="op">~</span> @. <span class="fu">Normal</span>(eff, σ_pd)</span>
+<span id="cb18-321"><a href="#cb18-321" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-322"><a href="#cb18-322" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-323"><a href="#cb18-323" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-324"><a href="#cb18-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-327"><a href="#cb18-327" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-328"><a href="#cb18-328" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ecomp-fit</span></span>
+<span id="cb18-329"><a href="#cb18-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-330"><a href="#cb18-330" aria-hidden="true" tabindex="-1"></a>ecomp_params <span class="op">=</span> (</span>
+<span id="cb18-331"><a href="#cb18-331" aria-hidden="true" tabindex="-1"></a>    tvKa <span class="op">=</span> <span class="fl">1.5</span>, tvCL <span class="op">=</span> <span class="fl">5.0</span>, tvV <span class="op">=</span> <span class="fl">35.0</span>, tvKe0 <span class="op">=</span> <span class="fl">0.07</span>,</span>
+<span id="cb18-332"><a href="#cb18-332" aria-hidden="true" tabindex="-1"></a>    tvEmax <span class="op">=</span> <span class="fl">100.0</span>, tvEC50 <span class="op">=</span> <span class="fl">5.0</span>, tvE0 <span class="op">=</span> <span class="fl">60.0</span>,</span>
+<span id="cb18-333"><a href="#cb18-333" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> <span class="fu">Diagonal</span>(<span class="fu">fill</span>(<span class="fl">0.04</span>, <span class="fl">7</span>)),</span>
+<span id="cb18-334"><a href="#cb18-334" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>, σ_pd <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">20.0</span>),</span>
+<span id="cb18-335"><a href="#cb18-335" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-336"><a href="#cb18-336" aria-hidden="true" tabindex="-1"></a>ecomp_fit <span class="op">=</span> <span class="fu">fit</span>(ecomp_pkpd, pop_pkpd, ecomp_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb18-337"><a href="#cb18-337" aria-hidden="true" tabindex="-1"></a>ecomp_fit</span>
+<span id="cb18-338"><a href="#cb18-338" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-339"><a href="#cb18-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-340"><a href="#cb18-340" aria-hidden="true" tabindex="-1"></a><span class="fu"># Indirect Response Models</span></span>
+<span id="cb18-341"><a href="#cb18-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-342"><a href="#cb18-342" aria-hidden="true" tabindex="-1"></a>Indirect response models describe drug effects on the production or loss of a response variable. The core concept is **turnover**: at steady state, the rate of production ($K_{in}$) equals the rate of loss ($K_{out} \cdot R$), giving baseline $R_0 = K_{in} / K_{out}$.</span>
+<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a>$$\frac{dR}{dt} = K_{in} \cdot S(C_p) - K_{out} \cdot R$$</span>
+<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a>where $S(C_p)$ is a stimulation or inhibition function applied to either $K_{in}$ or $K_{out}$:</span>
+<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Type <span class="pp">|</span> Target <span class="pp">|</span> Function <span class="pp">|</span> Equation <span class="pp">|</span> Response Direction <span class="pp">|</span></span>
+<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a><span class="pp">|------|--------|----------|----------|--------------------|</span></span>
+<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **I** <span class="pp">|</span> Inhibit $K_{in}$ <span class="pp">|</span> $1 - \frac{I_{max} \cdot C}{IC_{50} + C}$ <span class="pp">|</span> $\frac{dR}{dt} = K_{in}(1-E) - K_{out} \cdot R$ <span class="pp">|</span> ↓ Decrease <span class="pp">|</span></span>
+<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **II** <span class="pp">|</span> Inhibit $K_{out}$ <span class="pp">|</span> $1 - \frac{I_{max} \cdot C}{IC_{50} + C}$ <span class="pp">|</span> $\frac{dR}{dt} = K_{in} - K_{out}(1-E) \cdot R$ <span class="pp">|</span> ↑ Increase <span class="pp">|</span></span>
+<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **III** <span class="pp">|</span> Stimulate $K_{in}$ <span class="pp">|</span> $1 + \frac{E_{max} \cdot C}{EC_{50} + C}$ <span class="pp">|</span> $\frac{dR}{dt} = K_{in}(1+E) - K_{out} \cdot R$ <span class="pp">|</span> ↑ Increase <span class="pp">|</span></span>
+<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **IV** <span class="pp">|</span> Stimulate $K_{out}$ <span class="pp">|</span> $1 + \frac{E_{max} \cdot C}{EC_{50} + C}$ <span class="pp">|</span> $\frac{dR}{dt} = K_{in} - K_{out}(1+E) \cdot R$ <span class="pp">|</span> ↓ Decrease <span class="pp">|</span></span>
+<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-355"><a href="#cb18-355" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Key IDR Characteristics"}</span>
+<span id="cb18-356"><a href="#cb18-356" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Turnover half-life:** $t_{1/2} = \ln(2) / K_{out}$ — determines how quickly the response changes</span>
+<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Effect persistence:** Response continues to change after drug is eliminated (because the turnover system takes time to re-equilibrate)</span>
+<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Types I &amp; IV** decrease the response; **Types II &amp; III** increase it — but through different mechanisms</span>
+<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Distinguishing Types I vs IV (or II vs III):** Requires dense PD sampling at early time points — the onset/offset kinetics differ</span>
+<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-362"><a href="#cb18-362" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="The Turnover Concept: Why Biological Responses Have Inherent Delays"}</span>
+<span id="cb18-363"><a href="#cb18-363" aria-hidden="true" tabindex="-1"></a>Most biological responses — blood pressure, clotting factors, cholesterol, blood glucose, cortisol — exist in a **dynamic equilibrium** where a production process ($K_{in}$) is balanced by a degradation or loss process ($K_{out}$). At baseline, this equilibrium satisfies $K_{in} = K_{out} \times R_0$, where $R_0$ is the baseline response. Drugs perturb this equilibrium by altering either the production or the loss rate, but the response cannot change instantaneously because the existing pool of response variable must **turn over**. The characteristic time scale for this process is the turnover half-life:</span>
+<span id="cb18-364"><a href="#cb18-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-365"><a href="#cb18-365" aria-hidden="true" tabindex="-1"></a>$$t_{1/2,\text{turnover}} = \frac{\ln 2}{K_{out}}$$</span>
+<span id="cb18-366"><a href="#cb18-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a>This delay is fundamentally different from a distributional delay modeled by an effect compartment ($k_{e0}$). The effect compartment delay arises from the time required for drug to equilibrate between plasma and the biophase; the turnover delay arises from the time required for the **biological system itself** to respond to the perturbation. Distinguishing these two mechanisms — pharmacokinetic delay vs. pharmacodynamic (systems-level) delay — is essential for selecting the appropriate model structure and for making correct predictions about the time course of drug effect.</span>
+<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Clinical Examples by IDR Type"}</span>
+<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Type <span class="pp">|</span> Clinical Examples <span class="pp">|</span></span>
+<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a><span class="pp">|------|------------------|</span></span>
+<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Type I** (↓ Kin) <span class="pp">|</span> Corticosteroid suppression of cortisol, warfarin inhibition of clotting factor synthesis <span class="pp">|</span></span>
+<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Type II** (↓ Kout) <span class="pp">|</span> Heparin reducing factor Xa clearance, EPO reducing RBC destruction <span class="pp">|</span></span>
+<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Type III** (↑ Kin) <span class="pp">|</span> EPO stimulating RBC production, GH stimulating IGF-1 synthesis <span class="pp">|</span></span>
+<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Type IV** (↑ Kout) <span class="pp">|</span> Diuretics increasing sodium excretion, furosemide increasing urine output <span class="pp">|</span></span>
+<span id="cb18-377"><a href="#cb18-377" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-378"><a href="#cb18-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a><span class="fu">## Indirect Response Type I: Inhibition of Kin</span></span>
+<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-383"><a href="#cb18-383" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-384"><a href="#cb18-384" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: indirect-data</span></span>
+<span id="cb18-385"><a href="#cb18-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare indirect PK-PD data — pivot to wide format for multi-DV</span></span>
+<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a><span class="co"># PK and PD observations are at the same time points, so we merge them into one row</span></span>
+<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>dose_rows <span class="op">=</span> <span class="pp">@rsubset</span>(ind_df, <span class="op">:</span>AMT <span class="op">&gt;</span> <span class="fl">0</span>)</span>
+<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a>pk_rows <span class="op">=</span> <span class="pp">@rsubset</span>(ind_df, <span class="op">:</span>TYPE <span class="op">==</span> <span class="fl">0</span>, <span class="op">:</span>AMT <span class="op">==</span> <span class="fl">0</span>)</span>
+<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a>pd_rows <span class="op">=</span> <span class="pp">@rsubset</span>(ind_df, <span class="op">:</span>TYPE <span class="op">==</span> <span class="fl">1</span>)</span>
+<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge PK + PD at same (ID, TIME) into wide format</span></span>
+<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a>pk_wide <span class="op">=</span> <span class="fu">select</span>(pk_rows, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv_pk)</span>
+<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a>pd_wide <span class="op">=</span> <span class="fu">select</span>(pd_rows, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv_pd)</span>
+<span id="cb18-396"><a href="#cb18-396" aria-hidden="true" tabindex="-1"></a>obs_wide <span class="op">=</span> <span class="fu">outerjoin</span>(pk_wide, pd_wide, on <span class="op">=</span> [<span class="op">:</span>ID, <span class="op">:</span>TIME])</span>
+<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>obs_wide.AMT <span class="op">.=</span> <span class="fl">0</span></span>
+<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a>obs_wide.CMT <span class="op">.=</span> <span class="fl">2</span></span>
+<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a>obs_wide.evid <span class="op">.=</span> <span class="fl">0</span></span>
+<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-401"><a href="#cb18-401" aria-hidden="true" tabindex="-1"></a><span class="co"># Dose rows</span></span>
+<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a>dose_prep <span class="op">=</span> <span class="fu">select</span>(dose_rows, <span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="op">:</span>AMT, <span class="op">:</span>CMT)</span>
+<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a>dose_prep.dv_pk <span class="op">.=</span> <span class="cn">missing</span></span>
+<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a>dose_prep.dv_pd <span class="op">.=</span> <span class="cn">missing</span></span>
+<span id="cb18-405"><a href="#cb18-405" aria-hidden="true" tabindex="-1"></a>dose_prep.evid <span class="op">.=</span> <span class="fl">1</span></span>
+<span id="cb18-406"><a href="#cb18-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-407"><a href="#cb18-407" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine and sort</span></span>
+<span id="cb18-408"><a href="#cb18-408" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> <span class="fu">vcat</span>(dose_prep, obs_wide, cols <span class="op">=</span> <span class="op">:</span>union)</span>
+<span id="cb18-409"><a href="#cb18-409" aria-hidden="true" tabindex="-1"></a>combined.AMT <span class="op">=</span> <span class="fu">coalesce</span>.(combined.AMT, <span class="fl">0</span>)</span>
+<span id="cb18-410"><a href="#cb18-410" aria-hidden="true" tabindex="-1"></a>combined.evid <span class="op">=</span> <span class="fu">coalesce</span>.(combined.evid, <span class="fl">0</span>)</span>
+<span id="cb18-411"><a href="#cb18-411" aria-hidden="true" tabindex="-1"></a>combined.CMT <span class="op">=</span> <span class="fu">coalesce</span>.(combined.CMT, <span class="fl">2</span>)</span>
+<span id="cb18-412"><a href="#cb18-412" aria-hidden="true" tabindex="-1"></a><span class="fu">sort!</span>(combined, [<span class="op">:</span>ID, <span class="op">:</span>TIME, <span class="fu">order</span>(<span class="op">:</span>evid, rev <span class="op">=</span> <span class="cn">true</span>)])</span>
+<span id="cb18-413"><a href="#cb18-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-414"><a href="#cb18-414" aria-hidden="true" tabindex="-1"></a><span class="fu">rename!</span>(combined, <span class="op">:</span>ID <span class="op">=&gt;</span> <span class="op">:</span>id, <span class="op">:</span>TIME <span class="op">=&gt;</span> <span class="op">:</span>time, <span class="op">:</span>AMT <span class="op">=&gt;</span> <span class="op">:</span>amt, <span class="op">:</span>CMT <span class="op">=&gt;</span> <span class="op">:</span>cmt)</span>
+<span id="cb18-415"><a href="#cb18-415" aria-hidden="true" tabindex="-1"></a>pop_ind <span class="op">=</span> <span class="fu">read_pumas</span>(combined; observations <span class="op">=</span> [<span class="op">:</span>dv_pk, <span class="op">:</span>dv_pd])</span>
+<span id="cb18-416"><a href="#cb18-416" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Indirect PKPD subjects: "</span>, <span class="fu">length</span>(pop_ind))</span>
+<span id="cb18-417"><a href="#cb18-417" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-418"><a href="#cb18-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-421"><a href="#cb18-421" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-422"><a href="#cb18-422" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ind1-model</span></span>
+<span id="cb18-423"><a href="#cb18-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-424"><a href="#cb18-424" aria-hidden="true" tabindex="-1"></a><span class="co"># Type I: Inhibit Kin</span></span>
+<span id="cb18-425"><a href="#cb18-425" aria-hidden="true" tabindex="-1"></a><span class="co"># From ind1_pkpd.ctl: ADVAN6, $DES with DADT(3) = KIN*(1-E) - KOUT*A(3)</span></span>
+<span id="cb18-426"><a href="#cb18-426" aria-hidden="true" tabindex="-1"></a>ind1_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb18-427"><a href="#cb18-427" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb18-428"><a href="#cb18-428" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Indirect Response Type I: Inhibit Kin"</span></span>
+<span id="cb18-429"><a href="#cb18-429" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-430"><a href="#cb18-430" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb18-431"><a href="#cb18-431" aria-hidden="true" tabindex="-1"></a>        tvKa   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.5</span>)</span>
+<span id="cb18-432"><a href="#cb18-432" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-433"><a href="#cb18-433" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">35.0</span>)</span>
+<span id="cb18-434"><a href="#cb18-434" aria-hidden="true" tabindex="-1"></a>        tvKin  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">10.0</span>)</span>
+<span id="cb18-435"><a href="#cb18-435" aria-hidden="true" tabindex="-1"></a>        tvKout <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.05</span>)</span>
+<span id="cb18-436"><a href="#cb18-436" aria-hidden="true" tabindex="-1"></a>        tvIC50 <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-437"><a href="#cb18-437" aria-hidden="true" tabindex="-1"></a>        Ω      <span class="op">∈</span> <span class="fu">PDiagDomain</span>(<span class="fl">3</span>)</span>
+<span id="cb18-438"><a href="#cb18-438" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb18-439"><a href="#cb18-439" aria-hidden="true" tabindex="-1"></a>        σ_pd   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">4.47</span>)</span>
+<span id="cb18-440"><a href="#cb18-440" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-441"><a href="#cb18-441" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb18-442"><a href="#cb18-442" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb18-443"><a href="#cb18-443" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-444"><a href="#cb18-444" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb18-445"><a href="#cb18-445" aria-hidden="true" tabindex="-1"></a>        Ka   <span class="op">=</span> tvKa <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb18-446"><a href="#cb18-446" aria-hidden="true" tabindex="-1"></a>        CL   <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb18-447"><a href="#cb18-447" aria-hidden="true" tabindex="-1"></a>        Vc   <span class="op">=</span> tvV  <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">3</span>])</span>
+<span id="cb18-448"><a href="#cb18-448" aria-hidden="true" tabindex="-1"></a>        Kin  <span class="op">=</span> tvKin</span>
+<span id="cb18-449"><a href="#cb18-449" aria-hidden="true" tabindex="-1"></a>        Kout <span class="op">=</span> tvKout</span>
+<span id="cb18-450"><a href="#cb18-450" aria-hidden="true" tabindex="-1"></a>        IC50 <span class="op">=</span> tvIC50</span>
+<span id="cb18-451"><a href="#cb18-451" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Emax fixed at 1 (as in ctl: THETA(6) = 1 FIX)</span></span>
+<span id="cb18-452"><a href="#cb18-452" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-453"><a href="#cb18-453" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@init</span> <span class="cf">begin</span></span>
+<span id="cb18-454"><a href="#cb18-454" aria-hidden="true" tabindex="-1"></a>        Response <span class="op">=</span> Kin <span class="op">/</span> Kout  <span class="co"># steady-state baseline</span></span>
+<span id="cb18-455"><a href="#cb18-455" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-456"><a href="#cb18-456" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> <span class="cf">begin</span></span>
+<span id="cb18-457"><a href="#cb18-457" aria-hidden="true" tabindex="-1"></a>        Depot<span class="op">'</span>    <span class="op">=</span> <span class="op">-</span>Ka <span class="op">*</span> Depot</span>
+<span id="cb18-458"><a href="#cb18-458" aria-hidden="true" tabindex="-1"></a>        Central<span class="op">'</span>  <span class="op">=</span>  Ka <span class="op">*</span> Depot <span class="op">-</span> (CL <span class="op">/</span> Vc) <span class="op">*</span> Central</span>
+<span id="cb18-459"><a href="#cb18-459" aria-hidden="true" tabindex="-1"></a>        Response<span class="op">'</span> <span class="op">=</span>  Kin <span class="op">*</span> (<span class="fl">1</span> <span class="op">-</span> Central <span class="op">/</span> Vc <span class="op">/</span> (IC50 <span class="op">+</span> Central <span class="op">/</span> Vc)) <span class="op">-</span> Kout <span class="op">*</span> Response</span>
+<span id="cb18-460"><a href="#cb18-460" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-461"><a href="#cb18-461" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb18-462"><a href="#cb18-462" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb18-463"><a href="#cb18-463" aria-hidden="true" tabindex="-1"></a>        dv_pk <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb18-464"><a href="#cb18-464" aria-hidden="true" tabindex="-1"></a>        dv_pd <span class="op">~</span> @. <span class="fu">Normal</span>(Response, σ_pd)</span>
+<span id="cb18-465"><a href="#cb18-465" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-466"><a href="#cb18-466" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-467"><a href="#cb18-467" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-468"><a href="#cb18-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-471"><a href="#cb18-471" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-472"><a href="#cb18-472" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ind1-fit</span></span>
+<span id="cb18-473"><a href="#cb18-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-474"><a href="#cb18-474" aria-hidden="true" tabindex="-1"></a>ind1_params <span class="op">=</span> (</span>
+<span id="cb18-475"><a href="#cb18-475" aria-hidden="true" tabindex="-1"></a>    tvKa <span class="op">=</span> <span class="fl">1.5</span>, tvCL <span class="op">=</span> <span class="fl">5.0</span>, tvV <span class="op">=</span> <span class="fl">35.0</span>,</span>
+<span id="cb18-476"><a href="#cb18-476" aria-hidden="true" tabindex="-1"></a>    tvKin <span class="op">=</span> <span class="fl">10.0</span>, tvKout <span class="op">=</span> <span class="fl">0.05</span>, tvIC50 <span class="op">=</span> <span class="fl">5.0</span>,</span>
+<span id="cb18-477"><a href="#cb18-477" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> <span class="fu">Diagonal</span>([<span class="fl">0.04</span>, <span class="fl">0.04</span>, <span class="fl">0.04</span>]),</span>
+<span id="cb18-478"><a href="#cb18-478" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>, σ_pd <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">20.0</span>),</span>
+<span id="cb18-479"><a href="#cb18-479" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-480"><a href="#cb18-480" aria-hidden="true" tabindex="-1"></a>ind1_fit <span class="op">=</span> <span class="fu">fit</span>(ind1_model, pop_ind, ind1_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb18-481"><a href="#cb18-481" aria-hidden="true" tabindex="-1"></a>ind1_fit</span>
+<span id="cb18-482"><a href="#cb18-482" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-483"><a href="#cb18-483" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-484"><a href="#cb18-484" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Comparison</span></span>
+<span id="cb18-485"><a href="#cb18-485" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-488"><a href="#cb18-488" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-489"><a href="#cb18-489" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: pkpd-compare</span></span>
+<span id="cb18-490"><a href="#cb18-490" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-491"><a href="#cb18-491" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"PK-PD Model Comparison"</span>)</span>
+<span id="cb18-492"><a href="#cb18-492" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"="</span> <span class="op">^</span> <span class="fl">50</span>)</span>
+<span id="cb18-493"><a href="#cb18-493" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Direct Emax     AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(direct_fit), digits <span class="op">=</span> <span class="fl">1</span>))</span>
+<span id="cb18-494"><a href="#cb18-494" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Effect Comp     AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(ecomp_fit), digits <span class="op">=</span> <span class="fl">1</span>))</span>
+<span id="cb18-495"><a href="#cb18-495" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Indirect Type I AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(ind1_fit), digits <span class="op">=</span> <span class="fl">1</span>))</span>
+<span id="cb18-496"><a href="#cb18-496" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-497"><a href="#cb18-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-498"><a href="#cb18-498" aria-hidden="true" tabindex="-1"></a><span class="fu">## Diagnostic Plots</span></span>
+<span id="cb18-499"><a href="#cb18-499" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-502"><a href="#cb18-502" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-503"><a href="#cb18-503" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ch7-indirect-diag</span></span>
+<span id="cb18-504"><a href="#cb18-504" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Indirect Response Model Type I: GOF Diagnostics"</span></span>
+<span id="cb18-505"><a href="#cb18-505" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-506"><a href="#cb18-506" aria-hidden="true" tabindex="-1"></a>ind_insp <span class="op">=</span> <span class="fu">inspect</span>(ind1_fit)</span>
+<span id="cb18-507"><a href="#cb18-507" aria-hidden="true" tabindex="-1"></a>ind_insp_df <span class="op">=</span> <span class="fu">DataFrame</span>(ind_insp)</span>
+<span id="cb18-508"><a href="#cb18-508" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-509"><a href="#cb18-509" aria-hidden="true" tabindex="-1"></a><span class="co"># PD observations only</span></span>
+<span id="cb18-510"><a href="#cb18-510" aria-hidden="true" tabindex="-1"></a>pd_obs <span class="op">=</span> <span class="pp">@rsubset</span>(ind_insp_df, !<span class="fu">ismissing</span>(<span class="op">:</span>dv_pd))</span>
+<span id="cb18-511"><a href="#cb18-511" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-512"><a href="#cb18-512" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">400</span>))</span>
+<span id="cb18-513"><a href="#cb18-513" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-514"><a href="#cb18-514" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"PRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV (PD)"</span>, title <span class="op">=</span> <span class="st">"DV vs PRED"</span>)</span>
+<span id="cb18-515"><a href="#cb18-515" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax1, pd_obs.dv_pd_pred, pd_obs.dv_pd, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">5</span>, alpha <span class="op">=</span> <span class="fl">0.6</span>)</span>
+<span id="cb18-516"><a href="#cb18-516" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax1, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb18-517"><a href="#cb18-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-518"><a href="#cb18-518" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"IPRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV (PD)"</span>, title <span class="op">=</span> <span class="st">"DV vs IPRED"</span>)</span>
+<span id="cb18-519"><a href="#cb18-519" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax2, pd_obs.dv_pd_ipred, pd_obs.dv_pd, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">5</span>, alpha <span class="op">=</span> <span class="fl">0.6</span>)</span>
+<span id="cb18-520"><a href="#cb18-520" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax2, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb18-521"><a href="#cb18-521" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-522"><a href="#cb18-522" aria-hidden="true" tabindex="-1"></a>fig</span>
+<span id="cb18-523"><a href="#cb18-523" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-524"><a href="#cb18-524" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-525"><a href="#cb18-525" aria-hidden="true" tabindex="-1"></a><span class="fu"># K-PD Models: PD Without PK Data</span></span>
+<span id="cb18-526"><a href="#cb18-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-527"><a href="#cb18-527" aria-hidden="true" tabindex="-1"></a>When PK data are unavailable (PD-only studies, retrospective analyses, sparse sampling), K-PD models use a **virtual compartment** to replace the PK model:</span>
+<span id="cb18-528"><a href="#cb18-528" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-529"><a href="#cb18-529" aria-hidden="true" tabindex="-1"></a>$$\frac{dA}{dt} = -K_{DE} \cdot A$$</span>
+<span id="cb18-530"><a href="#cb18-530" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-531"><a href="#cb18-531" aria-hidden="true" tabindex="-1"></a>where $A$ is the virtual drug amount and $K_{DE}$ is the apparent elimination rate ($= CL/V$). The drug effect is then driven by $K_{DE} \cdot A$ (analogous to $CL \cdot C_p$) rather than by concentration.</span>
+<span id="cb18-532"><a href="#cb18-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-533"><a href="#cb18-533" aria-hidden="true" tabindex="-1"></a>**Key parameters:**</span>
+<span id="cb18-534"><a href="#cb18-534" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-535"><a href="#cb18-535" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$K_{DE}$ = apparent elimination rate (replaces CL/V)</span>
+<span id="cb18-536"><a href="#cb18-536" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$EDK_{50}$ = apparent potency (replaces $EC_{50}$; $EDK_{50} = EC_{50} \cdot CL$)</span>
+<span id="cb18-537"><a href="#cb18-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-540"><a href="#cb18-540" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb18-541"><a href="#cb18-541" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: kpd-model-example</span></span>
+<span id="cb18-542"><a href="#cb18-542" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb18-543"><a href="#cb18-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-544"><a href="#cb18-544" aria-hidden="true" tabindex="-1"></a>kpd_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb18-545"><a href="#cb18-545" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb18-546"><a href="#cb18-546" aria-hidden="true" tabindex="-1"></a>        tvKDE   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.1</span>)</span>
+<span id="cb18-547"><a href="#cb18-547" aria-hidden="true" tabindex="-1"></a>        tvEmax  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">100.0</span>)</span>
+<span id="cb18-548"><a href="#cb18-548" aria-hidden="true" tabindex="-1"></a>        tvEDK50 <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-549"><a href="#cb18-549" aria-hidden="true" tabindex="-1"></a>        tvE0    <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">60.0</span>)</span>
+<span id="cb18-550"><a href="#cb18-550" aria-hidden="true" tabindex="-1"></a>        Ω       <span class="op">∈</span> <span class="fu">PDiagDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb18-551"><a href="#cb18-551" aria-hidden="true" tabindex="-1"></a>        σ_pd    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">5.0</span>)</span>
+<span id="cb18-552"><a href="#cb18-552" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-553"><a href="#cb18-553" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb18-554"><a href="#cb18-554" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb18-555"><a href="#cb18-555" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-556"><a href="#cb18-556" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb18-557"><a href="#cb18-557" aria-hidden="true" tabindex="-1"></a>        KDE   <span class="op">=</span> tvKDE <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb18-558"><a href="#cb18-558" aria-hidden="true" tabindex="-1"></a>        Emax  <span class="op">=</span> tvEmax</span>
+<span id="cb18-559"><a href="#cb18-559" aria-hidden="true" tabindex="-1"></a>        EDK50 <span class="op">=</span> tvEDK50 <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb18-560"><a href="#cb18-560" aria-hidden="true" tabindex="-1"></a>        E0    <span class="op">=</span> tvE0</span>
+<span id="cb18-561"><a href="#cb18-561" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-562"><a href="#cb18-562" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> <span class="cf">begin</span></span>
+<span id="cb18-563"><a href="#cb18-563" aria-hidden="true" tabindex="-1"></a>        A<span class="op">'</span> <span class="op">=</span> <span class="op">-</span>KDE <span class="op">*</span> A  <span class="co"># virtual compartment</span></span>
+<span id="cb18-564"><a href="#cb18-564" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-565"><a href="#cb18-565" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb18-566"><a href="#cb18-566" aria-hidden="true" tabindex="-1"></a>        rate_out <span class="op">:=</span> @. KDE <span class="op">*</span> A</span>
+<span id="cb18-567"><a href="#cb18-567" aria-hidden="true" tabindex="-1"></a>        effect <span class="op">:=</span> @. E0 <span class="op">+</span> Emax <span class="op">*</span> rate_out <span class="op">/</span> (EDK50 <span class="op">+</span> rate_out)</span>
+<span id="cb18-568"><a href="#cb18-568" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(effect, σ_pd)</span>
+<span id="cb18-569"><a href="#cb18-569" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb18-570"><a href="#cb18-570" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb18-571"><a href="#cb18-571" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-572"><a href="#cb18-572" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-573"><a href="#cb18-573" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb18-574"><a href="#cb18-574" aria-hidden="true" tabindex="-1"></a>**K-PD limitations:**</span>
+<span id="cb18-575"><a href="#cb18-575" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-576"><a href="#cb18-576" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Assumes linear PK (first-order elimination)</span>
+<span id="cb18-577"><a href="#cb18-577" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cannot predict concentrations — only effects</span>
+<span id="cb18-578"><a href="#cb18-578" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>May overestimate IIV (conflates PK and PD variability)</span>
+<span id="cb18-579"><a href="#cb18-579" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Requires ≥ 3 dose levels for identifiability</span>
+<span id="cb18-580"><a href="#cb18-580" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Not recommended for regulatory submissions where PK data exist</span>
+<span id="cb18-581"><a href="#cb18-581" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-582"><a href="#cb18-582" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-583"><a href="#cb18-583" aria-hidden="true" tabindex="-1"></a><span class="fu"># The Four PD Paradigms: Decision Framework</span></span>
+<span id="cb18-584"><a href="#cb18-584" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-585"><a href="#cb18-585" aria-hidden="true" tabindex="-1"></a>When choosing a PD model structure, follow this decision tree:</span>
+<span id="cb18-586"><a href="#cb18-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-587"><a href="#cb18-587" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Question <span class="pp">|</span> If Yes → <span class="pp">|</span> If No → <span class="pp">|</span></span>
+<span id="cb18-588"><a href="#cb18-588" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|----------|---------|</span></span>
+<span id="cb18-589"><a href="#cb18-589" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Is there a measurable delay between Cp and effect? <span class="pp">|</span> Effect compartment or IDR <span class="pp">|</span> Direct response <span class="pp">|</span></span>
+<span id="cb18-590"><a href="#cb18-590" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Does the drug affect a turnover process? <span class="pp">|</span> IDR (Types I–IV) <span class="pp">|</span> Effect compartment <span class="pp">|</span></span>
+<span id="cb18-591"><a href="#cb18-591" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Is the CE plot loop counter-clockwise? <span class="pp">|</span> Effect compartment (ke0) <span class="pp">|</span> Direct, tolerance, or IDR <span class="pp">|</span></span>
+<span id="cb18-592"><a href="#cb18-592" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Is PK data available? <span class="pp">|</span> PK-PD model <span class="pp">|</span> K-PD model <span class="pp">|</span></span>
+<span id="cb18-593"><a href="#cb18-593" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Is the effect reversible and dose-dependent? <span class="pp">|</span> Standard Emax/IDR <span class="pp">|</span> Consider more complex models <span class="pp">|</span></span>
+<span id="cb18-594"><a href="#cb18-594" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-595"><a href="#cb18-595" aria-hidden="true" tabindex="-1"></a><span class="fu"># PK-PD Modeling Steps</span></span>
+<span id="cb18-596"><a href="#cb18-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-597"><a href="#cb18-597" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Develop and qualify the PK model first (using PK-only data)</span>
+<span id="cb18-598"><a href="#cb18-598" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Fix PK parameters and estimate PD parameters (sequential approach)</span>
+<span id="cb18-599"><a href="#cb18-599" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Or estimate PK and PD simultaneously (combined data approach — as shown above)</span>
+<span id="cb18-600"><a href="#cb18-600" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Evaluate GOF diagnostics for both PK and PD</span>
+<span id="cb18-601"><a href="#cb18-601" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Compare structural PD models (direct vs. effect compartment vs. indirect)</span>
+<span id="cb18-602"><a href="#cb18-602" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-603"><a href="#cb18-603" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Sequential vs. Simultaneous Estimation"}</span>
+<span id="cb18-604"><a href="#cb18-604" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Approach <span class="pp">|</span> Pros <span class="pp">|</span> Cons <span class="pp">|</span></span>
+<span id="cb18-605"><a href="#cb18-605" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|------|------|</span></span>
+<span id="cb18-606"><a href="#cb18-606" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Sequential** (fix PK, estimate PD) <span class="pp">|</span> Faster, PK model already validated <span class="pp">|</span> Ignores PK uncertainty, may bias PD estimates <span class="pp">|</span></span>
+<span id="cb18-607"><a href="#cb18-607" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Simultaneous** (estimate PK + PD together) <span class="pp">|</span> Full uncertainty propagation, optimal use of data <span class="pp">|</span> Slower, larger parameter space, harder to converge <span class="pp">|</span></span>
+<span id="cb18-608"><a href="#cb18-608" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-609"><a href="#cb18-609" aria-hidden="true" tabindex="-1"></a>**Recommendation:** Start sequential for model development (faster iteration), then switch to simultaneous for the final model.</span>
+<span id="cb18-610"><a href="#cb18-610" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-611"><a href="#cb18-611" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-612"><a href="#cb18-612" aria-hidden="true" tabindex="-1"></a><span class="fu"># Study Guide Questions</span></span>
+<span id="cb18-613"><a href="#cb18-613" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-614"><a href="#cb18-614" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>What is the difference between a direct and indirect PK-PD model?</span>
+<span id="cb18-615"><a href="#cb18-615" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>When would you use an effect compartment model instead of a direct model?</span>
+<span id="cb18-616"><a href="#cb18-616" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>What are the four types of indirect response models and how do they differ?</span>
+<span id="cb18-617"><a href="#cb18-617" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Why is Emax often fixed to 1 in indirect response models?</span>
+<span id="cb18-618"><a href="#cb18-618" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>What are the advantages of simultaneous PK-PD estimation vs. sequential?</span>
+<span id="cb18-619"><a href="#cb18-619" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>When would a K-PD model be appropriate instead of a full PK-PD model?</span>
+<span id="cb18-620"><a href="#cb18-620" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>How does turnover half-life affect the time course of an indirect response?</span>
+<span id="cb18-621"><a href="#cb18-621" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-622"><a href="#cb18-622" aria-hidden="true" tabindex="-1"></a><span class="fu"># Supplementary Material</span></span>
+<span id="cb18-623"><a href="#cb18-623" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-624"><a href="#cb18-624" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Topic <span class="pp">|</span> Tutorial <span class="pp">|</span> Key Additions <span class="pp">|</span></span>
+<span id="cb18-625"><a href="#cb18-625" aria-hidden="true" tabindex="-1"></a><span class="pp">|-------|----------|---------------|</span></span>
+<span id="cb18-626"><a href="#cb18-626" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Intrinsic CL &amp; Enzyme Kinetics** <span class="pp">|</span> <span class="co">[</span><span class="ot">PK W7a</span><span class="co">](../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.qmd)</span> <span class="pp">|</span> Vmax/KM enzyme kinetics — the pharmacological foundation of the Emax model <span class="pp">|</span></span>
+<span id="cb18-627"><a href="#cb18-627" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Clearance &amp; Hepatic Extraction** <span class="pp">|</span> <span class="co">[</span><span class="ot">PK W6</span><span class="co">](../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.qmd)</span> <span class="pp">|</span> Drug elimination physiology underlying PK-PD model structure <span class="pp">|</span></span>
+<span id="cb18-628"><a href="#cb18-628" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Oral Absorption** <span class="pp">|</span> <span class="co">[</span><span class="ot">PK W8</span><span class="co">](../lectures/pk/W8-extravascular-dosing-and-oral-absorption.qmd)</span> <span class="pp">|</span> First-order absorption, bioavailability — the PK driving function for PD <span class="pp">|</span></span>
+<span id="cb18-629"><a href="#cb18-629" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PD model overview <span class="pp">|</span> <span class="co">[</span><span class="ot">Introduction to PD Models</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/00-introduction-to-pd-models.html)</span> <span class="pp">|</span> Four PD paradigms, Emax/Hill curves, potency vs efficacy, decision flowchart <span class="pp">|</span></span>
+<span id="cb18-630"><a href="#cb18-630" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Direct response models <span class="pp">|</span> <span class="co">[</span><span class="ot">Direct Response</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/01-direct-response.html)</span> <span class="pp">|</span> Stimulatory + inhibitory Emax, population simulation, full fitting workflow <span class="pp">|</span></span>
+<span id="cb18-631"><a href="#cb18-631" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Effect compartment models <span class="pp">|</span> <span class="co">[</span><span class="ot">Effect Compartment</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/02-effect-compartment.html)</span> <span class="pp">|</span> Hysteresis visualization, ke0 sensitivity analysis, Cp vs Ce comparison, clinical examples <span class="pp">|</span></span>
+<span id="cb18-632"><a href="#cb18-632" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Indirect response models <span class="pp">|</span> <span class="co">[</span><span class="ot">Indirect Response</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/03-indirect-response.html)</span> <span class="pp">|</span> All 4 IDR types with code, comparative simulation, turnover time sensitivity, clinical examples <span class="pp">|</span></span>
+<span id="cb18-633"><a href="#cb18-633" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> K-PD models <span class="pp">|</span> <span class="co">[</span><span class="ot">K-PD Models</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/04-kpd-models.html)</span> <span class="pp">|</span> Virtual compartment concept, KDE/EDK50 parameterization, limitations, K-PD vs PK-PD decision framework <span class="pp">|</span></span>
+<span id="cb18-634"><a href="#cb18-634" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model selection <span class="pp">|</span> <span class="co">[</span><span class="ot">PD Model Selection</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/05-model-selection.html)</span> <span class="pp">|</span> Systematic selection (EDA → mechanism → statistics), warfarin case study, common pitfalls <span class="pp">|</span></span>
+<span id="cb18-635"><a href="#cb18-635" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> HCV viral dynamics <span class="pp">|</span> <span class="co">[</span><span class="ot">HCV GSA</span><span class="co">](https://tutorials.pumas.ai/html/pkpd/hcvgsa.html)</span> <span class="pp">|</span> QSP-style PK-PD with viral kinetics and global sensitivity analysis <span class="pp">|</span></span>
+<span id="cb18-636"><a href="#cb18-636" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> TMDD models <span class="pp">|</span> <span class="co">[</span><span class="ot">TMDD Foundations</span><span class="co">](https://tutorials.pumas.ai/html/tmdd/01-tmdd-foundations.html)</span> → <span class="co">[</span><span class="ot">TMDD Workflows</span><span class="co">](https://tutorials.pumas.ai/html/tmdd/05-tmdd-workflows.html)</span> <span class="pp">|</span> Target-mediated drug disposition: full model, approximations, special cases <span class="pp">|</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

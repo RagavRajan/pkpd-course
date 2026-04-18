@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Covariate Modeling in Population Pharmacokinetics: Fundamentals – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Covariate Modeling in Population Pharmacokinetics: Fundamentals</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction-and-goals-of-covariate-modeling" id="toc-introduction-and-goals-of-covariate-modeling" class="nav-link active" data-scroll-target="#introduction-and-goals-of-covariate-modeling"><span class="header-section-number">1</span> 1. Introduction and Goals of Covariate Modeling</a>
+  <ul class="collapse">
+  <li><a href="#business-perspective-on-covariates" id="toc-business-perspective-on-covariates" class="nav-link" data-scroll-target="#business-perspective-on-covariates"><span class="header-section-number">1.1</span> 1.1 Business Perspective on Covariates</a></li>
+  </ul></li>
+  <li><a href="#clinically-relevant-covariates-in-drug-development" id="toc-clinically-relevant-covariates-in-drug-development" class="nav-link" data-scroll-target="#clinically-relevant-covariates-in-drug-development"><span class="header-section-number">2</span> 2. Clinically Relevant Covariates in Drug Development</a></li>
+  <li><a href="#expanding-landscape-of-covariates" id="toc-expanding-landscape-of-covariates" class="nav-link" data-scroll-target="#expanding-landscape-of-covariates"><span class="header-section-number">3</span> 3. Expanding Landscape of Covariates</a></li>
+  <li><a href="#overview-of-covariate-modeling-methodologies" id="toc-overview-of-covariate-modeling-methodologies" class="nav-link" data-scroll-target="#overview-of-covariate-modeling-methodologies"><span class="header-section-number">4</span> 4. Overview of Covariate Modeling Methodologies</a></li>
+  <li><a href="#types-of-covariates" id="toc-types-of-covariates" class="nav-link" data-scroll-target="#types-of-covariates"><span class="header-section-number">5</span> 5. Types of Covariates</a>
+  <ul class="collapse">
+  <li><a href="#discrete-vs.-continuous" id="toc-discrete-vs.-continuous" class="nav-link" data-scroll-target="#discrete-vs.-continuous"><span class="header-section-number">5.1</span> 5.1 Discrete vs.&nbsp;Continuous</a></li>
+  <li><a href="#constant-vs.-time-varying" id="toc-constant-vs.-time-varying" class="nav-link" data-scroll-target="#constant-vs.-time-varying"><span class="header-section-number">5.2</span> 5.2 Constant vs.&nbsp;Time-Varying</a></li>
+  </ul></li>
+  <li><a href="#functional-forms-for-continuous-covariates" id="toc-functional-forms-for-continuous-covariates" class="nav-link" data-scroll-target="#functional-forms-for-continuous-covariates"><span class="header-section-number">6</span> 6. Functional Forms for Continuous Covariates</a>
+  <ul class="collapse">
+  <li><a href="#intercept-plus-slope-linear-model" id="toc-intercept-plus-slope-linear-model" class="nav-link" data-scroll-target="#intercept-plus-slope-linear-model"><span class="header-section-number">6.1</span> 6.1 Intercept-Plus-Slope (Linear) Model</a></li>
+  <li><a href="#standardized-body-weight-parameterization" id="toc-standardized-body-weight-parameterization" class="nav-link" data-scroll-target="#standardized-body-weight-parameterization"><span class="header-section-number">6.2</span> 6.2 Standardized Body Weight Parameterization</a></li>
+  <li><a href="#centered-covariate-parameterization" id="toc-centered-covariate-parameterization" class="nav-link" data-scroll-target="#centered-covariate-parameterization"><span class="header-section-number">6.3</span> 6.3 Centered Covariate Parameterization</a></li>
+  <li><a href="#allometric-scaling" id="toc-allometric-scaling" class="nav-link" data-scroll-target="#allometric-scaling"><span class="header-section-number">6.4</span> 6.4 Allometric Scaling</a></li>
+  <li><a href="#choosing-between-standardization-and-centering" id="toc-choosing-between-standardization-and-centering" class="nav-link" data-scroll-target="#choosing-between-standardization-and-centering"><span class="header-section-number">6.5</span> 6.5 Choosing Between Standardization and Centering</a></li>
+  </ul></li>
+  <li><a href="#discrete-covariate-models" id="toc-discrete-covariate-models" class="nav-link" data-scroll-target="#discrete-covariate-models"><span class="header-section-number">7</span> 7. Discrete Covariate Models</a>
+  <ul class="collapse">
+  <li><a href="#proportional-change-model" id="toc-proportional-change-model" class="nav-link" data-scroll-target="#proportional-change-model"><span class="header-section-number">7.1</span> 7.1 Proportional Change Model</a></li>
+  <li><a href="#fractional-change-model" id="toc-fractional-change-model" class="nav-link" data-scroll-target="#fractional-change-model"><span class="header-section-number">7.2</span> 7.2 Fractional Change Model</a></li>
+  <li><a href="#combined-discrete-and-continuous-covariates" id="toc-combined-discrete-and-continuous-covariates" class="nav-link" data-scroll-target="#combined-discrete-and-continuous-covariates"><span class="header-section-number">7.3</span> 7.3 Combined Discrete and Continuous Covariates</a></li>
+  </ul></li>
+  <li><a href="#practical-guidance-on-covariate-analysis" id="toc-practical-guidance-on-covariate-analysis" class="nav-link" data-scroll-target="#practical-guidance-on-covariate-analysis"><span class="header-section-number">8</span> 8. Practical Guidance on Covariate Analysis</a></li>
+  <li><a href="#homework-assignment" id="toc-homework-assignment" class="nav-link" data-scroll-target="#homework-assignment"><span class="header-section-number">9</span> 9. Homework Assignment</a></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">10</span> 10. Looking Ahead</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Covariate Modeling in Population Pharmacokinetics: Fundamentals</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Lecture Notes</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="introduction-and-goals-of-covariate-modeling" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction-and-goals-of-covariate-modeling"><span class="header-section-number">1</span> 1. Introduction and Goals of Covariate Modeling</h2>
+<p>Covariate modeling is widely regarded as one of the most challenging aspects of drug development, requiring continuous learning even for experienced practitioners.</p>
+<p>The primary goal of covariate modeling in population pharmacokinetics (PopPK) is to <strong>explain between-subject variability (BSV)</strong> in the data. BSV is random in nature; the objective is to reduce this apparent randomness by accounting for known, measurable factors. Covariates are pieces of information captured during a clinical trial that help explain why individuals differ in their pharmacokinetic (PK) profiles.</p>
+<p>The secondary goal is <strong>dose stratification</strong>: when a covariate is found to produce a clinically meaningful difference, the dose may be adjusted (e.g., X, 2X, X/2) so that all patients achieve similar exposure and, by extension, a similar response — whether clinical or biomarker-based.</p>
+<section id="business-perspective-on-covariates" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="business-perspective-on-covariates"><span class="header-section-number">1.1</span> 1.1 Business Perspective on Covariates</h3>
+<p>From a drug development and commercial standpoint, covariate-based dosing recommendations introduce complexity. A single, simple dose regimen is far easier to communicate to prescribers than a stratified one. Logistical challenges compound this — for instance, body weight, while intuitive, is difficult to measure in bedridden, critically ill, or post-surgical patients. In intensive care settings, body weight can change by more than 30–40% within a week, rendering a baseline measurement inaccurate. Similarly, neonatal body weight follows a non-monotonic trajectory in the first week of life (decreasing initially as body water redistributes before increasing), creating additional complexity when dosing adjustments are needed.</p>
+<p>The practical takeaway is that covariates useful in clinical practice tend to be simple, reliable, and easy to measure. A challenge for any analyst is to distinguish covariates that are scientifically interesting from those that are operationally actionable.</p>
+<hr>
+</section>
+</section>
+<section id="clinically-relevant-covariates-in-drug-development" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="clinically-relevant-covariates-in-drug-development"><span class="header-section-number">2</span> 2. Clinically Relevant Covariates in Drug Development</h2>
+<p>A review of FDA submissions over the past decade reveals that fewer than five covariates typically appear in approved drug labels. The most commonly observed are:</p>
+<ol type="1">
+<li><strong>Body weight</strong> (and body surface area as a related metric)</li>
+<li><strong>Age</strong></li>
+<li><strong>Renal function</strong> (e.g., creatinine clearance)</li>
+<li><strong>Hepatic function</strong></li>
+<li><strong>Metabolizer/transporter status</strong> (e.g., CYP polymorphisms)</li>
+</ol>
+<p>Several covariates that are frequently explored in analyses rarely appear in labels:</p>
+<ul>
+<li><strong>Gender</strong>: There is virtually no approved label (for drugs not sex-specific by indication) where gender functions as a covariate.</li>
+<li><strong>Race</strong>: Race effects, when present, are generally mediated through underlying pharmacogenomic polymorphisms rather than race itself.</li>
+<li><strong>Hematocrit</strong>: Rarely, if ever, appears in labels.</li>
+</ul>
+<p>A special category involves <strong>biomarker-defined subpopulations</strong>, particularly relevant for newer biologics. For example, pembrolizumab (Keytruda) is indicated for non-small cell lung cancer (NSCLC) with specific PD-L1 expression. During drug development, all-comers are enrolled first to confirm efficacy, with subgroup analyses subsequently identifying the biomarker-defined responder population. What begins as a covariate in the pharmacometric analysis ultimately becomes part of the indication in the label.</p>
+<blockquote class="blockquote">
+<p><strong>Historical context</strong>: The competition between pembrolizumab (Keytruda) and nivolumab (Opdivo) is one of the most instructive examples in pharmaceutical development. Nivolumab was developed first, but pembrolizumab reached the market approximately eight months earlier by identifying a highly responsive PD-L1-expressing subpopulation. It took nivolumab nearly four and a half years to recover market share.</p>
+</blockquote>
+<hr>
+</section>
+<section id="expanding-landscape-of-covariates" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="expanding-landscape-of-covariates"><span class="header-section-number">3</span> 3. Expanding Landscape of Covariates</h2>
+<p>Prior to approximately 2010, covariate panels in drug development were limited to classical demographic and laboratory variables. Since then, technological advances have dramatically expanded the scope:</p>
+<ul>
+<li><strong>New modalities</strong> (monoclonal antibodies, ADCs, RNA therapeutics): biomarker panels can number in the hundreds to thousands.</li>
+<li><strong>Omics data</strong>: genomics, proteomics, metabolomics.</li>
+<li><strong>Imaging data</strong>: increasingly relevant in oncology and dermatology.</li>
+<li><strong>Digital/sensor data</strong>: audio and video-based assessments in psychiatric indications.</li>
+</ul>
+<p>This expansion has driven corresponding evolution in covariate modeling methodologies.</p>
+<hr>
+</section>
+<section id="overview-of-covariate-modeling-methodologies" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="overview-of-covariate-modeling-methodologies"><span class="header-section-number">4</span> 4. Overview of Covariate Modeling Methodologies</h2>
+<p>The methodologies for covariate analysis have evolved considerably over time, from simple regression to neural-network-based approaches:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Methodology</th>
+<th>Era</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear / logistic regression</td>
+<td>Classic</td>
+<td>Foundation of all covariate work</td>
+</tr>
+<tr class="even">
+<td>Physiological functional forms</td>
+<td>Classic</td>
+<td>Mechanistically motivated regression</td>
+</tr>
+<tr class="odd">
+<td>Generalized Additive Modeling (GAM)</td>
+<td>1990s</td>
+<td>Handles multiple covariates simultaneously</td>
+</tr>
+<tr class="even">
+<td>Wald Approximation Modeling (WAM)</td>
+<td>Post-GAM</td>
+<td>Developed as a methodological improvement to GAM</td>
+</tr>
+<tr class="odd">
+<td>Stepwise Covariate Modeling (SCM)</td>
+<td>2000s</td>
+<td>Widely used; forward selection + backward elimination</td>
+</tr>
+<tr class="even">
+<td>Full Covariate Modeling (FCM)</td>
+<td>2010s</td>
+<td>All covariates retained; favored for interpretability</td>
+</tr>
+<tr class="odd">
+<td>LASSO (Least Absolute Shrinkage and Selection Operator)</td>
+<td>2010s</td>
+<td>Penalized regression; overlap with machine learning</td>
+</tr>
+<tr class="even">
+<td>LASSO + PCA (Principal Component Analysis)</td>
+<td>~2015</td>
+<td>Extended LASSO for high-dimensional covariate spaces</td>
+</tr>
+<tr class="odd">
+<td>FREM (Full Random Effects Models)</td>
+<td>~2011</td>
+<td>Extremely powerful; computationally demanding</td>
+</tr>
+<tr class="even">
+<td>Deep NLME (Neural network-based)</td>
+<td>Current</td>
+<td>Handles images, omics, audio, video</td>
+</tr>
+</tbody>
+</table>
+<p>SCM received substantial criticism in the 2010s for its propensity to overfit and produce variable results. Full covariate modeling emerged as an alternative and is considered a modeler’s preferred approach, though it presents challenges for regulatory reviewers. FREM was developed contemporaneously and, while technically demanding, provides a very complete picture of covariate relationships once software (e.g., NONMEM) became capable enough to support it.</p>
+<p>Deep NLME, implemented in tools such as DeepPumas (Pumas AI), represents the current frontier and is the only methodology capable of incorporating images and multimodal omics data directly.</p>
+<p><strong>Practical guidance</strong>: For most drug development decisions, regression-based approaches (linear functional forms, standardization/centering) remain the most communicable and actionable. More advanced methods are most relevant in academic research settings and for novel therapeutic modalities.</p>
+<hr>
+</section>
+<section id="types-of-covariates" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="types-of-covariates"><span class="header-section-number">5</span> 5. Types of Covariates</h2>
+<section id="discrete-vs.-continuous" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="discrete-vs.-continuous"><span class="header-section-number">5.1</span> 5.1 Discrete vs.&nbsp;Continuous</h3>
+<p><strong>Discrete covariates</strong> take a finite number of categories: - <strong>Binary</strong> (two categories): sex (male/female), smoking status (yes/no) - <strong>Categorical</strong> (more than two categories): race, metabolizer status (poor/normal/extensive/ultrarapid)</p>
+<p><strong>Continuous covariates</strong> follow an underlying statistical distribution: - Examples: age, body weight, creatinine clearance - The shape of the distribution (symmetric vs.&nbsp;skewed with a long tail) influences the choice of parameterization</p>
+</section>
+<section id="constant-vs.-time-varying" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="constant-vs.-time-varying"><span class="header-section-number">5.2</span> 5.2 Constant vs.&nbsp;Time-Varying</h3>
+<p>Both discrete and continuous covariates can be further classified by how they change over the study duration.</p>
+<p><strong>Constant (baseline) covariates</strong>: Collected once at study entry. Sex, race, smoking status, metabolizer status, age, body weight, and creatinine clearance are typically treated as constant in short-duration trials.</p>
+<p><strong>Time-varying covariates</strong>: Most commonly continuous variables that change meaningfully during the study.</p>
+<p><em>Examples:</em> - Body weight in a long-term cardiovascular trial (especially in participants actively modifying lifestyle) - Neonatal body weight in the first weeks of life - Smoking status in a psychiatric trial where the intervention motivates cessation</p>
+<p><strong>Challenges with time-varying covariates</strong>: When a covariate changes (e.g., a patient stops smoking), the intermediate physiological change driving PK — such as CYP2D6 expression level — may change gradually and non-linearly over time. This transition time is rarely measurable in routine clinical data collection. The implication is that while the covariate status changes discretely in the dataset (e.g., smoker → non-smoker at month 2), the corresponding PK changes gradually as enzymatic activity recovers. Collecting the biomarker of the intermediate mechanism in parallel (e.g., CYP protein expression) would be ideal but is rarely feasible.</p>
+<p>One advanced approach to handle this is <strong>joint biomarker modeling</strong>, where the covariate is treated as a biomarker with its own model governing temporal changes, rather than as a static input.</p>
+<hr>
+</section>
+</section>
+<section id="functional-forms-for-continuous-covariates" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="functional-forms-for-continuous-covariates"><span class="header-section-number">6</span> 6. Functional Forms for Continuous Covariates</h2>
+<p>Visualizing the relationship between an individual pharmacokinetic parameter (e.g., clearance, CL) and a covariate is essential to understanding, writing, and communicating covariate models.</p>
+<section id="intercept-plus-slope-linear-model" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="intercept-plus-slope-linear-model"><span class="header-section-number">6.1</span> 6.1 Intercept-Plus-Slope (Linear) Model</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{BW} \cdot \text{BW})\]</span></p>
+<p>Expanding:</p>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} + \theta_\text{CL} \cdot \theta_\text{BW} \cdot \text{BW}\]</span></p>
+<p>This is the standard form <span class="math inline">\(y = mx + b\)</span> where: - <span class="math inline">\(y\)</span> = clearance - <span class="math inline">\(x\)</span> = body weight (BW) - <span class="math inline">\(b\)</span> = <span class="math inline">\(\theta_\text{CL}\)</span> (intercept: clearance when BW = 0, which is the extrapolated value) - <span class="math inline">\(m\)</span> = <span class="math inline">\(\theta_\text{CL} \cdot \theta_\text{BW}\)</span> (slope)</p>
+<p><strong>Limitation</strong>: The intercept corresponds to BW = 0, which has no physiological meaning and makes clinical communication difficult.</p>
+</section>
+<section id="standardized-body-weight-parameterization" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="standardized-body-weight-parameterization"><span class="header-section-number">6.2</span> 6.2 Standardized Body Weight Parameterization</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot \left(\frac{\text{BW}}{70}\right)\]</span></p>
+<p>Here, <span class="math inline">\(\theta_\text{CL}\)</span> is the typical population clearance for a 70 kg individual. The reference value of 70 kg is set explicitly, and the slope coefficient is implicitly fixed to 1.</p>
+<p><em>Interpretation</em>: For a 140 kg subject, CL = <span class="math inline">\(\theta_\text{CL} \times 2\)</span>. For a 35 kg subject, CL = <span class="math inline">\(\theta_\text{CL} \times 0.5\)</span>.</p>
+<p><strong>Simulation exercise</strong>: Generate a vector of body weights from 40 to 140 kg, compute clearance using this equation (e.g., <span class="math inline">\(\theta_\text{CL} = 10\)</span>), and plot CL vs.&nbsp;BW. Then repeat with a slope of 0.75 instead of 1.0 to visualize the allometric relationship. The distinction between a linear and a power (allometric) relationship becomes immediately apparent.</p>
+</section>
+<section id="centered-covariate-parameterization" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="centered-covariate-parameterization"><span class="header-section-number">6.3</span> 6.3 Centered Covariate Parameterization</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} + \theta_\text{BW} \cdot (\text{BW} - 70)\]</span></p>
+<p>When BW = 70: the second term vanishes and CL = <span class="math inline">\(\theta_\text{CL}\)</span>, making <span class="math inline">\(\theta_\text{CL}\)</span> the clearance at the reference body weight of 70 kg.</p>
+<p>The centering approach is particularly useful when communicating the change in CL relative to a typical individual. The slope parameter <span class="math inline">\(\theta_\text{BW}\)</span> may be positive or negative, and <strong>careful attention to parameter bounds is required</strong> to prevent the coefficient from taking physiologically implausible values during optimization.</p>
+</section>
+<section id="allometric-scaling" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="allometric-scaling"><span class="header-section-number">6.4</span> 6.4 Allometric Scaling</h3>
+<p>The power model is commonly written as:</p>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot \left(\frac{\text{BW}}{70}\right)^{0.75}\]</span></p>
+<p>The exponent of 0.75 for clearance (and 1.0 for volume) originates from principles of fractal geometry and metabolic scaling across species — from small insects to large mammals. This framework has been translated into human physiology and is widely, though not universally, accepted. Advocates and critics both exist in the pharmacometrics literature, but it remains a foundational concept in allometric scaling and first-in-human dose projection.</p>
+</section>
+<section id="choosing-between-standardization-and-centering" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="choosing-between-standardization-and-centering"><span class="header-section-number">6.5</span> 6.5 Choosing Between Standardization and Centering</h3>
+<p>There is no universally mandated choice; the decision depends on: - The range of the covariate in the study population - The shape of the covariate distribution (symmetric vs.&nbsp;skewed/long-tailed) - Physiological plausibility at the extremes of the distribution - Ease of communication to the intended audience</p>
+<p>For covariates with large ranges and long tails (e.g., body weight spanning neonates to obese adults), simple standardization may imply physiologically implausible linearity at extremes; physiological or allometric considerations should govern the functional form. For covariates with overlapping, roughly symmetric ranges (e.g., age and creatinine clearance in a typical adult population), centering is often straightforward.</p>
+<p>Normalizing covariates becomes important when <strong>multiple covariates of very different magnitudes</strong> are included simultaneously (e.g., body weight in the range 40–140 kg alongside platelet count in the range 150,000–400,000 per µL). A difference of more than one order of magnitude between covariate scales makes numerical optimization unreliable; normalization corrects for this.</p>
+<hr>
+</section>
+</section>
+<section id="discrete-covariate-models" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="discrete-covariate-models"><span class="header-section-number">7</span> 7. Discrete Covariate Models</h2>
+<section id="proportional-change-model" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="proportional-change-model"><span class="header-section-number">7.1</span> 7.1 Proportional Change Model</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex} \cdot \mathbf{1}[\text{sex = female}])\]</span></p>
+<ul>
+<li>When sex = male: <span class="math inline">\(\text{CL} = \theta_\text{CL}\)</span></li>
+<li>When sex = female: <span class="math inline">\(\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex})\)</span></li>
+</ul>
+<p>Here <span class="math inline">\(\theta_\text{sex}\)</span> represents the <strong>proportional (percentage) change</strong> in clearance for females relative to males. For example, <span class="math inline">\(\theta_\text{sex} = 0.2\)</span> implies a 20% higher clearance in females.</p>
+</section>
+<section id="fractional-change-model" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="fractional-change-model"><span class="header-section-number">7.2</span> 7.2 Fractional Change Model</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot \theta_\text{sex} \cdot \mathbf{1}[\text{sex = female}]\]</span></p>
+<p>In this formulation, <span class="math inline">\(\theta_\text{sex}\)</span> is the <strong>fraction</strong> of the male clearance that applies to females. For example, <span class="math inline">\(\theta_\text{sex} = 0.1\)</span> means female clearance is one-tenth of male clearance. This is not a percentage change; the interpretation is fundamentally different from the proportional model above. Clarity in interpretation requires a solid grounding in linear regression concepts.</p>
+</section>
+<section id="combined-discrete-and-continuous-covariates" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="combined-discrete-and-continuous-covariates"><span class="header-section-number">7.3</span> 7.3 Combined Discrete and Continuous Covariates</h3>
+<p><span class="math display">\[\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex} \cdot \mathbf{1}[\text{sex = female}]) \cdot (1 + \theta_\text{BW} \cdot \text{BW})\]</span></p>
+<p>Visualizing this model: males and females will have <strong>different intercepts but the same slope</strong> with respect to body weight. This produces two parallel lines when CL is plotted against BW. This is a “same slope, different intercept” scenario.</p>
+<p>Alternative structures include: - Same intercept, different slopes - Different intercepts and different slopes</p>
+<p>Each represents a distinct hypothesis about how the covariate modifies the PK parameter, and the choice among them should be guided by both the data and physiological reasoning.</p>
+<hr>
+</section>
+</section>
+<section id="practical-guidance-on-covariate-analysis" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="practical-guidance-on-covariate-analysis"><span class="header-section-number">8</span> 8. Practical Guidance on Covariate Analysis</h2>
+<ul>
+<li>A covariate effect that does not alter exposure or efficacy by more than approximately 20% is unlikely to drive a label change or require a dose modification in drug development.</li>
+<li>Covariate models that do explain variability, even without reaching the threshold for labeling, are still useful for simulation and prediction, as they improve the precision of model-based inferences.</li>
+<li>For drugs without a market incentive for specific populations (e.g., neonates), covariate modeling from retrospective clinical data or experience-based dosing may be the only available approach.</li>
+<li>New drug modalities (biologics, ADCs, RNA therapeutics) are associated with larger and more complex covariate panels; however, the core principle — visualize and communicate the relationship between parameter and covariate — remains unchanged.</li>
+<li>The principle that a subject’s clearance is intrinsic to that subject holds regardless of whether covariates are included or excluded from the model. Adding or removing a covariate does not change the underlying biology; it changes how well the model explains the observed variability.</li>
+</ul>
+<hr>
+</section>
+<section id="homework-assignment" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="homework-assignment"><span class="header-section-number">9</span> 9. Homework Assignment</h2>
+<p>Write the NONMEM/Pumas-style model equations for the following four cases, using body weight and sex as the only covariates and clearance as the parameter of interest:</p>
+<ol type="1">
+<li>Clearance as a function of body weight only (linear/standardized)</li>
+<li>Clearance as a function of sex only (proportional change)</li>
+<li>Clearance as a function of both sex and body weight — same slope, different intercepts</li>
+<li>Clearance as a function of both sex and body weight — different slopes and different intercepts</li>
+</ol>
+<p>Post responses to the course discussion forum. These equations will be reviewed in the next session.</p>
+<hr>
+</section>
+<section id="looking-ahead" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">10</span> 10. Looking Ahead</h2>
+<p>The next session (Sunday, 10:00–12:00) will cover: - Deriving initial parameter estimates for covariate coefficients - Setting appropriate bounds on covariate parameters - Introduction to model validation fundamentals</p>
+<hr>
+<p><em>These notes cover covariate fundamentals as a prerequisite for understanding the full range of covariate modeling strategies. Mastery of the functional forms and visualization principles presented here is necessary before advancing to stepwise covariate modeling, LASSO, FREM, or deep learning-based approaches.</em></p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Covariate Modeling in Population Pharmacokinetics: Fundamentals"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Lecture Notes"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Introduction and Goals of Covariate Modeling</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Covariate modeling is widely regarded as one of the most challenging aspects of drug development, requiring continuous learning even for experienced practitioners.</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>The primary goal of covariate modeling in population pharmacokinetics (PopPK) is to **explain between-subject variability (BSV)** in the data. BSV is random in nature; the objective is to reduce this apparent randomness by accounting for known, measurable factors. Covariates are pieces of information captured during a clinical trial that help explain why individuals differ in their pharmacokinetic (PK) profiles.</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>The secondary goal is **dose stratification**: when a covariate is found to produce a clinically meaningful difference, the dose may be adjusted (e.g., X, 2X, X/2) so that all patients achieve similar exposure and, by extension, a similar response — whether clinical or biomarker-based.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1.1 Business Perspective on Covariates</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>From a drug development and commercial standpoint, covariate-based dosing recommendations introduce complexity. A single, simple dose regimen is far easier to communicate to prescribers than a stratified one. Logistical challenges compound this — for instance, body weight, while intuitive, is difficult to measure in bedridden, critically ill, or post-surgical patients. In intensive care settings, body weight can change by more than 30–40% within a week, rendering a baseline measurement inaccurate. Similarly, neonatal body weight follows a non-monotonic trajectory in the first week of life (decreasing initially as body water redistributes before increasing), creating additional complexity when dosing adjustments are needed.</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>The practical takeaway is that covariates useful in clinical practice tend to be simple, reliable, and easy to measure. A challenge for any analyst is to distinguish covariates that are scientifically interesting from those that are operationally actionable.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Clinically Relevant Covariates in Drug Development</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>A review of FDA submissions over the past decade reveals that fewer than five covariates typically appear in approved drug labels. The most commonly observed are:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Body weight** (and body surface area as a related metric)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Age**</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Renal function** (e.g., creatinine clearance)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Hepatic function**</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Metabolizer/transporter status** (e.g., CYP polymorphisms)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>Several covariates that are frequently explored in analyses rarely appear in labels:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Gender**: There is virtually no approved label (for drugs not sex-specific by indication) where gender functions as a covariate.</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Race**: Race effects, when present, are generally mediated through underlying pharmacogenomic polymorphisms rather than race itself.</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Hematocrit**: Rarely, if ever, appears in labels.</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>A special category involves **biomarker-defined subpopulations**, particularly relevant for newer biologics. For example, pembrolizumab (Keytruda) is indicated for non-small cell lung cancer (NSCLC) with specific PD-L1 expression. During drug development, all-comers are enrolled first to confirm efficacy, with subgroup analyses subsequently identifying the biomarker-defined responder population. What begins as a covariate in the pharmacometric analysis ultimately becomes part of the indication in the label.</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Historical context**: The competition between pembrolizumab (Keytruda) and nivolumab (Opdivo) is one of the most instructive examples in pharmaceutical development. Nivolumab was developed first, but pembrolizumab reached the market approximately eight months earlier by identifying a highly responsive PD-L1-expressing subpopulation. It took nivolumab nearly four and a half years to recover market share.</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Expanding Landscape of Covariates</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>Prior to approximately 2010, covariate panels in drug development were limited to classical demographic and laboratory variables. Since then, technological advances have dramatically expanded the scope:</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**New modalities** (monoclonal antibodies, ADCs, RNA therapeutics): biomarker panels can number in the hundreds to thousands.</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Omics data**: genomics, proteomics, metabolomics.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Imaging data**: increasingly relevant in oncology and dermatology.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Digital/sensor data**: audio and video-based assessments in psychiatric indications.</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>This expansion has driven corresponding evolution in covariate modeling methodologies.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Overview of Covariate Modeling Methodologies</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>The methodologies for covariate analysis have evolved considerably over time, from simple regression to neural-network-based approaches:</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Methodology <span class="pp">|</span> Era <span class="pp">|</span> Notes <span class="pp">|</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear / logistic regression <span class="pp">|</span> Classic <span class="pp">|</span> Foundation of all covariate work <span class="pp">|</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Physiological functional forms <span class="pp">|</span> Classic <span class="pp">|</span> Mechanistically motivated regression <span class="pp">|</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Generalized Additive Modeling (GAM) <span class="pp">|</span> 1990s <span class="pp">|</span> Handles multiple covariates simultaneously <span class="pp">|</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Wald Approximation Modeling (WAM) <span class="pp">|</span> Post-GAM <span class="pp">|</span> Developed as a methodological improvement to GAM <span class="pp">|</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Stepwise Covariate Modeling (SCM) <span class="pp">|</span> 2000s <span class="pp">|</span> Widely used; forward selection + backward elimination <span class="pp">|</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Full Covariate Modeling (FCM) <span class="pp">|</span> 2010s <span class="pp">|</span> All covariates retained; favored for interpretability <span class="pp">|</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LASSO (Least Absolute Shrinkage and Selection Operator) <span class="pp">|</span> 2010s <span class="pp">|</span> Penalized regression; overlap with machine learning <span class="pp">|</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LASSO + PCA (Principal Component Analysis) <span class="pp">|</span> ~2015 <span class="pp">|</span> Extended LASSO for high-dimensional covariate spaces <span class="pp">|</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> FREM (Full Random Effects Models) <span class="pp">|</span> ~2011 <span class="pp">|</span> Extremely powerful; computationally demanding <span class="pp">|</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Deep NLME (Neural network-based) <span class="pp">|</span> Current <span class="pp">|</span> Handles images, omics, audio, video <span class="pp">|</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>SCM received substantial criticism in the 2010s for its propensity to overfit and produce variable results. Full covariate modeling emerged as an alternative and is considered a modeler's preferred approach, though it presents challenges for regulatory reviewers. FREM was developed contemporaneously and, while technically demanding, provides a very complete picture of covariate relationships once software (e.g., NONMEM) became capable enough to support it.</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>Deep NLME, implemented in tools such as DeepPumas (Pumas AI), represents the current frontier and is the only methodology capable of incorporating images and multimodal omics data directly.</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>**Practical guidance**: For most drug development decisions, regression-based approaches (linear functional forms, standardization/centering) remain the most communicable and actionable. More advanced methods are most relevant in academic research settings and for novel therapeutic modalities.</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Types of Covariates</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5.1 Discrete vs. Continuous</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>**Discrete covariates** take a finite number of categories:</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Binary** (two categories): sex (male/female), smoking status (yes/no)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Categorical** (more than two categories): race, metabolizer status (poor/normal/extensive/ultrarapid)</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>**Continuous covariates** follow an underlying statistical distribution:</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Examples: age, body weight, creatinine clearance</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The shape of the distribution (symmetric vs. skewed with a long tail) influences the choice of parameterization</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5.2 Constant vs. Time-Varying</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>Both discrete and continuous covariates can be further classified by how they change over the study duration.</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>**Constant (baseline) covariates**: Collected once at study entry. Sex, race, smoking status, metabolizer status, age, body weight, and creatinine clearance are typically treated as constant in short-duration trials.</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>**Time-varying covariates**: Most commonly continuous variables that change meaningfully during the study.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>*Examples:*</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Body weight in a long-term cardiovascular trial (especially in participants actively modifying lifestyle)</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Neonatal body weight in the first weeks of life</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Smoking status in a psychiatric trial where the intervention motivates cessation</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>**Challenges with time-varying covariates**: When a covariate changes (e.g., a patient stops smoking), the intermediate physiological change driving PK — such as CYP2D6 expression level — may change gradually and non-linearly over time. This transition time is rarely measurable in routine clinical data collection. The implication is that while the covariate status changes discretely in the dataset (e.g., smoker → non-smoker at month 2), the corresponding PK changes gradually as enzymatic activity recovers. Collecting the biomarker of the intermediate mechanism in parallel (e.g., CYP protein expression) would be ideal but is rarely feasible.</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>One advanced approach to handle this is **joint biomarker modeling**, where the covariate is treated as a biomarker with its own model governing temporal changes, rather than as a static input.</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="fu">## 6. Functional Forms for Continuous Covariates</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>Visualizing the relationship between an individual pharmacokinetic parameter (e.g., clearance, CL) and a covariate is essential to understanding, writing, and communicating covariate models.</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.1 Intercept-Plus-Slope (Linear) Model</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{BW} \cdot \text{BW})$$</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>Expanding:</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} + \theta_\text{CL} \cdot \theta_\text{BW} \cdot \text{BW}$$</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>This is the standard form $y = mx + b$ where:</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$y$ = clearance</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$x$ = body weight (BW)</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$b$ = $\theta_\text{CL}$ (intercept: clearance when BW = 0, which is the extrapolated value)</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$m$ = $\theta_\text{CL} \cdot \theta_\text{BW}$ (slope)</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>**Limitation**: The intercept corresponds to BW = 0, which has no physiological meaning and makes clinical communication difficult.</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.2 Standardized Body Weight Parameterization</span></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot \left(\frac{\text{BW}}{70}\right)$$</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>Here, $\theta_\text{CL}$ is the typical population clearance for a 70 kg individual. The reference value of 70 kg is set explicitly, and the slope coefficient is implicitly fixed to 1.</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>*Interpretation*: For a 140 kg subject, CL = $\theta_\text{CL} \times 2$. For a 35 kg subject, CL = $\theta_\text{CL} \times 0.5$.</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>**Simulation exercise**: Generate a vector of body weights from 40 to 140 kg, compute clearance using this equation (e.g., $\theta_\text{CL} = 10$), and plot CL vs. BW. Then repeat with a slope of 0.75 instead of 1.0 to visualize the allometric relationship. The distinction between a linear and a power (allometric) relationship becomes immediately apparent.</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.3 Centered Covariate Parameterization</span></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} + \theta_\text{BW} \cdot (\text{BW} - 70)$$</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>When BW = 70: the second term vanishes and CL = $\theta_\text{CL}$, making $\theta_\text{CL}$ the clearance at the reference body weight of 70 kg.</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>The centering approach is particularly useful when communicating the change in CL relative to a typical individual. The slope parameter $\theta_\text{BW}$ may be positive or negative, and **careful attention to parameter bounds is required** to prevent the coefficient from taking physiologically implausible values during optimization.</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.4 Allometric Scaling</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>The power model is commonly written as:</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot \left(\frac{\text{BW}}{70}\right)^{0.75}$$</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>The exponent of 0.75 for clearance (and 1.0 for volume) originates from principles of fractal geometry and metabolic scaling across species — from small insects to large mammals. This framework has been translated into human physiology and is widely, though not universally, accepted. Advocates and critics both exist in the pharmacometrics literature, but it remains a foundational concept in allometric scaling and first-in-human dose projection.</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.5 Choosing Between Standardization and Centering</span></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>There is no universally mandated choice; the decision depends on:</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The range of the covariate in the study population</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The shape of the covariate distribution (symmetric vs. skewed/long-tailed)</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Physiological plausibility at the extremes of the distribution</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ease of communication to the intended audience</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>For covariates with large ranges and long tails (e.g., body weight spanning neonates to obese adults), simple standardization may imply physiologically implausible linearity at extremes; physiological or allometric considerations should govern the functional form. For covariates with overlapping, roughly symmetric ranges (e.g., age and creatinine clearance in a typical adult population), centering is often straightforward.</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>Normalizing covariates becomes important when **multiple covariates of very different magnitudes** are included simultaneously (e.g., body weight in the range 40–140 kg alongside platelet count in the range 150,000–400,000 per µL). A difference of more than one order of magnitude between covariate scales makes numerical optimization unreliable; normalization corrects for this.</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="fu">## 7. Discrete Covariate Models</span></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="fu">### 7.1 Proportional Change Model</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex} \cdot \mathbf{1}<span class="co">[</span><span class="ot">\text{sex = female}</span><span class="co">]</span>)$$</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When sex = male: $\text{CL} = \theta_\text{CL}$</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When sex = female: $\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex})$</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>Here $\theta_\text{sex}$ represents the **proportional (percentage) change** in clearance for females relative to males. For example, $\theta_\text{sex} = 0.2$ implies a 20% higher clearance in females.</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="fu">### 7.2 Fractional Change Model</span></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot \theta_\text{sex} \cdot \mathbf{1}<span class="co">[</span><span class="ot">\text{sex = female}</span><span class="co">]</span>$$</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>In this formulation, $\theta_\text{sex}$ is the **fraction** of the male clearance that applies to females. For example, $\theta_\text{sex} = 0.1$ means female clearance is one-tenth of male clearance. This is not a percentage change; the interpretation is fundamentally different from the proportional model above. Clarity in interpretation requires a solid grounding in linear regression concepts.</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="fu">### 7.3 Combined Discrete and Continuous Covariates</span></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>$$\text{CL} = \theta_\text{CL} \cdot (1 + \theta_\text{sex} \cdot \mathbf{1}<span class="co">[</span><span class="ot">\text{sex = female}</span><span class="co">]</span>) \cdot (1 + \theta_\text{BW} \cdot \text{BW})$$</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>Visualizing this model: males and females will have **different intercepts but the same slope** with respect to body weight. This produces two parallel lines when CL is plotted against BW. This is a "same slope, different intercept" scenario.</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>Alternative structures include:</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Same intercept, different slopes</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Different intercepts and different slopes</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>Each represents a distinct hypothesis about how the covariate modifies the PK parameter, and the choice among them should be guided by both the data and physiological reasoning.</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## 8. Practical Guidance on Covariate Analysis</span></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A covariate effect that does not alter exposure or efficacy by more than approximately 20% is unlikely to drive a label change or require a dose modification in drug development.</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Covariate models that do explain variability, even without reaching the threshold for labeling, are still useful for simulation and prediction, as they improve the precision of model-based inferences.</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>For drugs without a market incentive for specific populations (e.g., neonates), covariate modeling from retrospective clinical data or experience-based dosing may be the only available approach.</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>New drug modalities (biologics, ADCs, RNA therapeutics) are associated with larger and more complex covariate panels; however, the core principle — visualize and communicate the relationship between parameter and covariate — remains unchanged.</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The principle that a subject's clearance is intrinsic to that subject holds regardless of whether covariates are included or excluded from the model. Adding or removing a covariate does not change the underlying biology; it changes how well the model explains the observed variability.</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="fu">## 9. Homework Assignment</span></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>Write the NONMEM/Pumas-style model equations for the following four cases, using body weight and sex as the only covariates and clearance as the parameter of interest:</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Clearance as a function of body weight only (linear/standardized)</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Clearance as a function of sex only (proportional change)</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Clearance as a function of both sex and body weight — same slope, different intercepts</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Clearance as a function of both sex and body weight — different slopes and different intercepts</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a>Post responses to the course discussion forum. These equations will be reviewed in the next session.</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="fu">## 10. Looking Ahead</span></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>The next session (Sunday, 10:00–12:00) will cover:</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Deriving initial parameter estimates for covariate coefficients</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Setting appropriate bounds on covariate parameters</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Introduction to model validation fundamentals</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>*These notes cover covariate fundamentals as a prerequisite for understanding the full range of covariate modeling strategies. Mastery of the functional forms and visualization principles presented here is necessary before advancing to stepwise covariate modeling, LASSO, FREM, or deep learning-based approaches.*</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

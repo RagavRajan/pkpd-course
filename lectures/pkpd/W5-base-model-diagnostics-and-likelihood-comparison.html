@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Population PK Modeling: Base Model Construction, Model Diagnostics, and Likelihood-Based Model Comparison – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Population PK Modeling: Base Model Construction, Model Diagnostics, and Likelihood-Based Model Comparison</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#review-components-of-a-population-pk-model" id="toc-review-components-of-a-population-pk-model" class="nav-link active" data-scroll-target="#review-components-of-a-population-pk-model"><span class="header-section-number">1</span> Review: Components of a Population PK Model</a></li>
+  <li><a href="#goals-of-population-pk-modeling" id="toc-goals-of-population-pk-modeling" class="nav-link" data-scroll-target="#goals-of-population-pk-modeling"><span class="header-section-number">2</span> Goals of Population PK Modeling</a>
+  <ul class="collapse">
+  <li><a href="#descriptive-vs.-predictive-models" id="toc-descriptive-vs.-predictive-models" class="nav-link" data-scroll-target="#descriptive-vs.-predictive-models"><span class="header-section-number">2.1</span> Descriptive vs.&nbsp;Predictive Models</a></li>
+  </ul></li>
+  <li><a href="#gaining-confidence-in-a-model" id="toc-gaining-confidence-in-a-model" class="nav-link" data-scroll-target="#gaining-confidence-in-a-model"><span class="header-section-number">3</span> Gaining Confidence in a Model</a>
+  <ul class="collapse">
+  <li><a href="#correlation-between-observed-and-predicted-values" id="toc-correlation-between-observed-and-predicted-values" class="nav-link" data-scroll-target="#correlation-between-observed-and-predicted-values"><span class="header-section-number">3.1</span> 1. Correlation Between Observed and Predicted Values</a></li>
+  <li><a href="#physiological-and-clinical-plausibility" id="toc-physiological-and-clinical-plausibility" class="nav-link" data-scroll-target="#physiological-and-clinical-plausibility"><span class="header-section-number">3.2</span> 2. Physiological and Clinical Plausibility</a></li>
+  <li><a href="#parameter-precision" id="toc-parameter-precision" class="nav-link" data-scroll-target="#parameter-precision"><span class="header-section-number">3.3</span> 3. Parameter Precision</a></li>
+  <li><a href="#distributional-assumptions" id="toc-distributional-assumptions" class="nav-link" data-scroll-target="#distributional-assumptions"><span class="header-section-number">3.4</span> 4. Distributional Assumptions</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility"><span class="header-section-number">3.5</span> 5. Reproducibility</a></li>
+  <li><a href="#robustness" id="toc-robustness" class="nav-link" data-scroll-target="#robustness"><span class="header-section-number">3.6</span> 6. Robustness</a></li>
+  </ul></li>
+  <li><a href="#the-base-model" id="toc-the-base-model" class="nav-link" data-scroll-target="#the-base-model"><span class="header-section-number">4</span> The Base Model</a></li>
+  <li><a href="#model-diagnostics" id="toc-model-diagnostics" class="nav-link" data-scroll-target="#model-diagnostics"><span class="header-section-number">5</span> Model Diagnostics</a>
+  <ul class="collapse">
+  <li><a href="#fit-for-purpose-models" id="toc-fit-for-purpose-models" class="nav-link" data-scroll-target="#fit-for-purpose-models"><span class="header-section-number">5.1</span> Fit-for-Purpose Models</a></li>
+  </ul></li>
+  <li><a href="#information-flow-inside-a-pumas-model" id="toc-information-flow-inside-a-pumas-model" class="nav-link" data-scroll-target="#information-flow-inside-a-pumas-model"><span class="header-section-number">6</span> Information Flow Inside a Pumas Model</a>
+  <ul class="collapse">
+  <li><a href="#structural-model" id="toc-structural-model" class="nav-link" data-scroll-target="#structural-model"><span class="header-section-number">6.1</span> Structural Model</a></li>
+  <li><a href="#population-and-individual-parameters-pre-block" id="toc-population-and-individual-parameters-pre-block" class="nav-link" data-scroll-target="#population-and-individual-parameters-pre-block"><span class="header-section-number">6.2</span> Population and Individual Parameters (pre block)</a></li>
+  <li><a href="#parameters-to-optimize-param-block" id="toc-parameters-to-optimize-param-block" class="nav-link" data-scroll-target="#parameters-to-optimize-param-block"><span class="header-section-number">6.3</span> Parameters to Optimize (param block)</a></li>
+  <li><a href="#random-effects-random-block" id="toc-random-effects-random-block" class="nav-link" data-scroll-target="#random-effects-random-block"><span class="header-section-number">6.4</span> Random Effects (random block)</a></li>
+  <li><a href="#from-amount-to-concentration-derived-block" id="toc-from-amount-to-concentration-derived-block" class="nav-link" data-scroll-target="#from-amount-to-concentration-derived-block"><span class="header-section-number">6.5</span> From Amount to Concentration (derived block)</a></li>
+  <li><a href="#residual-error-model" id="toc-residual-error-model" class="nav-link" data-scroll-target="#residual-error-model"><span class="header-section-number">6.6</span> Residual Error Model</a></li>
+  <li><a href="#summary-block-sequence-in-pumas" id="toc-summary-block-sequence-in-pumas" class="nav-link" data-scroll-target="#summary-block-sequence-in-pumas"><span class="header-section-number">6.7</span> Summary: Block Sequence in Pumas</a></li>
+  </ul></li>
+  <li><a href="#numerical-diagnostics-and-likelihood-based-metrics" id="toc-numerical-diagnostics-and-likelihood-based-metrics" class="nav-link" data-scroll-target="#numerical-diagnostics-and-likelihood-based-metrics"><span class="header-section-number">7</span> Numerical Diagnostics and Likelihood-Based Metrics</a>
+  <ul class="collapse">
+  <li><a href="#log-likelihood-and-related-criteria" id="toc-log-likelihood-and-related-criteria" class="nav-link" data-scroll-target="#log-likelihood-and-related-criteria"><span class="header-section-number">7.1</span> Log-Likelihood and Related Criteria</a></li>
+  <li><a href="#the-maximum-likelihood-estimate-as-the-mode" id="toc-the-maximum-likelihood-estimate-as-the-mode" class="nav-link" data-scroll-target="#the-maximum-likelihood-estimate-as-the-mode"><span class="header-section-number">7.2</span> The Maximum Likelihood Estimate as the Mode</a></li>
+  <li><a href="#parameter-precision-1" id="toc-parameter-precision-1" class="nav-link" data-scroll-target="#parameter-precision-1"><span class="header-section-number">7.3</span> Parameter Precision</a></li>
+  </ul></li>
+  <li><a href="#model-comparison-and-the-log-likelihood-ratio-test" id="toc-model-comparison-and-the-log-likelihood-ratio-test" class="nav-link" data-scroll-target="#model-comparison-and-the-log-likelihood-ratio-test"><span class="header-section-number">8</span> Model Comparison and the Log-Likelihood Ratio Test</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-the-comparison" id="toc-setting-up-the-comparison" class="nav-link" data-scroll-target="#setting-up-the-comparison"><span class="header-section-number">8.1</span> Setting Up the Comparison</a></li>
+  <li><a href="#the-log-likelihood-ratio-test-lrt" id="toc-the-log-likelihood-ratio-test-lrt" class="nav-link" data-scroll-target="#the-log-likelihood-ratio-test-lrt"><span class="header-section-number">8.2</span> The Log-Likelihood Ratio Test (LRT)</a></li>
+  <li><a href="#critical-values-and-decision-rule" id="toc-critical-values-and-decision-rule" class="nav-link" data-scroll-target="#critical-values-and-decision-rule"><span class="header-section-number">8.3</span> Critical Values and Decision Rule</a></li>
+  <li><a href="#when-to-explore-multiple-structural-models" id="toc-when-to-explore-multiple-structural-models" class="nav-link" data-scroll-target="#when-to-explore-multiple-structural-models"><span class="header-section-number">8.4</span> When to Explore Multiple Structural Models</a></li>
+  </ul></li>
+  <li><a href="#reading-assignment" id="toc-reading-assignment" class="nav-link" data-scroll-target="#reading-assignment"><span class="header-section-number">9</span> Reading Assignment</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Population PK Modeling: Base Model Construction, Model Diagnostics, and Likelihood-Based Model Comparison</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Lecture Notes</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="review-components-of-a-population-pk-model" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="review-components-of-a-population-pk-model"><span class="header-section-number">1</span> Review: Components of a Population PK Model</h2>
+<p>As established in previous sessions, a population PK model comprises three primary components:</p>
+<ol type="1">
+<li><strong>Structural component</strong> — the mathematical model describing the system (e.g., one-compartment, two-compartment, three-compartment, indirect response, or linear regression models)</li>
+<li><strong>Variability component</strong> — between-subject variability (BSV/IIV) and residual unexplained variability (RUV)</li>
+<li><strong>Covariate component</strong> — factors that explain inter-individual variability</li>
+</ol>
+<hr>
+</section>
+<section id="goals-of-population-pk-modeling" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="goals-of-population-pk-modeling"><span class="header-section-number">2</span> Goals of Population PK Modeling</h2>
+<p>The overarching goal of population PK modeling is to <strong>explain variability</strong> by identifying the factors that cause it. This process yields:</p>
+<ul>
+<li>Accurate predictions of the pharmacokinetic behavior under study</li>
+<li>Identification of physiologically or clinically meaningful covariates</li>
+<li>A model capable of simulating alternate or future scenarios</li>
+</ul>
+<section id="descriptive-vs.-predictive-models" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="descriptive-vs.-predictive-models"><span class="header-section-number">2.1</span> Descriptive vs.&nbsp;Predictive Models</h3>
+<p>Models can be broadly classified as either <strong>descriptive</strong> or <strong>predictive</strong>:</p>
+<ul>
+<li>A <strong>descriptive model</strong> fits the observed data; the analysis ends there.</li>
+<li>A <strong>predictive model</strong> is one with validated predictive performance — it is the basis for simulating future scenarios or informing clinical decisions.</li>
+</ul>
+<p>In practice, descriptive models serve primarily as a stepping stone toward building a model that is predictive in nature. The utility of any model is ultimately realized through its ability to forecast outcomes — analogous to a weather forecast, which is only useful if it supports decision-making.</p>
+<hr>
+</section>
+</section>
+<section id="gaining-confidence-in-a-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="gaining-confidence-in-a-model"><span class="header-section-number">3</span> Gaining Confidence in a Model</h2>
+<p>Before a model is used for simulation or decision-making, confidence in its structure and parameters must be established. The following criteria contribute to model confidence:</p>
+<section id="correlation-between-observed-and-predicted-values" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="correlation-between-observed-and-predicted-values"><span class="header-section-number">3.1</span> 1. Correlation Between Observed and Predicted Values</h3>
+<p>Observations and model predictions should be well correlated.</p>
+</section>
+<section id="physiological-and-clinical-plausibility" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="physiological-and-clinical-plausibility"><span class="header-section-number">3.2</span> 2. Physiological and Clinical Plausibility</h3>
+<p>Parameter estimates must be physiologically plausible. For example, a clearance estimate of 600 L/h would warrant serious scrutiny.</p>
+</section>
+<section id="parameter-precision" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="parameter-precision"><span class="header-section-number">3.3</span> 3. Parameter Precision</h3>
+<p>Parameters should be estimated with sufficient precision, expressed as standard error (SE), relative standard error (RSE), or confidence intervals. High RSE (e.g., 150%) undermines confidence in an otherwise plausible estimate.</p>
+</section>
+<section id="distributional-assumptions" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="distributional-assumptions"><span class="header-section-number">3.4</span> 4. Distributional Assumptions</h3>
+<p>Assumptions embedded in the model must be verified. If the random effects (ETAs) are assumed to be normally distributed but the empirical distribution is clearly non-normal, that assumption is violated and must be addressed. Similarly, if residuals (epsilons) are assumed to be normally distributed with mean zero and standard deviation σ, deviations from this assumption indicate a model misspecification.</p>
+</section>
+<section id="reproducibility" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="reproducibility"><span class="header-section-number">3.5</span> 5. Reproducibility</h3>
+<p>Model results should be reproducible. Reproducibility is a foundational requirement of scientific rigor.</p>
+</section>
+<section id="robustness" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="robustness"><span class="header-section-number">3.6</span> 6. Robustness</h3>
+<p>A model is considered robust if its parameter estimates are insensitive to the choice of initial estimates. For example, if different starting values for clearance (e.g., 5 vs.&nbsp;7.5 vs.&nbsp;55) all converge to the same final estimate, this reflects numerical stability. It is important to distinguish robustness (insensitivity to initial conditions) from assumption testing — these are conceptually distinct.</p>
+<p>The full set of metrics and plots used to evaluate these criteria is collectively referred to as <strong>model diagnostics</strong>.</p>
+<hr>
+</section>
+</section>
+<section id="the-base-model" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-base-model"><span class="header-section-number">4</span> The Base Model</h2>
+<p>Before incorporating covariates, a <strong>base model</strong> must be established. The base model combines:</p>
+<ul>
+<li>The <strong>structural model</strong></li>
+<li>The <strong>variability model</strong> (BSV and RUV)</li>
+</ul>
+<p>without any covariate terms. The base model determines how much of the variability in the data can be captured by the structural and statistical assumptions alone. Once a satisfactory base model is identified, covariates can be introduced to explain the remaining unexplained variability.</p>
+<p>In the modeling workflow, the base model corresponds to the stage where one-compartment and two-compartment models (or other structural forms) are compared before proceeding to covariate analysis.</p>
+<hr>
+</section>
+<section id="model-diagnostics" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="model-diagnostics"><span class="header-section-number">5</span> Model Diagnostics</h2>
+<p>Diagnostics are used to evaluate and compare models. They fall into two categories:</p>
+<ul>
+<li><strong>Numerical diagnostics</strong> — quantitative metrics (e.g., log-likelihood, AIC, BIC, RSE)</li>
+<li><strong>Graphical diagnostics</strong> — visual tools (e.g., observed vs.&nbsp;predicted plots, VPCs, residual plots)</li>
+</ul>
+<p>Both types are applied to each candidate model; models are then compared statistically, physiologically, and clinically — and in terms of fitness for the question being answered.</p>
+<section id="fit-for-purpose-models" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="fit-for-purpose-models"><span class="header-section-number">5.1</span> Fit-for-Purpose Models</h3>
+<p>In some modeling contexts, the primary goal is to support a specific decision (e.g., study design). In these cases, the model need not be fully mechanistic. Fit-for-purpose models may incorporate pragmatic assumptions where data are insufficient to fully characterize a given component, provided the model reliably supports the decision at hand.</p>
+<hr>
+</section>
+</section>
+<section id="information-flow-inside-a-pumas-model" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="information-flow-inside-a-pumas-model"><span class="header-section-number">6</span> Information Flow Inside a Pumas Model</h2>
+<p>The following describes the complete mathematical and computational workflow for a one-compartment IV bolus model in Pumas.</p>
+<section id="structural-model" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="structural-model"><span class="header-section-number">6.1</span> Structural Model</h3>
+<p>The system is described by a single differential equation:</p>
+<p><span class="math display">\[\text{central}' = -\frac{CL}{V_C} \cdot \text{central}\]</span></p>
+<p>This is the <strong>dynamics block</strong> in Pumas.</p>
+</section>
+<section id="population-and-individual-parameters-pre-block" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="population-and-individual-parameters-pre-block"><span class="header-section-number">6.2</span> Population and Individual Parameters (pre block)</h3>
+<p>The individual clearance and volume are assumed to be log-normally distributed:</p>
+<p><span class="math display">\[CL_i = \theta_{CL} \cdot e^{\eta_{CL,i}}\]</span> <span class="math display">\[V_{C,i} = \theta_{V_C} \cdot e^{\eta_{V_C,i}}\]</span></p>
+<p>where: - <span class="math inline">\(\theta_{CL}\)</span> and <span class="math inline">\(\theta_{V_C}\)</span> are the population (typical) values of clearance and volume - <span class="math inline">\(\eta_{CL,i}\)</span> and <span class="math inline">\(\eta_{V_C,i}\)</span> are individual random effects, assumed to follow:</p>
+<p><span class="math display">\[\eta_{CL} \sim \mathcal{N}(0, \omega_{CL}^2), \quad \eta_{V_C} \sim \mathcal{N}(0, \omega_{V_C}^2)\]</span></p>
+<p>These equations belong to the <strong>pre block</strong> in Pumas. The pre block must be specified before the dynamics block, as the individual parameters it computes are required inputs to the differential equation.</p>
+</section>
+<section id="parameters-to-optimize-param-block" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="parameters-to-optimize-param-block"><span class="header-section-number">6.3</span> Parameters to Optimize (param block)</h3>
+<p>The unknown parameters to be optimized are:</p>
+<p><span class="math display">\[\theta_{CL}, \quad \theta_{V_C}, \quad \omega_{CL}, \quad \omega_{V_C}\]</span></p>
+<p>These are declared in the <strong>param block</strong>, where each parameter is given a lower bound, upper bound, and initial estimate. Any parameter declared in the param block is submitted to the optimizer.</p>
+</section>
+<section id="random-effects-random-block" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="random-effects-random-block"><span class="header-section-number">6.4</span> Random Effects (random block)</h3>
+<p>The distributional assumptions for the random effects <span class="math inline">\(\eta_{CL}\)</span> and <span class="math inline">\(\eta_{V_C}\)</span> are declared explicitly in the <strong>random block</strong>.</p>
+</section>
+<section id="from-amount-to-concentration-derived-block" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="from-amount-to-concentration-derived-block"><span class="header-section-number">6.5</span> From Amount to Concentration (derived block)</h3>
+<p>The differential equation yields <code>central</code>, the <strong>amount</strong> of drug over time. Because the observed data are concentrations, the solution must be scaled:</p>
+<p><span class="math display">\[CP_{ij} = \frac{\text{central}_{ij}}{V_{C,i}}\]</span></p>
+<p>In Julia/Pumas, since <code>central</code> is a vector (over time points) and <span class="math inline">\(V_C\)</span> is a scalar (per individual), broadcasting is used:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>CP <span class="op">=</span> @. central <span class="op">/</span> VC</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This predicted concentration <span class="math inline">\(CP_{ij}\)</span> is computed in the <strong>derived block</strong>.</p>
+</section>
+<section id="residual-error-model" class="level3" data-number="6.6">
+<h3 data-number="6.6" class="anchored" data-anchor-id="residual-error-model"><span class="header-section-number">6.6</span> Residual Error Model</h3>
+<p>The observed dependent variable <span class="math inline">\(DV_{ij}\)</span> is modeled as:</p>
+<p><span class="math display">\[DV_{ij} \sim \mathcal{N}(CP_{ij},\ \sigma^2) \quad \text{(additive error)}\]</span></p>
+<p>or</p>
+<p><span class="math display">\[DV_{ij} \sim \mathcal{N}(CP_{ij},\ (CP_{ij} \cdot \sigma)^2) \quad \text{(proportional error)}\]</span></p>
+<p>The residual <span class="math inline">\(DV_{ij} - CP_{ij}\)</span> is assumed to have mean zero and standard deviation σ. The sigma (additive, proportional, or combined) is also declared in the param block and optimized.</p>
+</section>
+<section id="summary-block-sequence-in-pumas" class="level3" data-number="6.7">
+<h3 data-number="6.7" class="anchored" data-anchor-id="summary-block-sequence-in-pumas"><span class="header-section-number">6.7</span> Summary: Block Sequence in Pumas</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Order</th>
+<th>Block</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><code>@param</code></td>
+<td>Declare parameters with bounds and initial estimates</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><code>@random</code></td>
+<td>Declare distributional assumptions for random effects</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td><code>@pre</code></td>
+<td>Compute individual parameters from population values and ETAs</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><code>@dynamics</code></td>
+<td>Define the differential equation(s)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>@derived</code></td>
+<td>Scale solution to observed metric; specify residual error model</td>
+</tr>
+</tbody>
+</table>
+<p>At every iteration of the optimizer, this full chain is executed: parameters are updated → individual values are computed → the differential equation is solved → concentrations are predicted → residuals are evaluated → likelihood is computed. This continues until the optimizer converges to the maximum likelihood estimate.</p>
+<hr>
+</section>
+</section>
+<section id="numerical-diagnostics-and-likelihood-based-metrics" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="numerical-diagnostics-and-likelihood-based-metrics"><span class="header-section-number">7</span> Numerical Diagnostics and Likelihood-Based Metrics</h2>
+<section id="log-likelihood-and-related-criteria" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="log-likelihood-and-related-criteria"><span class="header-section-number">7.1</span> Log-Likelihood and Related Criteria</h3>
+<p>The optimization process yields a set of <strong>maximum likelihood parameter estimates</strong> along with a log-likelihood value. Associated metrics include:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Direction</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Log-likelihood (LL)</td>
+<td>Maximize</td>
+<td>Higher is better</td>
+</tr>
+<tr class="even">
+<td>−2 Log-likelihood (−2LL)</td>
+<td>Minimize</td>
+<td>Lower is better</td>
+</tr>
+<tr class="odd">
+<td>AIC (Akaike Information Criterion)</td>
+<td>Minimize</td>
+<td>Lower is better</td>
+</tr>
+<tr class="even">
+<td>BIC (Bayesian Information Criterion)</td>
+<td>Minimize</td>
+<td>Lower is better</td>
+</tr>
+</tbody>
+</table>
+<p>These metrics are most meaningful in <strong>comparison</strong> between models, not in isolation. A standalone AIC of 34, for instance, carries no interpretive value without a reference model.</p>
+</section>
+<section id="the-maximum-likelihood-estimate-as-the-mode" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="the-maximum-likelihood-estimate-as-the-mode"><span class="header-section-number">7.2</span> The Maximum Likelihood Estimate as the Mode</h3>
+<p>From a statistical standpoint, the maximum likelihood estimate of a parameter corresponds to the <strong>mode</strong> of the posterior distribution — not the mean or median. This distinction is relevant when reading the modeling literature, where this terminology appears frequently.</p>
+</section>
+<section id="parameter-precision-1" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="parameter-precision-1"><span class="header-section-number">7.3</span> Parameter Precision</h3>
+<p>Each maximum likelihood estimate is accompanied by a confidence interval (derived from the standard error or RSE). A parameter estimate is only useful if it is sufficiently precise. High RSE values signal poor identifiability and reduce confidence in the model.</p>
+<hr>
+</section>
+</section>
+<section id="model-comparison-and-the-log-likelihood-ratio-test" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="model-comparison-and-the-log-likelihood-ratio-test"><span class="header-section-number">8</span> Model Comparison and the Log-Likelihood Ratio Test</h2>
+<section id="setting-up-the-comparison" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="setting-up-the-comparison"><span class="header-section-number">8.1</span> Setting Up the Comparison</h3>
+<p>Consider comparing a one-compartment model (Model 1) and a two-compartment model (Model 2):</p>
+<p><strong>One-compartment model parameters:</strong> <span class="math display">\[\theta_{CL},\ \theta_{V_C},\ \omega_{CL},\ \omega_{V_C},\ \sigma \quad (5\ \text{parameters})\]</span></p>
+<p><strong>Two-compartment model parameters:</strong> <span class="math display">\[\theta_{CL},\ \theta_{V_C},\ \theta_{V_P},\ \theta_Q,\ \omega_{CL},\ \omega_{V_C},\ \omega_{V_P},\ \omega_Q,\ \sigma \quad (9\ \text{parameters})\]</span></p>
+<p>The two-compartment model has <strong>4 additional parameters</strong> (degrees of freedom, <span class="math inline">\(\Delta df = 4\)</span>).</p>
+</section>
+<section id="the-log-likelihood-ratio-test-lrt" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="the-log-likelihood-ratio-test-lrt"><span class="header-section-number">8.2</span> The Log-Likelihood Ratio Test (LRT)</h3>
+<p>The <strong>log-likelihood ratio test</strong> (LRT, implemented in Pumas as <code>lrtest()</code>) compares two nested models. The test statistic is:</p>
+<p><span class="math display">\[\Delta \text{LL} = \text{LL}_{\text{complex}} - \text{LL}_{\text{simple}}\]</span></p>
+<p>Under the null hypothesis, this difference follows a <strong>chi-squared distribution</strong> (<span class="math inline">\(\chi^2\)</span>) with degrees of freedom equal to the difference in the number of parameters between the two models.</p>
+</section>
+<section id="critical-values-and-decision-rule" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="critical-values-and-decision-rule"><span class="header-section-number">8.3</span> Critical Values and Decision Rule</h3>
+<p>For a significance level of <span class="math inline">\(\alpha = 0.05\)</span> and <strong>one degree of freedom</strong>, the expected <span class="math inline">\(\Delta\)</span>LL threshold is <strong>3.84</strong> (the 95th percentile of the <span class="math inline">\(\chi^2_1\)</span> distribution). For multiple degrees of freedom, the threshold scales accordingly:</p>
+<p><span class="math display">\[\Delta \text{LL}_{\text{critical}} = \Delta df \times 3.84\]</span></p>
+<p><strong>Example:</strong> Comparing a two-compartment model (LL = 68) against a one-compartment model (LL = 55):</p>
+<ul>
+<li><span class="math inline">\(\Delta \text{LL} = 68 - 55 = 13\)</span></li>
+<li><span class="math inline">\(\Delta df = 9 - 5 = 4\)</span></li>
+<li>Critical threshold: <span class="math inline">\(4 \times 3.84 = 15.36\)</span></li>
+<li>Since <span class="math inline">\(13 &lt; 15.36\)</span>, the test <strong>does not pass</strong> at <span class="math inline">\(\alpha = 0.05\)</span></li>
+</ul>
+<p>Despite the two-compartment model yielding a higher log-likelihood, the improvement is not statistically significant after accounting for the additional model complexity. The one-compartment model is therefore preferred on the basis of this test.</p>
+<p><strong>Important:</strong> Even when the LRT does not favor the more complex model, graphical diagnostics (e.g., goodness-of-fit plots, VPCs) may still reveal that the two-compartment model provides a better description of the data. Numerical and graphical diagnostics are complementary and should both be considered.</p>
+</section>
+<section id="when-to-explore-multiple-structural-models" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="when-to-explore-multiple-structural-models"><span class="header-section-number">8.4</span> When to Explore Multiple Structural Models</h3>
+<p>The extent of model exploration depends on the context:</p>
+<ul>
+<li><strong>New compound / first analysis:</strong> Explore the full structural space (one-compartment, two-compartment, linear vs.&nbsp;Michaelis-Menten elimination, etc.) to identify the most parsimonious model.</li>
+<li><strong>Prior literature or study history available:</strong> Structural choices are guided by precedent; exploration focuses on the variability model, which is sensitive to the design and sample size of the current dataset.</li>
+<li><strong>Late-phase trials (e.g., Phase 3):</strong> Structural forms are largely established from earlier phases; the modeling effort shifts to refining and confirming the variability and covariate structure.</li>
+</ul>
+<p>The guiding principle is parsimony — the simplest model that adequately describes the data is preferred.</p>
+<hr>
+</section>
+</section>
+<section id="reading-assignment" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="reading-assignment"><span class="header-section-number">9</span> Reading Assignment</h2>
+<p>Before the next session, review the following:</p>
+<ol type="1">
+<li><strong>Chi-squared (<span class="math inline">\(\chi^2\)</span>) distribution</strong> — understand its relationship to the normal distribution (a <span class="math inline">\(\chi^2\)</span> random variable is the square of a standard normal random variable), its shape, and how it is used as a reference distribution for test statistics.</li>
+<li><strong>Log-likelihood ratio test</strong> — understand how <span class="math inline">\(\Delta\)</span>LL is computed, how it relates to the <span class="math inline">\(\chi^2\)</span> distribution, and how to apply it to compare nested models.</li>
+<li><strong>Test statistics in general</strong> — revisit the concept of test statistics from normal distributions, t-tests, and ANOVA to reinforce the principle of how p-values and significance thresholds are derived.</li>
+</ol>
+<p>The value 3.84 — the threshold for one degree of freedom at <span class="math inline">\(\alpha = 0.05\)</span> — arises directly from the <span class="math inline">\(\chi^2_1\)</span> distribution. Understanding where this number comes from is essential for independently applying and interpreting likelihood-based model comparison.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Population PK Modeling: Base Model Construction, Model Diagnostics, and Likelihood-Based Model Comparison"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Lecture Notes"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Review: Components of a Population PK Model</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>As established in previous sessions, a population PK model comprises three primary components:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Structural component** — the mathematical model describing the system (e.g., one-compartment, two-compartment, three-compartment, indirect response, or linear regression models)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Variability component** — between-subject variability (BSV/IIV) and residual unexplained variability (RUV)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Covariate component** — factors that explain inter-individual variability</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Goals of Population PK Modeling</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>The overarching goal of population PK modeling is to **explain variability** by identifying the factors that cause it. This process yields:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Accurate predictions of the pharmacokinetic behavior under study</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Identification of physiologically or clinically meaningful covariates</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A model capable of simulating alternate or future scenarios</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="fu">### Descriptive vs. Predictive Models</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>Models can be broadly classified as either **descriptive** or **predictive**:</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A **descriptive model** fits the observed data; the analysis ends there.</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A **predictive model** is one with validated predictive performance — it is the basis for simulating future scenarios or informing clinical decisions.</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>In practice, descriptive models serve primarily as a stepping stone toward building a model that is predictive in nature. The utility of any model is ultimately realized through its ability to forecast outcomes — analogous to a weather forecast, which is only useful if it supports decision-making.</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gaining Confidence in a Model</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>Before a model is used for simulation or decision-making, confidence in its structure and parameters must be established. The following criteria contribute to model confidence:</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Correlation Between Observed and Predicted Values</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>Observations and model predictions should be well correlated.</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Physiological and Clinical Plausibility</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>Parameter estimates must be physiologically plausible. For example, a clearance estimate of 600 L/h would warrant serious scrutiny.</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Parameter Precision</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>Parameters should be estimated with sufficient precision, expressed as standard error (SE), relative standard error (RSE), or confidence intervals. High RSE (e.g., 150%) undermines confidence in an otherwise plausible estimate.</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. Distributional Assumptions</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>Assumptions embedded in the model must be verified. If the random effects (ETAs) are assumed to be normally distributed but the empirical distribution is clearly non-normal, that assumption is violated and must be addressed. Similarly, if residuals (epsilons) are assumed to be normally distributed with mean zero and standard deviation σ, deviations from this assumption indicate a model misspecification.</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="fu">### 5. Reproducibility</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>Model results should be reproducible. Reproducibility is a foundational requirement of scientific rigor.</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6. Robustness</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>A model is considered robust if its parameter estimates are insensitive to the choice of initial estimates. For example, if different starting values for clearance (e.g., 5 vs. 7.5 vs. 55) all converge to the same final estimate, this reflects numerical stability. It is important to distinguish robustness (insensitivity to initial conditions) from assumption testing — these are conceptually distinct.</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>The full set of metrics and plots used to evaluate these criteria is collectively referred to as **model diagnostics**.</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Base Model</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>Before incorporating covariates, a **base model** must be established. The base model combines:</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The **structural model**</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The **variability model** (BSV and RUV)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>without any covariate terms. The base model determines how much of the variability in the data can be captured by the structural and statistical assumptions alone. Once a satisfactory base model is identified, covariates can be introduced to explain the remaining unexplained variability.</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>In the modeling workflow, the base model corresponds to the stage where one-compartment and two-compartment models (or other structural forms) are compared before proceeding to covariate analysis.</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Diagnostics</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>Diagnostics are used to evaluate and compare models. They fall into two categories:</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Numerical diagnostics** — quantitative metrics (e.g., log-likelihood, AIC, BIC, RSE)</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Graphical diagnostics** — visual tools (e.g., observed vs. predicted plots, VPCs, residual plots)</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>Both types are applied to each candidate model; models are then compared statistically, physiologically, and clinically — and in terms of fitness for the question being answered.</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fit-for-Purpose Models</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>In some modeling contexts, the primary goal is to support a specific decision (e.g., study design). In these cases, the model need not be fully mechanistic. Fit-for-purpose models may incorporate pragmatic assumptions where data are insufficient to fully characterize a given component, provided the model reliably supports the decision at hand.</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="fu">## Information Flow Inside a Pumas Model</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>The following describes the complete mathematical and computational workflow for a one-compartment IV bolus model in Pumas.</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Structural Model</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>The system is described by a single differential equation:</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>$$\text{central}' = -\frac{CL}{V_C} \cdot \text{central}$$</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>This is the **dynamics block** in Pumas.</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="fu">### Population and Individual Parameters (pre block)</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>The individual clearance and volume are assumed to be log-normally distributed:</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>$$CL_i = \theta_{CL} \cdot e^{\eta_{CL,i}}$$</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>$$V_{C,i} = \theta_{V_C} \cdot e^{\eta_{V_C,i}}$$</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>where:</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\theta_{CL}$ and $\theta_{V_C}$ are the population (typical) values of clearance and volume</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\eta_{CL,i}$ and $\eta_{V_C,i}$ are individual random effects, assumed to follow:</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>$$\eta_{CL} \sim \mathcal{N}(0, \omega_{CL}^2), \quad \eta_{V_C} \sim \mathcal{N}(0, \omega_{V_C}^2)$$</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>These equations belong to the **pre block** in Pumas. The pre block must be specified before the dynamics block, as the individual parameters it computes are required inputs to the differential equation.</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a><span class="fu">### Parameters to Optimize (param block)</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>The unknown parameters to be optimized are:</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>$$\theta_{CL}, \quad \theta_{V_C}, \quad \omega_{CL}, \quad \omega_{V_C}$$</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>These are declared in the **param block**, where each parameter is given a lower bound, upper bound, and initial estimate. Any parameter declared in the param block is submitted to the optimizer.</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Random Effects (random block)</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>The distributional assumptions for the random effects $\eta_{CL}$ and $\eta_{V_C}$ are declared explicitly in the **random block**.</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="fu">### From Amount to Concentration (derived block)</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>The differential equation yields <span class="in">`central`</span>, the **amount** of drug over time. Because the observed data are concentrations, the solution must be scaled:</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>$$CP_{ij} = \frac{\text{central}_{ij}}{V_{C,i}}$$</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>In Julia/Pumas, since <span class="in">`central`</span> is a vector (over time points) and $V_C$ is a scalar (per individual), broadcasting is used:</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a><span class="in">```julia</span></span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>CP <span class="op">=</span> @. central <span class="op">/</span> VC</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>This predicted concentration $CP_{ij}$ is computed in the **derived block**.</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a><span class="fu">### Residual Error Model</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>The observed dependent variable $DV_{ij}$ is modeled as:</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>$$DV_{ij} \sim \mathcal{N}(CP_{ij},\ \sigma^2) \quad \text{(additive error)}$$</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>or</span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>$$DV_{ij} \sim \mathcal{N}(CP_{ij},\ (CP_{ij} \cdot \sigma)^2) \quad \text{(proportional error)}$$</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>The residual $DV_{ij} - CP_{ij}$ is assumed to have mean zero and standard deviation σ. The sigma (additive, proportional, or combined) is also declared in the param block and optimized.</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Summary: Block Sequence in Pumas</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Order <span class="pp">|</span> Block <span class="pp">|</span> Purpose <span class="pp">|</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a><span class="pp">|-------|-------|---------|</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> <span class="in">`@param`</span> <span class="pp">|</span> Declare parameters with bounds and initial estimates <span class="pp">|</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> <span class="in">`@random`</span> <span class="pp">|</span> Declare distributional assumptions for random effects <span class="pp">|</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> <span class="in">`@pre`</span> <span class="pp">|</span> Compute individual parameters from population values and ETAs <span class="pp">|</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 4 <span class="pp">|</span> <span class="in">`@dynamics`</span> <span class="pp">|</span> Define the differential equation(s) <span class="pp">|</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 5 <span class="pp">|</span> <span class="in">`@derived`</span> <span class="pp">|</span> Scale solution to observed metric; specify residual error model <span class="pp">|</span></span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>At every iteration of the optimizer, this full chain is executed: parameters are updated → individual values are computed → the differential equation is solved → concentrations are predicted → residuals are evaluated → likelihood is computed. This continues until the optimizer converges to the maximum likelihood estimate.</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a><span class="fu">## Numerical Diagnostics and Likelihood-Based Metrics</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a><span class="fu">### Log-Likelihood and Related Criteria</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>The optimization process yields a set of **maximum likelihood parameter estimates** along with a log-likelihood value. Associated metrics include:</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Direction <span class="pp">|</span> Interpretation <span class="pp">|</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------|-----------|----------------|</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Log-likelihood (LL) <span class="pp">|</span> Maximize <span class="pp">|</span> Higher is better <span class="pp">|</span></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> −2 Log-likelihood (−2LL) <span class="pp">|</span> Minimize <span class="pp">|</span> Lower is better <span class="pp">|</span></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> AIC (Akaike Information Criterion) <span class="pp">|</span> Minimize <span class="pp">|</span> Lower is better <span class="pp">|</span></span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> BIC (Bayesian Information Criterion) <span class="pp">|</span> Minimize <span class="pp">|</span> Lower is better <span class="pp">|</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>These metrics are most meaningful in **comparison** between models, not in isolation. A standalone AIC of 34, for instance, carries no interpretive value without a reference model.</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Maximum Likelihood Estimate as the Mode</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>From a statistical standpoint, the maximum likelihood estimate of a parameter corresponds to the **mode** of the posterior distribution — not the mean or median. This distinction is relevant when reading the modeling literature, where this terminology appears frequently.</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a><span class="fu">### Parameter Precision</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>Each maximum likelihood estimate is accompanied by a confidence interval (derived from the standard error or RSE). A parameter estimate is only useful if it is sufficiently precise. High RSE values signal poor identifiability and reduce confidence in the model.</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Comparison and the Log-Likelihood Ratio Test</span></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a><span class="fu">### Setting Up the Comparison</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>Consider comparing a one-compartment model (Model 1) and a two-compartment model (Model 2):</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>**One-compartment model parameters:**</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>$$\theta_{CL},\ \theta_{V_C},\ \omega_{CL},\ \omega_{V_C},\ \sigma \quad (5\ \text{parameters})$$</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>**Two-compartment model parameters:**</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>$$\theta_{CL},\ \theta_{V_C},\ \theta_{V_P},\ \theta_Q,\ \omega_{CL},\ \omega_{V_C},\ \omega_{V_P},\ \omega_Q,\ \sigma \quad (9\ \text{parameters})$$</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>The two-compartment model has **4 additional parameters** (degrees of freedom, $\Delta df = 4$).</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Log-Likelihood Ratio Test (LRT)</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>The **log-likelihood ratio test** (LRT, implemented in Pumas as <span class="in">`lrtest()`</span>) compares two nested models. The test statistic is:</span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>$$\Delta \text{LL} = \text{LL}_{\text{complex}} - \text{LL}_{\text{simple}}$$</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>Under the null hypothesis, this difference follows a **chi-squared distribution** ($\chi^2$) with degrees of freedom equal to the difference in the number of parameters between the two models.</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a><span class="fu">### Critical Values and Decision Rule</span></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>For a significance level of $\alpha = 0.05$ and **one degree of freedom**, the expected $\Delta$LL threshold is **3.84** (the 95th percentile of the $\chi^2_1$ distribution). For multiple degrees of freedom, the threshold scales accordingly:</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>$$\Delta \text{LL}_{\text{critical}} = \Delta df \times 3.84$$</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>**Example:** Comparing a two-compartment model (LL = 68) against a one-compartment model (LL = 55):</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\Delta \text{LL} = 68 - 55 = 13$</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\Delta df = 9 - 5 = 4$</span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Critical threshold: $4 \times 3.84 = 15.36$</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Since $13 &lt; 15.36$, the test **does not pass** at $\alpha = 0.05$</span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>Despite the two-compartment model yielding a higher log-likelihood, the improvement is not statistically significant after accounting for the additional model complexity. The one-compartment model is therefore preferred on the basis of this test.</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>**Important:** Even when the LRT does not favor the more complex model, graphical diagnostics (e.g., goodness-of-fit plots, VPCs) may still reveal that the two-compartment model provides a better description of the data. Numerical and graphical diagnostics are complementary and should both be considered.</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a><span class="fu">### When to Explore Multiple Structural Models</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>The extent of model exploration depends on the context:</span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**New compound / first analysis:** Explore the full structural space (one-compartment, two-compartment, linear vs. Michaelis-Menten elimination, etc.) to identify the most parsimonious model.</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Prior literature or study history available:** Structural choices are guided by precedent; exploration focuses on the variability model, which is sensitive to the design and sample size of the current dataset.</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Late-phase trials (e.g., Phase 3):** Structural forms are largely established from earlier phases; the modeling effort shifts to refining and confirming the variability and covariate structure.</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>The guiding principle is parsimony — the simplest model that adequately describes the data is preferred.</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading Assignment</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>Before the next session, review the following:</span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Chi-squared ($\chi^2$) distribution** — understand its relationship to the normal distribution (a $\chi^2$ random variable is the square of a standard normal random variable), its shape, and how it is used as a reference distribution for test statistics.</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Log-likelihood ratio test** — understand how $\Delta$LL is computed, how it relates to the $\chi^2$ distribution, and how to apply it to compare nested models.</span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Test statistics in general** — revisit the concept of test statistics from normal distributions, t-tests, and ANOVA to reinforce the principle of how p-values and significance thresholds are derived.</span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>The value 3.84 — the threshold for one degree of freedom at $\alpha = 0.05$ — arises directly from the $\chi^2_1$ distribution. Understanding where this number comes from is essential for independently applying and interpreting likelihood-based model comparison.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Week 2: Pharmacokinetics — One-Compartment IV Bolus Model – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Week 2: Pharmacokinetics — One-Compartment IV Bolus Model</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#systemic-exposure" id="toc-systemic-exposure" class="nav-link" data-scroll-target="#systemic-exposure"><span class="header-section-number">2</span> 1. Systemic Exposure</a></li>
+  <li><a href="#measurement-matrices" id="toc-measurement-matrices" class="nav-link" data-scroll-target="#measurement-matrices"><span class="header-section-number">3</span> 2. Measurement Matrices</a>
+  <ul class="collapse">
+  <li><a href="#invasive-methods" id="toc-invasive-methods" class="nav-link" data-scroll-target="#invasive-methods"><span class="header-section-number">3.1</span> Invasive Methods</a></li>
+  <li><a href="#non-invasive-methods" id="toc-non-invasive-methods" class="nav-link" data-scroll-target="#non-invasive-methods"><span class="header-section-number">3.2</span> Non-Invasive Methods</a></li>
+  <li><a href="#biological-matrices-defined" id="toc-biological-matrices-defined" class="nav-link" data-scroll-target="#biological-matrices-defined"><span class="header-section-number">3.3</span> Biological Matrices Defined</a></li>
+  <li><a href="#surrogate-concentrations-and-the-site-of-action" id="toc-surrogate-concentrations-and-the-site-of-action" class="nav-link" data-scroll-target="#surrogate-concentrations-and-the-site-of-action"><span class="header-section-number">3.4</span> Surrogate Concentrations and the Site of Action</a></li>
+  </ul></li>
+  <li><a href="#free-drug-hypothesis" id="toc-free-drug-hypothesis" class="nav-link" data-scroll-target="#free-drug-hypothesis"><span class="header-section-number">4</span> 3. Free Drug Hypothesis</a>
+  <ul class="collapse">
+  <li><a href="#bound-vs.-unbound-drug" id="toc-bound-vs.-unbound-drug" class="nav-link" data-scroll-target="#bound-vs.-unbound-drug"><span class="header-section-number">4.1</span> Bound vs.&nbsp;Unbound Drug</a></li>
+  <li><a href="#two-principles-of-the-free-drug-hypothesis" id="toc-two-principles-of-the-free-drug-hypothesis" class="nav-link" data-scroll-target="#two-principles-of-the-free-drug-hypothesis"><span class="header-section-number">4.2</span> Two Principles of the Free Drug Hypothesis</a></li>
+  <li><a href="#total-vs.-unbound-concentration" id="toc-total-vs.-unbound-concentration" class="nav-link" data-scroll-target="#total-vs.-unbound-concentration"><span class="header-section-number">4.3</span> Total vs.&nbsp;Unbound Concentration</a></li>
+  </ul></li>
+  <li><a href="#zero-order-vs.-first-order-processes" id="toc-zero-order-vs.-first-order-processes" class="nav-link" data-scroll-target="#zero-order-vs.-first-order-processes"><span class="header-section-number">5</span> 4. Zero-Order vs.&nbsp;First-Order Processes</a>
+  <ul class="collapse">
+  <li><a href="#zero-order-kinetics" id="toc-zero-order-kinetics" class="nav-link" data-scroll-target="#zero-order-kinetics"><span class="header-section-number">5.1</span> Zero-Order Kinetics</a></li>
+  <li><a href="#first-order-kinetics" id="toc-first-order-kinetics" class="nav-link" data-scroll-target="#first-order-kinetics"><span class="header-section-number">5.2</span> First-Order Kinetics</a></li>
+  </ul></li>
+  <li><a href="#one-compartment-iv-bolus-model" id="toc-one-compartment-iv-bolus-model" class="nav-link" data-scroll-target="#one-compartment-iv-bolus-model"><span class="header-section-number">6</span> 5. One-Compartment IV Bolus Model</a>
+  <ul class="collapse">
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions"><span class="header-section-number">6.1</span> Assumptions</a></li>
+  <li><a href="#differential-equation" id="toc-differential-equation" class="nav-link" data-scroll-target="#differential-equation"><span class="header-section-number">6.2</span> Differential Equation</a></li>
+  <li><a href="#integrated-closed-form-solution" id="toc-integrated-closed-form-solution" class="nav-link" data-scroll-target="#integrated-closed-form-solution"><span class="header-section-number">6.3</span> Integrated (Closed-Form) Solution</a></li>
+  </ul></li>
+  <li><a href="#volume-of-distribution" id="toc-volume-of-distribution" class="nav-link" data-scroll-target="#volume-of-distribution"><span class="header-section-number">7</span> 6. Volume of Distribution</a>
+  <ul class="collapse">
+  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition"><span class="header-section-number">7.1</span> Definition</a></li>
+  <li><a href="#illustrative-example-two-cylinders" id="toc-illustrative-example-two-cylinders" class="nav-link" data-scroll-target="#illustrative-example-two-cylinders"><span class="header-section-number">7.2</span> Illustrative Example: Two Cylinders</a></li>
+  </ul></li>
+  <li><a href="#clearance" id="toc-clearance" class="nav-link" data-scroll-target="#clearance"><span class="header-section-number">8</span> 7. Clearance</a>
+  <ul class="collapse">
+  <li><a href="#introduction-via-the-differential-equation" id="toc-introduction-via-the-differential-equation" class="nav-link" data-scroll-target="#introduction-via-the-differential-equation"><span class="header-section-number">8.1</span> Introduction via the Differential Equation</a></li>
+  <li><a href="#units-and-interpretation" id="toc-units-and-interpretation" class="nav-link" data-scroll-target="#units-and-interpretation"><span class="header-section-number">8.2</span> Units and Interpretation</a></li>
+  <li><a href="#rate-of-elimination" id="toc-rate-of-elimination" class="nav-link" data-scroll-target="#rate-of-elimination"><span class="header-section-number">8.3</span> Rate of Elimination</a></li>
+  <li><a href="#distinguishing-rate-of-elimination-from-fractional-elimination-rate-constant" id="toc-distinguishing-rate-of-elimination-from-fractional-elimination-rate-constant" class="nav-link" data-scroll-target="#distinguishing-rate-of-elimination-from-fractional-elimination-rate-constant"><span class="header-section-number">8.4</span> Distinguishing Rate of Elimination from Fractional Elimination Rate Constant</a></li>
+  </ul></li>
+  <li><a href="#half-life" id="toc-half-life" class="nav-link" data-scroll-target="#half-life"><span class="header-section-number">9</span> 8. Half-Life</a>
+  <ul class="collapse">
+  <li><a href="#definition-1" id="toc-definition-1" class="nav-link" data-scroll-target="#definition-1"><span class="header-section-number">9.1</span> Definition</a></li>
+  <li><a href="#derivation" id="toc-derivation" class="nav-link" data-scroll-target="#derivation"><span class="header-section-number">9.2</span> Derivation</a></li>
+  </ul></li>
+  <li><a href="#area-under-the-curve-auc" id="toc-area-under-the-curve-auc" class="nav-link" data-scroll-target="#area-under-the-curve-auc"><span class="header-section-number">10</span> 9. Area Under the Curve (AUC)</a>
+  <ul class="collapse">
+  <li><a href="#definition-2" id="toc-definition-2" class="nav-link" data-scroll-target="#definition-2"><span class="header-section-number">10.1</span> Definition</a></li>
+  <li><a href="#relationship-to-clearance" id="toc-relationship-to-clearance" class="nav-link" data-scroll-target="#relationship-to-clearance"><span class="header-section-number">10.2</span> Relationship to Clearance</a></li>
+  <li><a href="#numerical-estimation-trapezoidal-rule" id="toc-numerical-estimation-trapezoidal-rule" class="nav-link" data-scroll-target="#numerical-estimation-trapezoidal-rule"><span class="header-section-number">10.3</span> Numerical Estimation: Trapezoidal Rule</a></li>
+  </ul></li>
+  <li><a href="#volume-of-distribution-and-the-free-drug-hypothesis" id="toc-volume-of-distribution-and-the-free-drug-hypothesis" class="nav-link" data-scroll-target="#volume-of-distribution-and-the-free-drug-hypothesis"><span class="header-section-number">11</span> 10. Volume of Distribution and the Free Drug Hypothesis</a></li>
+  <li><a href="#summary-iv-bolus-one-compartment-model" id="toc-summary-iv-bolus-one-compartment-model" class="nav-link" data-scroll-target="#summary-iv-bolus-one-compartment-model"><span class="header-section-number">12</span> 11. Summary: IV Bolus One-Compartment Model</a>
+  <ul class="collapse">
+  <li><a href="#the-fundamental-equation" id="toc-the-fundamental-equation" class="nav-link" data-scroll-target="#the-fundamental-equation"><span class="header-section-number">12.1</span> The Fundamental Equation</a></li>
+  </ul></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">13</span> 12. Looking Ahead</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Week 2: Pharmacokinetics — One-Compartment IV Bolus Model</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Lecture Notes</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
+<p>This session covers the foundational concepts of pharmacokinetics (PK), beginning from first principles. The primary focus is the one-compartment model under intravenous (IV) bolus administration, which serves as the foundation for understanding the core PK parameters: clearance and volume of distribution.</p>
+<hr>
+</section>
+<section id="systemic-exposure" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="systemic-exposure"><span class="header-section-number">2</span> 1. Systemic Exposure</h2>
+<p>The term <strong>systemic</strong> refers to something present throughout the body. In pharmacokinetics, <strong>systemic exposure</strong> refers to the internal exposure of the body to a drug. It has two defining attributes:</p>
+<ul>
+<li><strong>Magnitude</strong> — characterized by metrics such as maximum concentration (C_max)</li>
+<li><strong>Duration</strong> — characterized by metrics such as half-life or area under the curve (AUC)</li>
+</ul>
+<hr>
+</section>
+<section id="measurement-matrices" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="measurement-matrices"><span class="header-section-number">3</span> 2. Measurement Matrices</h2>
+<p>Drug concentrations can be measured using both invasive and non-invasive methods.</p>
+<section id="invasive-methods" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="invasive-methods"><span class="header-section-number">3.1</span> Invasive Methods</h3>
+<p>The most common invasive approach is the collection of blood for plasma concentration measurement.</p>
+</section>
+<section id="non-invasive-methods" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="non-invasive-methods"><span class="header-section-number">3.2</span> Non-Invasive Methods</h3>
+<p>Examples include measurement of drug concentrations in urine, breath, saliva, and milk.</p>
+</section>
+<section id="biological-matrices-defined" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="biological-matrices-defined"><span class="header-section-number">3.3</span> Biological Matrices Defined</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Matrix</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Whole Blood</strong></td>
+<td>All components: red blood cells (RBCs), plasma, platelets, and clotting factors</td>
+</tr>
+<tr class="even">
+<td><strong>Plasma</strong></td>
+<td>Whole blood minus RBCs (and other blood cells)</td>
+</tr>
+<tr class="odd">
+<td><strong>Serum</strong></td>
+<td>Plasma minus clotting factors</td>
+</tr>
+</tbody>
+</table>
+<p>In practice, <strong>plasma concentration</strong> is the primary measurement matrix in pharmacokinetics. The choice between blood, plasma, and serum depends on the physicochemical properties of the drug — for example, whether the drug binds to RBCs.</p>
+</section>
+<section id="surrogate-concentrations-and-the-site-of-action" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="surrogate-concentrations-and-the-site-of-action"><span class="header-section-number">3.4</span> Surrogate Concentrations and the Site of Action</h3>
+<p>In many cases, the drug’s site of action is not directly accessible. For example, in tuberculosis research, the alveolar fluid in the lungs is the relevant site, but plasma is the practical sampling matrix. The relationship between the surrogate plasma concentration and the true site-of-action concentration must be established through modeling and mechanistic understanding.</p>
+<hr>
+</section>
+</section>
+<section id="free-drug-hypothesis" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="free-drug-hypothesis"><span class="header-section-number">4</span> 3. Free Drug Hypothesis</h2>
+<section id="bound-vs.-unbound-drug" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="bound-vs.-unbound-drug"><span class="header-section-number">4.1</span> Bound vs.&nbsp;Unbound Drug</h3>
+<p>Drugs in plasma can exist in two forms: - <strong>Bound</strong> — complexed to plasma proteins (plasma protein binding) - <strong>Unbound (free)</strong> — not complexed; available for membrane crossing</p>
+<p>Drugs in the body may also bind to tissues (tissue binding), which is distinct from plasma protein binding.</p>
+<p>Only <strong>free (unbound) drug</strong> can cross biological membranes and therefore only the unbound drug can exert pharmacological activity.</p>
+</section>
+<section id="two-principles-of-the-free-drug-hypothesis" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="two-principles-of-the-free-drug-hypothesis"><span class="header-section-number">4.2</span> Two Principles of the Free Drug Hypothesis</h3>
+<ol type="1">
+<li><p><strong>At steady state</strong>, the unbound drug concentration on both sides of a membrane is equal. This assumes <strong>passive diffusion</strong> as the transport mechanism.</p></li>
+<li><p>The <strong>drug concentration at the site of action</strong> — specifically the unbound concentration — is what drives pharmacological effect.</p></li>
+</ol>
+</section>
+<section id="total-vs.-unbound-concentration" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="total-vs.-unbound-concentration"><span class="header-section-number">4.3</span> Total vs.&nbsp;Unbound Concentration</h3>
+<p>In practice, what is typically measured is <strong>total plasma concentration</strong> (bound + unbound). However, using the concept of <strong>fraction unbound (f_u)</strong>, the unbound concentration can be estimated:</p>
+<p><span class="math display">\[C_{\text{unbound}} = f_u \times C_{\text{total}}\]</span></p>
+<p>The fraction unbound is experimentally determined and is drug-specific. Understanding f_u is critical for interpreting PK parameters, particularly volume of distribution and clearance, as only the unbound drug is available for metabolism and elimination.</p>
+<hr>
+</section>
+</section>
+<section id="zero-order-vs.-first-order-processes" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="zero-order-vs.-first-order-processes"><span class="header-section-number">5</span> 4. Zero-Order vs.&nbsp;First-Order Processes</h2>
+<section id="zero-order-kinetics" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="zero-order-kinetics"><span class="header-section-number">5.1</span> Zero-Order Kinetics</h3>
+<p>A <strong>constant amount</strong> of drug is processed per unit time, independent of the amount remaining. On a linear scale, this appears as a straight line.</p>
+</section>
+<section id="first-order-kinetics" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="first-order-kinetics"><span class="header-section-number">5.2</span> First-Order Kinetics</h3>
+<p>A <strong>constant fraction</strong> of drug is processed per unit time. The rate of processing is proportional to the amount remaining in the body. This leads to an exponential decline in drug concentration.</p>
+<ul>
+<li>On a <strong>linear scale</strong>: the concentration-time profile is a curve.</li>
+<li>On a <strong>log scale</strong>: the concentration-time profile is a straight line.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="one-compartment-iv-bolus-model" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="one-compartment-iv-bolus-model"><span class="header-section-number">6</span> 5. One-Compartment IV Bolus Model</h2>
+<section id="assumptions" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="assumptions"><span class="header-section-number">6.1</span> Assumptions</h3>
+<p>The one-compartment IV bolus model is built on three key assumptions:</p>
+<ol type="1">
+<li>The drug enters the systemic circulation <strong>rapidly</strong> upon IV administration.</li>
+<li>The drug is <strong>instantaneously and uniformly distributed</strong> throughout the body (the body is treated as a single homogeneous compartment).</li>
+<li>The rate of <strong>elimination follows a first-order process</strong>.</li>
+</ol>
+</section>
+<section id="differential-equation" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="differential-equation"><span class="header-section-number">6.2</span> Differential Equation</h3>
+<p>The rate of change of drug amount in the body is:</p>
+<p><span class="math display">\[\frac{dX}{dt} = -K \cdot X\]</span></p>
+<p>where: - <span class="math inline">\(X\)</span> is the amount of drug in the body - <span class="math inline">\(K\)</span> (or <span class="math inline">\(K_{el}\)</span>) is the <strong>fractional elimination rate constant</strong> (units: 1/time)</p>
+<p>Equivalently, in terms of concentration:</p>
+<p><span class="math display">\[\frac{dC}{dt} = -K \cdot C\]</span></p>
+<p>This holds because dividing both sides of the amount equation by volume <span class="math inline">\(V\)</span> converts amount to concentration.</p>
+</section>
+<section id="integrated-closed-form-solution" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="integrated-closed-form-solution"><span class="header-section-number">6.3</span> Integrated (Closed-Form) Solution</h3>
+<p>Integrating the differential equation yields:</p>
+<p><span class="math display">\[C(t) = C_0 \cdot e^{-K \cdot t}\]</span></p>
+<p>where <span class="math inline">\(C_0\)</span> is the drug concentration at time zero (immediately after the IV bolus). This is the fundamental equation of the one-compartment IV bolus model.</p>
+<hr>
+</section>
+</section>
+<section id="volume-of-distribution" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="volume-of-distribution"><span class="header-section-number">7</span> 6. Volume of Distribution</h2>
+<section id="definition" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="definition"><span class="header-section-number">7.1</span> Definition</h3>
+<p><strong>Volume of distribution (V)</strong> is a <strong>proportionality constant</strong> that relates the amount of drug in the body to the measured plasma concentration at any given time:</p>
+<p><span class="math display">\[V = \frac{X}{C} \implies C = \frac{\text{Dose}}{V}\]</span></p>
+<p>Volume of distribution has <strong>no direct physiological meaning</strong> as a true anatomical volume. It simply scales the amount in the body to the observed concentration.</p>
+</section>
+<section id="illustrative-example-two-cylinders" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="illustrative-example-two-cylinders"><span class="header-section-number">7.2</span> Illustrative Example: Two Cylinders</h3>
+<p>Consider two identical 10-liter cylinders, each receiving 100 units of drug:</p>
+<ul>
+<li><strong>Cylinder A</strong> (water only): Measured concentration = 10 units/L → Apparent V = 100/10 = <strong>10 L</strong></li>
+<li><strong>Cylinder B</strong> (water + charcoal that binds drug): Measured concentration = 1 unit/L → Apparent V = 100/1 = <strong>100 L</strong></li>
+</ul>
+<p>Both cylinders have the same physical volume (10 L), but the apparent volume in Cylinder B is 100 L because drug is sequestered by the charcoal. This illustrates that volume of distribution is an <strong>apparent volume</strong> determined by the measured (free) concentration, not the physical space.</p>
+<p>This concept is directly relevant to pharmacokinetics: a drug with high tissue binding or lipophilicity will exhibit a large apparent volume of distribution because most drug is sequestered outside the sampling compartment (plasma), resulting in a low measured plasma concentration.</p>
+<hr>
+</section>
+</section>
+<section id="clearance" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="clearance"><span class="header-section-number">8</span> 7. Clearance</h2>
+<section id="introduction-via-the-differential-equation" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="introduction-via-the-differential-equation"><span class="header-section-number">8.1</span> Introduction via the Differential Equation</h3>
+<p>Introducing clearance (<span class="math inline">\(CL\)</span>) into the differential equation:</p>
+<p><span class="math display">\[\frac{dC}{dt} = -\frac{CL}{V} \cdot C\]</span></p>
+<p>This reveals the relationship:</p>
+<p><span class="math display">\[K = \frac{CL}{V} \implies CL = K \cdot V\]</span></p>
+</section>
+<section id="units-and-interpretation" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="units-and-interpretation"><span class="header-section-number">8.2</span> Units and Interpretation</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Unit</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(K_{el}\)</span></td>
+<td>1/time (e.g., h⁻¹)</td>
+<td>Fractional rate at which drug is eliminated</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(V\)</span></td>
+<td>volume (e.g., L)</td>
+<td>Proportionality constant between amount and concentration</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(CL\)</span></td>
+<td>volume/time (e.g., L/h)</td>
+<td>Volume of blood/plasma cleared of drug per unit time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Textbook definition of clearance:</strong> The volume of blood or plasma that is completely cleared of its drug content per unit time.</p>
+</section>
+<section id="rate-of-elimination" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="rate-of-elimination"><span class="header-section-number">8.3</span> Rate of Elimination</h3>
+<p>Multiplying both sides of the differential equation by <span class="math inline">\(V\)</span>:</p>
+<p><span class="math display">\[\frac{dX}{dt} = -CL \cdot C\]</span></p>
+<p>This defines the <strong>rate of elimination</strong>:</p>
+<p><span class="math display">\[\text{Rate of elimination} = CL \times C\]</span></p>
+<p>Units: mg/h = (L/h) × (mg/L). If the rate of elimination is plotted against concentration, the <strong>slope is clearance</strong>.</p>
+</section>
+<section id="distinguishing-rate-of-elimination-from-fractional-elimination-rate-constant" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="distinguishing-rate-of-elimination-from-fractional-elimination-rate-constant"><span class="header-section-number">8.4</span> Distinguishing Rate of Elimination from Fractional Elimination Rate Constant</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Concept</th>
+<th>Symbol</th>
+<th>Derived From</th>
+<th>Units</th>
+<th>Graphical Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fractional elimination rate constant</td>
+<td><span class="math inline">\(K_{el}\)</span></td>
+<td>Slope of ln(C) vs.&nbsp;time</td>
+<td>h⁻¹</td>
+<td>Slope of log-concentration vs.&nbsp;time plot</td>
+</tr>
+<tr class="even">
+<td>Rate of elimination</td>
+<td><span class="math inline">\(K_{el} \cdot X\)</span> or <span class="math inline">\(CL \cdot C\)</span></td>
+<td><span class="math inline">\(dX/dt\)</span>; derived by scaling concentration equation by V</td>
+<td>mg/h</td>
+<td>Slope of rate vs.&nbsp;concentration plot</td>
+</tr>
+</tbody>
+</table>
+<p>Clearance is <strong>independent of dose</strong> in a linear (first-order) system. As dose increases, AUC increases proportionally, and the ratio <span class="math inline">\(\text{Dose}/\text{AUC}\)</span> remains constant.</p>
+<hr>
+</section>
+</section>
+<section id="half-life" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="half-life"><span class="header-section-number">9</span> 8. Half-Life</h2>
+<section id="definition-1" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="definition-1"><span class="header-section-number">9.1</span> Definition</h3>
+<p>Half-life (<span class="math inline">\(t_{1/2}\)</span>) is the time required for the drug concentration to decrease by 50%.</p>
+</section>
+<section id="derivation" class="level3" data-number="9.2">
+<h3 data-number="9.2" class="anchored" data-anchor-id="derivation"><span class="header-section-number">9.2</span> Derivation</h3>
+<p>Starting from <span class="math inline">\(K_{el} = \frac{\ln 2}{t_{1/2}}\)</span>, rearranging:</p>
+<p><span class="math display">\[K_{el} \cdot t_{1/2} = \ln 2\]</span></p>
+<p>Exponentiating both sides:</p>
+<p><span class="math display">\[e^{K_{el} \cdot t_{1/2}} = 2\]</span></p>
+<p>Taking the reciprocal:</p>
+<p><span class="math display">\[e^{-K_{el} \cdot t_{1/2}} = \frac{1}{2} = 0.5\]</span></p>
+<p>This confirms that at <span class="math inline">\(t = t_{1/2}\)</span>, the concentration has decreased to exactly 50% of its initial value — a direct consequence of the first-order exponential equation, not an arbitrary definition.</p>
+<p><span class="math display">\[\boxed{t_{1/2} = \frac{\ln 2}{K_{el}} = \frac{0.693}{K_{el}}}\]</span></p>
+<p>Since <span class="math inline">\(K_{el} = CL/V\)</span>, it follows that:</p>
+<p><span class="math display">\[t_{1/2} = \frac{0.693 \cdot V}{CL}\]</span></p>
+<p>Half-life increases with increasing volume of distribution and decreases with increasing clearance.</p>
+<hr>
+</section>
+</section>
+<section id="area-under-the-curve-auc" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="area-under-the-curve-auc"><span class="header-section-number">10</span> 9. Area Under the Curve (AUC)</h2>
+<section id="definition-2" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="definition-2"><span class="header-section-number">10.1</span> Definition</h3>
+<p>AUC is the area under the plasma concentration-time curve from time zero to infinity:</p>
+<p><span class="math display">\[\text{AUC}_{0 \to \infty} = \int_0^{\infty} C_0 \cdot e^{-K_{el} \cdot t} \, dt = \frac{C_0}{K_{el}}\]</span></p>
+</section>
+<section id="relationship-to-clearance" class="level3" data-number="10.2">
+<h3 data-number="10.2" class="anchored" data-anchor-id="relationship-to-clearance"><span class="header-section-number">10.2</span> Relationship to Clearance</h3>
+<p>Substituting <span class="math inline">\(C_0 = \text{Dose}/V\)</span> and <span class="math inline">\(K_{el} = CL/V\)</span>:</p>
+<p><span class="math display">\[\text{AUC} = \frac{C_0}{K_{el}} = \frac{\text{Dose}/V}{CL/V} = \frac{\text{Dose}}{CL}\]</span></p>
+<p>Therefore:</p>
+<p><span class="math display">\[\boxed{CL = \frac{\text{Dose}}{AUC}}\]</span></p>
+<p>This is one of the most important equations in pharmacokinetics. It states that clearance can be estimated from the administered dose and the observed AUC. For a linear system, doubling the dose doubles the AUC, leaving clearance unchanged.</p>
+</section>
+<section id="numerical-estimation-trapezoidal-rule" class="level3" data-number="10.3">
+<h3 data-number="10.3" class="anchored" data-anchor-id="numerical-estimation-trapezoidal-rule"><span class="header-section-number">10.3</span> Numerical Estimation: Trapezoidal Rule</h3>
+<p>AUC can also be computed numerically by dividing the concentration-time profile into trapezoids, computing the area of each, and summing them. This method (non-compartmental analysis, or NCA) does not require assuming a compartmental model.</p>
+<hr>
+</section>
+</section>
+<section id="volume-of-distribution-and-the-free-drug-hypothesis" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="volume-of-distribution-and-the-free-drug-hypothesis"><span class="header-section-number">11</span> 10. Volume of Distribution and the Free Drug Hypothesis</h2>
+<p>The total volume of distribution can be decomposed in terms of the unbound fraction:</p>
+<p><span class="math display">\[V = \frac{X}{C} = \frac{X_u/f_u}{C_u/f_u} = V_u \cdot \frac{C_u}{C} = V_u \cdot f_u\]</span></p>
+<p>Wait — more precisely, the relationship shows that the total observed volume of distribution is modulated by the fraction unbound (<span class="math inline">\(f_u\)</span>). Because only unbound drug crosses membranes, changes in plasma protein binding (and hence <span class="math inline">\(f_u\)</span>) directly affect both the apparent volume of distribution and clearance. These implications are discussed further in the volume of distribution and multiple-dosing lectures.</p>
+<hr>
+</section>
+<section id="summary-iv-bolus-one-compartment-model" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="summary-iv-bolus-one-compartment-model"><span class="header-section-number">12</span> 11. Summary: IV Bolus One-Compartment Model</h2>
+<p>Given an IV bolus dose and measured plasma concentrations over time, the analysis proceeds as follows:</p>
+<ol type="1">
+<li><strong>Plot</strong> log-concentration vs.&nbsp;time — this yields a straight line.</li>
+<li><strong>Slope</strong> = <span class="math inline">\(-K_{el}\)</span></li>
+<li><strong>Intercept</strong> = <span class="math inline">\(\ln(C_0)\)</span>, where <span class="math inline">\(C_0 = \text{Dose}/V\)</span></li>
+<li><strong>Derived parameters:</strong>
+<ul>
+<li><span class="math inline">\(t_{1/2} = \ln 2 / K_{el}\)</span></li>
+<li><span class="math inline">\(V = \text{Dose} / C_0\)</span></li>
+<li><span class="math inline">\(CL = K_{el} \times V\)</span></li>
+<li><span class="math inline">\(\text{AUC} = C_0 / K_{el} = \text{Dose} / CL\)</span></li>
+</ul></li>
+</ol>
+<section id="the-fundamental-equation" class="level3" data-number="12.1">
+<h3 data-number="12.1" class="anchored" data-anchor-id="the-fundamental-equation"><span class="header-section-number">12.1</span> The Fundamental Equation</h3>
+<p><span class="math display">\[\boxed{C(t) = C_0 \cdot e^{-\frac{CL}{V} \cdot t}}\]</span></p>
+<p>All basic one-compartment PK concepts — half-life, clearance, volume, AUC — are embedded in this single equation. More complex PK models (multi-compartment, non-linear, multiple dosing) extend from this foundation.</p>
+<hr>
+</section>
+</section>
+<section id="looking-ahead" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">13</span> 12. Looking Ahead</h2>
+<p>The next lectures will cover <strong>volume of distribution</strong> and <strong>clearance</strong> in detail, including:</p>
+<ul>
+<li>Physiological determinants of volume (lipophilicity, tissue binding, protein binding)</li>
+<li>Physiological determinants of clearance (hepatic blood flow, intrinsic clearance — the well-stirred model)</li>
+<li>Non-linear (saturable) pharmacokinetics</li>
+<li>Multiple dosing and accumulation</li>
+<li>The impact of fraction unbound on steady-state concentrations</li>
+</ul>
+<p>Pre-reading materials on volume of distribution will be distributed prior to the next session. Students are encouraged to (1) discuss lecture concepts with peers, (2) review the provided lecture notes, and (3) reinforce learning with a pharmacokinetics textbook of their choice.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Week 2: Pharmacokinetics — One-Compartment IV Bolus Model"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Lecture Notes"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>This session covers the foundational concepts of pharmacokinetics (PK), beginning from first principles. The primary focus is the one-compartment model under intravenous (IV) bolus administration, which serves as the foundation for understanding the core PK parameters: clearance and volume of distribution.</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Systemic Exposure</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>The term **systemic** refers to something present throughout the body. In pharmacokinetics, **systemic exposure** refers to the internal exposure of the body to a drug. It has two defining attributes:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Magnitude** — characterized by metrics such as maximum concentration (C_max)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Duration** — characterized by metrics such as half-life or area under the curve (AUC)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Measurement Matrices</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>Drug concentrations can be measured using both invasive and non-invasive methods.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### Invasive Methods</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>The most common invasive approach is the collection of blood for plasma concentration measurement.</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Non-Invasive Methods</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>Examples include measurement of drug concentrations in urine, breath, saliva, and milk.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### Biological Matrices Defined</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Matrix <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Whole Blood** <span class="pp">|</span> All components: red blood cells (RBCs), plasma, platelets, and clotting factors <span class="pp">|</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Plasma** <span class="pp">|</span> Whole blood minus RBCs (and other blood cells) <span class="pp">|</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Serum** <span class="pp">|</span> Plasma minus clotting factors <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>In practice, **plasma concentration** is the primary measurement matrix in pharmacokinetics. The choice between blood, plasma, and serum depends on the physicochemical properties of the drug — for example, whether the drug binds to RBCs.</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### Surrogate Concentrations and the Site of Action</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>In many cases, the drug's site of action is not directly accessible. For example, in tuberculosis research, the alveolar fluid in the lungs is the relevant site, but plasma is the practical sampling matrix. The relationship between the surrogate plasma concentration and the true site-of-action concentration must be established through modeling and mechanistic understanding.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Free Drug Hypothesis</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bound vs. Unbound Drug</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Drugs in plasma can exist in two forms:</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bound** — complexed to plasma proteins (plasma protein binding)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Unbound (free)** — not complexed; available for membrane crossing</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>Drugs in the body may also bind to tissues (tissue binding), which is distinct from plasma protein binding.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>Only **free (unbound) drug** can cross biological membranes and therefore only the unbound drug can exert pharmacological activity.</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">### Two Principles of the Free Drug Hypothesis</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**At steady state**, the unbound drug concentration on both sides of a membrane is equal. This assumes **passive diffusion** as the transport mechanism.</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>The **drug concentration at the site of action** — specifically the unbound concentration — is what drives pharmacological effect.</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="fu">### Total vs. Unbound Concentration</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>In practice, what is typically measured is **total plasma concentration** (bound + unbound). However, using the concept of **fraction unbound (f_u)**, the unbound concentration can be estimated:</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>$$C_{\text{unbound}} = f_u \times C_{\text{total}}$$</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>The fraction unbound is experimentally determined and is drug-specific. Understanding f_u is critical for interpreting PK parameters, particularly volume of distribution and clearance, as only the unbound drug is available for metabolism and elimination.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Zero-Order vs. First-Order Processes</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### Zero-Order Kinetics</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>A **constant amount** of drug is processed per unit time, independent of the amount remaining. On a linear scale, this appears as a straight line.</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="fu">### First-Order Kinetics</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>A **constant fraction** of drug is processed per unit time. The rate of processing is proportional to the amount remaining in the body. This leads to an exponential decline in drug concentration.</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>On a **linear scale**: the concentration-time profile is a curve.</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>On a **log scale**: the concentration-time profile is a straight line.</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. One-Compartment IV Bolus Model</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="fu">### Assumptions</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>The one-compartment IV bolus model is built on three key assumptions:</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>The drug enters the systemic circulation **rapidly** upon IV administration.</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>The drug is **instantaneously and uniformly distributed** throughout the body (the body is treated as a single homogeneous compartment).</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>The rate of **elimination follows a first-order process**.</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="fu">### Differential Equation</span></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>The rate of change of drug amount in the body is:</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>$$\frac{dX}{dt} = -K \cdot X$$</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>where:</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$X$ is the amount of drug in the body</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$K$ (or $K_{el}$) is the **fractional elimination rate constant** (units: 1/time)</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>Equivalently, in terms of concentration:</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>$$\frac{dC}{dt} = -K \cdot C$$</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>This holds because dividing both sides of the amount equation by volume $V$ converts amount to concentration.</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integrated (Closed-Form) Solution</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>Integrating the differential equation yields:</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>$$C(t) = C_0 \cdot e^{-K \cdot t}$$</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>where $C_0$ is the drug concentration at time zero (immediately after the IV bolus). This is the fundamental equation of the one-compartment IV bolus model.</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="fu">## 6. Volume of Distribution</span></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="fu">### Definition</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>**Volume of distribution (V)** is a **proportionality constant** that relates the amount of drug in the body to the measured plasma concentration at any given time:</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>$$V = \frac{X}{C} \implies C = \frac{\text{Dose}}{V}$$</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>Volume of distribution has **no direct physiological meaning** as a true anatomical volume. It simply scales the amount in the body to the observed concentration.</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a><span class="fu">### Illustrative Example: Two Cylinders</span></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>Consider two identical 10-liter cylinders, each receiving 100 units of drug:</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cylinder A** (water only): Measured concentration = 10 units/L → Apparent V = 100/10 = **10 L**</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cylinder B** (water + charcoal that binds drug): Measured concentration = 1 unit/L → Apparent V = 100/1 = **100 L**</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>Both cylinders have the same physical volume (10 L), but the apparent volume in Cylinder B is 100 L because drug is sequestered by the charcoal. This illustrates that volume of distribution is an **apparent volume** determined by the measured (free) concentration, not the physical space.</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>This concept is directly relevant to pharmacokinetics: a drug with high tissue binding or lipophilicity will exhibit a large apparent volume of distribution because most drug is sequestered outside the sampling compartment (plasma), resulting in a low measured plasma concentration.</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="fu">## 7. Clearance</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="fu">### Introduction via the Differential Equation</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>Introducing clearance ($CL$) into the differential equation:</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>$$\frac{dC}{dt} = -\frac{CL}{V} \cdot C$$</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>This reveals the relationship:</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>$$K = \frac{CL}{V} \implies CL = K \cdot V$$</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="fu">### Units and Interpretation</span></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parameter <span class="pp">|</span> Unit <span class="pp">|</span> Interpretation <span class="pp">|</span></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $K_{el}$ <span class="pp">|</span> 1/time (e.g., h⁻¹) <span class="pp">|</span> Fractional rate at which drug is eliminated <span class="pp">|</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $V$ <span class="pp">|</span> volume (e.g., L) <span class="pp">|</span> Proportionality constant between amount and concentration <span class="pp">|</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $CL$ <span class="pp">|</span> volume/time (e.g., L/h) <span class="pp">|</span> Volume of blood/plasma cleared of drug per unit time <span class="pp">|</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>**Textbook definition of clearance:** The volume of blood or plasma that is completely cleared of its drug content per unit time.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rate of Elimination</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>Multiplying both sides of the differential equation by $V$:</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>$$\frac{dX}{dt} = -CL \cdot C$$</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>This defines the **rate of elimination**:</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>$$\text{Rate of elimination} = CL \times C$$</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>Units: mg/h = (L/h) × (mg/L). If the rate of elimination is plotted against concentration, the **slope is clearance**.</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="fu">### Distinguishing Rate of Elimination from Fractional Elimination Rate Constant</span></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Concept <span class="pp">|</span> Symbol <span class="pp">|</span> Derived From <span class="pp">|</span> Units <span class="pp">|</span> Graphical Meaning <span class="pp">|</span></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|</span></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fractional elimination rate constant <span class="pp">|</span> $K_{el}$ <span class="pp">|</span> Slope of ln(C) vs. time <span class="pp">|</span> h⁻¹ <span class="pp">|</span> Slope of log-concentration vs. time plot <span class="pp">|</span></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rate of elimination <span class="pp">|</span> $K_{el} \cdot X$ or $CL \cdot C$ <span class="pp">|</span> $dX/dt$; derived by scaling concentration equation by V <span class="pp">|</span> mg/h <span class="pp">|</span> Slope of rate vs. concentration plot <span class="pp">|</span></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>Clearance is **independent of dose** in a linear (first-order) system. As dose increases, AUC increases proportionally, and the ratio $\text{Dose}/\text{AUC}$ remains constant.</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## 8. Half-Life</span></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### Definition</span></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>Half-life ($t_{1/2}$) is the time required for the drug concentration to decrease by 50%.</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="fu">### Derivation</span></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>Starting from $K_{el} = \frac{\ln 2}{t_{1/2}}$, rearranging:</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>$$K_{el} \cdot t_{1/2} = \ln 2$$</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>Exponentiating both sides:</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>$$e^{K_{el} \cdot t_{1/2}} = 2$$</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a>Taking the reciprocal:</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>$$e^{-K_{el} \cdot t_{1/2}} = \frac{1}{2} = 0.5$$</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a>This confirms that at $t = t_{1/2}$, the concentration has decreased to exactly 50% of its initial value — a direct consequence of the first-order exponential equation, not an arbitrary definition.</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>$$\boxed{t_{1/2} = \frac{\ln 2}{K_{el}} = \frac{0.693}{K_{el}}}$$</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>Since $K_{el} = CL/V$, it follows that:</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>$$t_{1/2} = \frac{0.693 \cdot V}{CL}$$</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>Half-life increases with increasing volume of distribution and decreases with increasing clearance.</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="fu">## 9. Area Under the Curve (AUC)</span></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="fu">### Definition</span></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>AUC is the area under the plasma concentration-time curve from time zero to infinity:</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>$$\text{AUC}_{0 \to \infty} = \int_0^{\infty} C_0 \cdot e^{-K_{el} \cdot t} \, dt = \frac{C_0}{K_{el}}$$</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="fu">### Relationship to Clearance</span></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>Substituting $C_0 = \text{Dose}/V$ and $K_{el} = CL/V$:</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>$$\text{AUC} = \frac{C_0}{K_{el}} = \frac{\text{Dose}/V}{CL/V} = \frac{\text{Dose}}{CL}$$</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>Therefore:</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>$$\boxed{CL = \frac{\text{Dose}}{AUC}}$$</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a>This is one of the most important equations in pharmacokinetics. It states that clearance can be estimated from the administered dose and the observed AUC. For a linear system, doubling the dose doubles the AUC, leaving clearance unchanged.</span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="fu">### Numerical Estimation: Trapezoidal Rule</span></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>AUC can also be computed numerically by dividing the concentration-time profile into trapezoids, computing the area of each, and summing them. This method (non-compartmental analysis, or NCA) does not require assuming a compartmental model.</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="fu">## 10. Volume of Distribution and the Free Drug Hypothesis</span></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>The total volume of distribution can be decomposed in terms of the unbound fraction:</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>$$V = \frac{X}{C} = \frac{X_u/f_u}{C_u/f_u} = V_u \cdot \frac{C_u}{C} = V_u \cdot f_u$$</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>Wait — more precisely, the relationship shows that the total observed volume of distribution is modulated by the fraction unbound ($f_u$). Because only unbound drug crosses membranes, changes in plasma protein binding (and hence $f_u$) directly affect both the apparent volume of distribution and clearance. These implications are discussed further in the volume of distribution and multiple-dosing lectures.</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="fu">## 11. Summary: IV Bolus One-Compartment Model</span></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>Given an IV bolus dose and measured plasma concentrations over time, the analysis proceeds as follows:</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Plot** log-concentration vs. time — this yields a straight line.</span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Slope** = $-K_{el}$</span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Intercept** = $\ln(C_0)$, where $C_0 = \text{Dose}/V$</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Derived parameters:**</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>$t_{1/2} = \ln 2 / K_{el}$</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>$V = \text{Dose} / C_0$</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>$CL = K_{el} \times V$</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>$\text{AUC} = C_0 / K_{el} = \text{Dose} / CL$</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Fundamental Equation</span></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a>$$\boxed{C(t) = C_0 \cdot e^{-\frac{CL}{V} \cdot t}}$$</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a>All basic one-compartment PK concepts — half-life, clearance, volume, AUC — are embedded in this single equation. More complex PK models (multi-compartment, non-linear, multiple dosing) extend from this foundation.</span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="fu">## 12. Looking Ahead</span></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a>The next lectures will cover **volume of distribution** and **clearance** in detail, including:</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Physiological determinants of volume (lipophilicity, tissue binding, protein binding)</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Physiological determinants of clearance (hepatic blood flow, intrinsic clearance — the well-stirred model)</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Non-linear (saturable) pharmacokinetics</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Multiple dosing and accumulation</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The impact of fraction unbound on steady-state concentrations</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a>Pre-reading materials on volume of distribution will be distributed prior to the next session. Students are encouraged to (1) discuss lecture concepts with peers, (2) review the provided lecture notes, and (3) reinforce learning with a pharmacokinetics textbook of their choice.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

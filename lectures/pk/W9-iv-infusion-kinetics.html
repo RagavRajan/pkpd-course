@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Week 9 Pharmacokinetics: IV Infusion Kinetics – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Week 9 Pharmacokinetics: IV Infusion Kinetics</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#introduction-to-iv-infusion" id="toc-introduction-to-iv-infusion" class="nav-link" data-scroll-target="#introduction-to-iv-infusion"><span class="header-section-number">2</span> 1. Introduction to IV Infusion</a>
+  <ul class="collapse">
+  <li><a href="#dosing-rate-a-unifying-concept" id="toc-dosing-rate-a-unifying-concept" class="nav-link" data-scroll-target="#dosing-rate-a-unifying-concept"><span class="header-section-number">2.1</span> 1.1 Dosing Rate: A Unifying Concept</a></li>
+  <li><a href="#infusion-rate-and-duration" id="toc-infusion-rate-and-duration" class="nav-link" data-scroll-target="#infusion-rate-and-duration"><span class="header-section-number">2.2</span> 1.2 Infusion Rate and Duration</a></li>
+  </ul></li>
+  <li><a href="#steady-state-and-the-concept-of-rate-balance" id="toc-steady-state-and-the-concept-of-rate-balance" class="nav-link" data-scroll-target="#steady-state-and-the-concept-of-rate-balance"><span class="header-section-number">3</span> 2. Steady State and the Concept of Rate Balance</a>
+  <ul class="collapse">
+  <li><a href="#what-is-steady-state" id="toc-what-is-steady-state" class="nav-link" data-scroll-target="#what-is-steady-state"><span class="header-section-number">3.1</span> 2.1 What is Steady State?</a></li>
+  <li><a href="#time-to-steady-state-and-half-life" id="toc-time-to-steady-state-and-half-life" class="nav-link" data-scroll-target="#time-to-steady-state-and-half-life"><span class="header-section-number">3.2</span> 2.2 Time to Steady State and Half-Life</a></li>
+  <li><a href="#what-determines-the-dosing-rate" id="toc-what-determines-the-dosing-rate" class="nav-link" data-scroll-target="#what-determines-the-dosing-rate"><span class="header-section-number">3.3</span> 2.3 What Determines the Dosing Rate?</a></li>
+  <li><a href="#steady-state-concentration-as-an-exposure-metric" id="toc-steady-state-concentration-as-an-exposure-metric" class="nav-link" data-scroll-target="#steady-state-concentration-as-an-exposure-metric"><span class="header-section-number">3.4</span> 2.4 Steady-State Concentration as an Exposure Metric</a></li>
+  </ul></li>
+  <li><a href="#zero-order-input-and-first-order-elimination" id="toc-zero-order-input-and-first-order-elimination" class="nav-link" data-scroll-target="#zero-order-input-and-first-order-elimination"><span class="header-section-number">4</span> 3. Zero-Order Input and First-Order Elimination</a>
+  <ul class="collapse">
+  <li><a href="#nature-of-infusion-input" id="toc-nature-of-infusion-input" class="nav-link" data-scroll-target="#nature-of-infusion-input"><span class="header-section-number">4.1</span> 3.1 Nature of Infusion Input</a></li>
+  <li><a href="#differential-equation-for-iv-infusion" id="toc-differential-equation-for-iv-infusion" class="nav-link" data-scroll-target="#differential-equation-for-iv-infusion"><span class="header-section-number">4.2</span> 3.2 Differential Equation for IV Infusion</a></li>
+  </ul></li>
+  <li><a href="#short-infusions-vs.-long-infusions" id="toc-short-infusions-vs.-long-infusions" class="nav-link" data-scroll-target="#short-infusions-vs.-long-infusions"><span class="header-section-number">5</span> 4. Short Infusions vs.&nbsp;Long Infusions</a>
+  <ul class="collapse">
+  <li><a href="#short-infusions" id="toc-short-infusions" class="nav-link" data-scroll-target="#short-infusions"><span class="header-section-number">5.1</span> 4.1 Short Infusions</a></li>
+  <li><a href="#long-infusions" id="toc-long-infusions" class="nav-link" data-scroll-target="#long-infusions"><span class="header-section-number">5.2</span> 4.2 Long Infusions</a></li>
+  <li><a href="#general-concentration-equations-during-and-after-infusion" id="toc-general-concentration-equations-during-and-after-infusion" class="nav-link" data-scroll-target="#general-concentration-equations-during-and-after-infusion"><span class="header-section-number">5.3</span> 4.3 General Concentration Equations During and After Infusion</a></li>
+  </ul></li>
+  <li><a href="#measuring-concentrations-during-infusion" id="toc-measuring-concentrations-during-infusion" class="nav-link" data-scroll-target="#measuring-concentrations-during-infusion"><span class="header-section-number">6</span> 5. Measuring Concentrations During Infusion</a></li>
+  <li><a href="#loading-doses-combined-with-maintenance-infusions" id="toc-loading-doses-combined-with-maintenance-infusions" class="nav-link" data-scroll-target="#loading-doses-combined-with-maintenance-infusions"><span class="header-section-number">7</span> 6. Loading Doses Combined with Maintenance Infusions</a>
+  <ul class="collapse">
+  <li><a href="#rationale" id="toc-rationale" class="nav-link" data-scroll-target="#rationale"><span class="header-section-number">7.1</span> 6.1 Rationale</a></li>
+  <li><a href="#combined-equation" id="toc-combined-equation" class="nav-link" data-scroll-target="#combined-equation"><span class="header-section-number">7.2</span> 6.2 Combined Equation</a></li>
+  <li><a href="#optimal-loading-dose" id="toc-optimal-loading-dose" class="nav-link" data-scroll-target="#optimal-loading-dose"><span class="header-section-number">7.3</span> 6.3 Optimal Loading Dose</a></li>
+  <li><a href="#effect-of-suboptimal-loading-dose" id="toc-effect-of-suboptimal-loading-dose" class="nav-link" data-scroll-target="#effect-of-suboptimal-loading-dose"><span class="header-section-number">7.4</span> 6.4 Effect of Suboptimal Loading Dose</a></li>
+  </ul></li>
+  <li><a href="#summary-of-key-concepts" id="toc-summary-of-key-concepts" class="nav-link" data-scroll-target="#summary-of-key-concepts"><span class="header-section-number">8</span> 7. Summary of Key Concepts</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Week 9 Pharmacokinetics: IV Infusion Kinetics</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Lecture Notes</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1</span> Overview</h2>
+<p>This lecture covers intravenous (IV) infusion pharmacokinetics, with a focus on the conceptual and mathematical framework governing drug input during constant-rate infusions, the relationship between infusion kinetics and multiple-dose pharmacokinetics, and the attainment of steady state.</p>
+<hr>
+</section>
+<section id="introduction-to-iv-infusion" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="introduction-to-iv-infusion"><span class="header-section-number">2</span> 1. Introduction to IV Infusion</h2>
+<p>IV infusion is a route of administration in which drug is delivered into the body at a constant rate over a defined period of time. Understanding infusion kinetics provides the conceptual foundation for understanding multiple-dose pharmacokinetics.</p>
+<section id="dosing-rate-a-unifying-concept" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="dosing-rate-a-unifying-concept"><span class="header-section-number">2.1</span> 1.1 Dosing Rate: A Unifying Concept</h3>
+<p>When a drug is administered at any route of administration with a defined frequency, the dose per unit time can be expressed as a <strong>dosing rate</strong>. For example, 100 mg administered orally every 24 hours corresponds to a dosing rate of:</p>
+<p><span class="math display">\[\text{Dosing Rate} = \frac{100 \text{ mg}}{24 \text{ h}}\]</span></p>
+<p>This concept applies regardless of route — oral, IV bolus, subcutaneous, intramuscular, or infusion.</p>
+</section>
+<section id="infusion-rate-and-duration" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="infusion-rate-and-duration"><span class="header-section-number">2.2</span> 1.2 Infusion Rate and Duration</h3>
+<p>For an IV infusion, the two most clinically important input parameters are:</p>
+<ul>
+<li><strong>Infusion rate</strong> — the speed at which the drug is administered (e.g., mg/min or mL/min)</li>
+<li><strong>Infusion duration</strong> — the total time over which drug is delivered</li>
+</ul>
+<p><strong>Example:</strong> Suppose the goal is to deliver a 100 mg dose from an IV bag. The bag has a volume of 100 mL at a concentration of 5 mg/mL, giving a total drug content of 500 mg. Since only 100 mg is needed, only 20 mL of the bag needs to be infused. If the infusion pump is set to 1 mL/min, the infusion duration is 20 minutes.</p>
+<p>The clinician may choose any combination of rate and duration that delivers the required dose. This decision is influenced by clinical, pharmacological, and operational factors.</p>
+<hr>
+</section>
+</section>
+<section id="steady-state-and-the-concept-of-rate-balance" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="steady-state-and-the-concept-of-rate-balance"><span class="header-section-number">3</span> 2. Steady State and the Concept of Rate Balance</h2>
+<section id="what-is-steady-state" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="what-is-steady-state"><span class="header-section-number">3.1</span> 2.1 What is Steady State?</h3>
+<p>Steady state is the condition at which the rate of drug input into the body equals the rate of drug elimination from the body:</p>
+<p><span class="math display">\[\text{Rate of Input} = \text{Rate of Elimination}\]</span></p>
+<p>At steady state, the net change in drug amount (or concentration) in the body is zero. This is analogous to a tank with a constant inflow and outflow of water reaching a stable level.</p>
+</section>
+<section id="time-to-steady-state-and-half-life" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="time-to-steady-state-and-half-life"><span class="header-section-number">3.2</span> 2.2 Time to Steady State and Half-Life</h3>
+<p>The time required to reach steady state is governed by the <strong>elimination half-life</strong> of the drug, regardless of the route of administration. It takes approximately <strong>four to five half-lives</strong> to reach approximately 97–99% of steady state.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Half-Life Number</th>
+<th>Fraction Remaining</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>50%</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>25%</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>12.5%</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>6.25%</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>~3%</td>
+</tr>
+</tbody>
+</table>
+<p>This principle applies universally — for oral multiple-dose regimens, IV infusions, and any other route.</p>
+</section>
+<section id="what-determines-the-dosing-rate" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="what-determines-the-dosing-rate"><span class="header-section-number">3.3</span> 2.3 What Determines the Dosing Rate?</h3>
+<p>To achieve a target exposure at steady state, the dosing rate is determined by two quantities:</p>
+<ol type="1">
+<li><strong>Clearance (CL)</strong> — the fundamental pharmacokinetic parameter governing drug elimination</li>
+<li><strong>Target steady-state concentration (C_ss)</strong> — the desired plasma concentration at steady state</li>
+</ol>
+<p>At steady state:</p>
+<p><span class="math display">\[\text{Rate of Input} = \text{Rate of Elimination} = CL \times C_{ss}\]</span></p>
+<p>Therefore:</p>
+<p><span class="math display">\[K_0 = CL \times C_{ss}\]</span></p>
+<p>where <span class="math inline">\(K_0\)</span> is the infusion rate (zero-order input rate). If clearance is known and a target <span class="math inline">\(C_{ss}\)</span> is defined, the required infusion rate can be calculated directly.</p>
+</section>
+<section id="steady-state-concentration-as-an-exposure-metric" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="steady-state-concentration-as-an-exposure-metric"><span class="header-section-number">3.4</span> 2.4 Steady-State Concentration as an Exposure Metric</h3>
+<p>A common clinical practice is to measure the <strong>trough concentration</strong> (<span class="math inline">\(C_{trough}\)</span>, also denoted <span class="math inline">\(C_{min}\)</span>) at steady state — the concentration just before the next dose. This is favored primarily for logistical reasons: patients return to the clinic for the next dose, making it operationally straightforward to collect a pre-dose sample. Depending on the drug and the pharmacodynamic relationship, the relevant exposure metric at steady state may be <span class="math inline">\(C_{max}\)</span>, <span class="math inline">\(C_{trough}\)</span>, or area under the curve (AUC). The selection is drug- and disease-specific.</p>
+<hr>
+</section>
+</section>
+<section id="zero-order-input-and-first-order-elimination" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="zero-order-input-and-first-order-elimination"><span class="header-section-number">4</span> 3. Zero-Order Input and First-Order Elimination</h2>
+<section id="nature-of-infusion-input" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="nature-of-infusion-input"><span class="header-section-number">4.1</span> 3.1 Nature of Infusion Input</h3>
+<p>In oral dosing, drug absorption from the gastrointestinal tract is a <strong>first-order</strong> process — the rate of absorption depends on the amount of drug remaining at the absorption site (depot):</p>
+<p><span class="math display">\[\frac{dA_{depot}}{dt} = -k_a \cdot A_{depot}\]</span></p>
+<p>In an IV infusion, drug is delivered directly into the systemic circulation at a <strong>preset, constant rate</strong> that is independent of the amount of drug remaining in the IV bag. This is a <strong>zero-order</strong> input:</p>
+<p><span class="math display">\[\frac{dA}{dt}\bigg|_{\text{in}} = K_0\]</span></p>
+</section>
+<section id="differential-equation-for-iv-infusion" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="differential-equation-for-iv-infusion"><span class="header-section-number">4.2</span> 3.2 Differential Equation for IV Infusion</h3>
+<p>The rate of change of the amount of drug in the body during a constant-rate IV infusion is:</p>
+<p><span class="math display">\[\frac{dA}{dt} = K_0 - k_{el} \cdot A\]</span></p>
+<p>where: - <span class="math inline">\(K_0\)</span> = zero-order infusion rate (e.g., mg/h) - <span class="math inline">\(k_{el}\)</span> = first-order elimination rate constant (h⁻¹) - <span class="math inline">\(A\)</span> = amount of drug in the body at time <span class="math inline">\(t\)</span></p>
+<p>At steady state, <span class="math inline">\(\frac{dA}{dt} = 0\)</span>, which gives:</p>
+<p><span class="math display">\[K_0 = k_{el} \cdot A_{ss} = k_{el} \cdot V \cdot C_{ss} = CL \cdot C_{ss}\]</span></p>
+<hr>
+</section>
+</section>
+<section id="short-infusions-vs.-long-infusions" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="short-infusions-vs.-long-infusions"><span class="header-section-number">5</span> 4. Short Infusions vs.&nbsp;Long Infusions</h2>
+<section id="short-infusions" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="short-infusions"><span class="header-section-number">5.1</span> 4.1 Short Infusions</h3>
+<p>A <strong>short infusion</strong> is one where the drug is administered over a brief period and stopped before reaching steady state. After the infusion ends, the plasma concentration follows a simple exponential decline — identical to the post-dose decline observed with IV bolus administration:</p>
+<p><span class="math display">\[C(t) = C_0 \cdot e^{-k_{el} \cdot t}\]</span></p>
+<p>where <span class="math inline">\(C_0\)</span> is the concentration at the end of the infusion (equivalent to <span class="math inline">\(C_{max}\)</span> for a short infusion).</p>
+<p>Short infusions behave pharmacokinetically like any other single-dose route of administration once the input has stopped. Multiple short infusions given at defined intervals are analogous to multiple-dose oral regimens, approaching steady state over four to five half-lives.</p>
+</section>
+<section id="long-infusions" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="long-infusions"><span class="header-section-number">5.2</span> 4.2 Long Infusions</h3>
+<p>A <strong>long infusion</strong> is one that is continued until steady state is achieved. During the infusion, plasma concentration rises exponentially toward <span class="math inline">\(C_{ss}\)</span>:</p>
+<p><span class="math display">\[C(t) = \frac{K_0}{CL} \cdot \left(1 - e^{-k_{el} \cdot t}\right) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)\]</span></p>
+<p>This equation describes a <strong>mirror image</strong> of the post-infusion exponential decline. The approach to steady state is mono-exponential for a one-compartment model.</p>
+<p>Once the infusion is stopped (at time <span class="math inline">\(T_{end}\)</span>), the concentration declines as:</p>
+<p><span class="math display">\[C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}\]</span></p>
+</section>
+<section id="general-concentration-equations-during-and-after-infusion" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="general-concentration-equations-during-and-after-infusion"><span class="header-section-number">5.3</span> 4.3 General Concentration Equations During and After Infusion</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Equation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>During infusion</td>
+<td><span class="math inline">\(C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)\)</span></td>
+</tr>
+<tr class="even">
+<td>At steady state (during continued infusion)</td>
+<td><span class="math inline">\(C = C_{ss}\)</span></td>
+</tr>
+<tr class="odd">
+<td>After infusion stops</td>
+<td><span class="math inline">\(C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}\)</span></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="measuring-concentrations-during-infusion" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="measuring-concentrations-during-infusion"><span class="header-section-number">6</span> 5. Measuring Concentrations During Infusion</h2>
+<p>From a strictly mathematical standpoint, if the following are known:</p>
+<ul>
+<li>The infusion rate (<span class="math inline">\(K_0\)</span>)</li>
+<li>The drug clearance (<span class="math inline">\(CL\)</span>) and volume of distribution (<span class="math inline">\(V\)</span>)</li>
+<li>The target steady-state concentration (<span class="math inline">\(C_{ss}\)</span>)</li>
+</ul>
+<p>Then plasma concentrations at any time point during the infusion can be <strong>predicted</strong> without measurement, using:</p>
+<p><span class="math display">\[C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)\]</span></p>
+<p>Accordingly, if a truly constant-rate infusion is being administered and the pharmacokinetic parameters are already characterized, collecting samples during the infusion adds limited additional information. The post-infusion concentration–time data alone are sufficient to estimate the relevant parameters.</p>
+<hr>
+</section>
+<section id="loading-doses-combined-with-maintenance-infusions" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="loading-doses-combined-with-maintenance-infusions"><span class="header-section-number">7</span> 6. Loading Doses Combined with Maintenance Infusions</h2>
+<section id="rationale" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="rationale"><span class="header-section-number">7.1</span> 6.1 Rationale</h3>
+<p>The time required to reach steady state via a constant-rate infusion alone is four to five half-lives. For drugs with long half-lives, this delay may be clinically unacceptable. A <strong>loading dose</strong> (IV bolus) administered simultaneously at the start of the infusion allows the plasma concentration to reach <span class="math inline">\(C_{ss}\)</span> immediately.</p>
+</section>
+<section id="combined-equation" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="combined-equation"><span class="header-section-number">7.2</span> 6.2 Combined Equation</h3>
+<p>When an IV bolus (loading dose) and a constant-rate infusion are given simultaneously, the total plasma concentration is the sum of contributions from each:</p>
+<p><span class="math display">\[C(t) = \underbrace{C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)}_{\text{infusion}} + \underbrace{C_0 \cdot e^{-k_{el} \cdot t}}_{\text{bolus}}\]</span></p>
+<p>where <span class="math inline">\(C_0 = \frac{\text{Loading Dose}}{V}\)</span>.</p>
+</section>
+<section id="optimal-loading-dose" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="optimal-loading-dose"><span class="header-section-number">7.3</span> 6.3 Optimal Loading Dose</h3>
+<p>If the loading dose is chosen such that <span class="math inline">\(C_0 = C_{ss}\)</span>, the two exponential terms cancel:</p>
+<p><span class="math display">\[C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right) + C_{ss} \cdot e^{-k_{el} \cdot t} = C_{ss}\]</span></p>
+<p>The plasma concentration is constant at <span class="math inline">\(C_{ss}\)</span> from time zero onward — there is no transient approach phase. The required loading dose is therefore:</p>
+<p><span class="math display">\[\text{Loading Dose} = C_{ss} \cdot V\]</span></p>
+</section>
+<section id="effect-of-suboptimal-loading-dose" class="level3" data-number="7.4">
+<h3 data-number="7.4" class="anchored" data-anchor-id="effect-of-suboptimal-loading-dose"><span class="header-section-number">7.4</span> 6.4 Effect of Suboptimal Loading Dose</h3>
+<p>If <span class="math inline">\(C_0 \neq C_{ss}\)</span>, the concentration–time profile will show an initial transient that either rises toward <span class="math inline">\(C_{ss}\)</span> (if <span class="math inline">\(C_0 &lt; C_{ss}\)</span>) or falls toward <span class="math inline">\(C_{ss}\)</span> (if <span class="math inline">\(C_0 &gt; C_{ss}\)</span>) before converging to the steady-state plateau. The infusion component continues to drive the system toward <span class="math inline">\(C_{ss}\)</span> in either case; the loading dose only alters how quickly the apparent steady state is reached from the combined-dose perspective.</p>
+<hr>
+</section>
+</section>
+<section id="summary-of-key-concepts" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="summary-of-key-concepts"><span class="header-section-number">8</span> 7. Summary of Key Concepts</h2>
+<ol type="1">
+<li><strong>Zero-order input, first-order elimination</strong> characterizes IV infusion pharmacokinetics.</li>
+<li><strong>Steady state</strong> is achieved when the rate of infusion equals the rate of elimination: <span class="math inline">\(K_0 = CL \cdot C_{ss}\)</span>.</li>
+<li><strong>Time to steady state</strong> depends on the elimination half-life and is independent of the infusion rate; it takes approximately four to five half-lives.</li>
+<li><strong>Short infusions</strong> behave like IV bolus doses after the infusion ends; multiple short infusions accumulate to steady state similarly to multiple oral doses.</li>
+<li><strong>Long infusions</strong> produce an exponential approach to <span class="math inline">\(C_{ss}\)</span>, described by <span class="math inline">\(C(t) = C_{ss}(1 - e^{-k_{el} t})\)</span>.</li>
+<li><strong>Concentration during infusion can be predicted</strong> mathematically if <span class="math inline">\(CL\)</span>, <span class="math inline">\(V\)</span>, and <span class="math inline">\(K_0\)</span> are known; sampling during the infusion may not always add analytical value.</li>
+<li><strong>Loading doses</strong> can be combined with maintenance infusions to achieve <span class="math inline">\(C_{ss}\)</span> immediately; the optimal loading dose is <span class="math inline">\(C_{ss} \cdot V\)</span>.</li>
+<li>All infusion concepts reduce to the same mathematical framework as IV bolus kinetics — the post-infusion decline is <span class="math inline">\(e^{-k_{el} t}\)</span>, and the approach to maximum is <span class="math inline">\(1 - e^{-k_{el} t}\)</span>, its mirror image.</li>
+</ol>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Week 9 Pharmacokinetics: IV Infusion Kinetics"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Lecture Notes"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>This lecture covers intravenous (IV) infusion pharmacokinetics, with a focus on the conceptual and mathematical framework governing drug input during constant-rate infusions, the relationship between infusion kinetics and multiple-dose pharmacokinetics, and the attainment of steady state.</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Introduction to IV Infusion</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>IV infusion is a route of administration in which drug is delivered into the body at a constant rate over a defined period of time. Understanding infusion kinetics provides the conceptual foundation for understanding multiple-dose pharmacokinetics.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1.1 Dosing Rate: A Unifying Concept</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>When a drug is administered at any route of administration with a defined frequency, the dose per unit time can be expressed as a **dosing rate**. For example, 100 mg administered orally every 24 hours corresponds to a dosing rate of:</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>$$\text{Dosing Rate} = \frac{100 \text{ mg}}{24 \text{ h}}$$</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>This concept applies regardless of route — oral, IV bolus, subcutaneous, intramuscular, or infusion.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1.2 Infusion Rate and Duration</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>For an IV infusion, the two most clinically important input parameters are:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Infusion rate** — the speed at which the drug is administered (e.g., mg/min or mL/min)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Infusion duration** — the total time over which drug is delivered</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>**Example:** Suppose the goal is to deliver a 100 mg dose from an IV bag. The bag has a volume of 100 mL at a concentration of 5 mg/mL, giving a total drug content of 500 mg. Since only 100 mg is needed, only 20 mL of the bag needs to be infused. If the infusion pump is set to 1 mL/min, the infusion duration is 20 minutes.</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>The clinician may choose any combination of rate and duration that delivers the required dose. This decision is influenced by clinical, pharmacological, and operational factors.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Steady State and the Concept of Rate Balance</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.1 What is Steady State?</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>Steady state is the condition at which the rate of drug input into the body equals the rate of drug elimination from the body:</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>$$\text{Rate of Input} = \text{Rate of Elimination}$$</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>At steady state, the net change in drug amount (or concentration) in the body is zero. This is analogous to a tank with a constant inflow and outflow of water reaching a stable level.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.2 Time to Steady State and Half-Life</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>The time required to reach steady state is governed by the **elimination half-life** of the drug, regardless of the route of administration. It takes approximately **four to five half-lives** to reach approximately 97–99% of steady state.</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Half-Life Number <span class="pp">|</span> Fraction Remaining <span class="pp">|</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> 50% <span class="pp">|</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> 25% <span class="pp">|</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> 12.5% <span class="pp">|</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 4 <span class="pp">|</span> 6.25% <span class="pp">|</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 5 <span class="pp">|</span> ~3% <span class="pp">|</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>This principle applies universally — for oral multiple-dose regimens, IV infusions, and any other route.</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.3 What Determines the Dosing Rate?</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>To achieve a target exposure at steady state, the dosing rate is determined by two quantities:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Clearance (CL)** — the fundamental pharmacokinetic parameter governing drug elimination</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Target steady-state concentration (C_ss)** — the desired plasma concentration at steady state</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>At steady state:</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>$$\text{Rate of Input} = \text{Rate of Elimination} = CL \times C_{ss}$$</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>Therefore:</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>$$K_0 = CL \times C_{ss}$$</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>where $K_0$ is the infusion rate (zero-order input rate). If clearance is known and a target $C_{ss}$ is defined, the required infusion rate can be calculated directly.</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2.4 Steady-State Concentration as an Exposure Metric</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>A common clinical practice is to measure the **trough concentration** ($C_{trough}$, also denoted $C_{min}$) at steady state — the concentration just before the next dose. This is favored primarily for logistical reasons: patients return to the clinic for the next dose, making it operationally straightforward to collect a pre-dose sample. Depending on the drug and the pharmacodynamic relationship, the relevant exposure metric at steady state may be $C_{max}$, $C_{trough}$, or area under the curve (AUC). The selection is drug- and disease-specific.</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Zero-Order Input and First-Order Elimination</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.1 Nature of Infusion Input</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>In oral dosing, drug absorption from the gastrointestinal tract is a **first-order** process — the rate of absorption depends on the amount of drug remaining at the absorption site (depot):</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>$$\frac{dA_{depot}}{dt} = -k_a \cdot A_{depot}$$</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>In an IV infusion, drug is delivered directly into the systemic circulation at a **preset, constant rate** that is independent of the amount of drug remaining in the IV bag. This is a **zero-order** input:</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>$$\frac{dA}{dt}\bigg|_{\text{in}} = K_0$$</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3.2 Differential Equation for IV Infusion</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>The rate of change of the amount of drug in the body during a constant-rate IV infusion is:</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>$$\frac{dA}{dt} = K_0 - k_{el} \cdot A$$</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>where:</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$K_0$ = zero-order infusion rate (e.g., mg/h)</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$k_{el}$ = first-order elimination rate constant (h⁻¹)</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$A$ = amount of drug in the body at time $t$</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>At steady state, $\frac{dA}{dt} = 0$, which gives:</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>$$K_0 = k_{el} \cdot A_{ss} = k_{el} \cdot V \cdot C_{ss} = CL \cdot C_{ss}$$</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Short Infusions vs. Long Infusions</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.1 Short Infusions</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>A **short infusion** is one where the drug is administered over a brief period and stopped before reaching steady state. After the infusion ends, the plasma concentration follows a simple exponential decline — identical to the post-dose decline observed with IV bolus administration:</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>$$C(t) = C_0 \cdot e^{-k_{el} \cdot t}$$</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>where $C_0$ is the concentration at the end of the infusion (equivalent to $C_{max}$ for a short infusion).</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>Short infusions behave pharmacokinetically like any other single-dose route of administration once the input has stopped. Multiple short infusions given at defined intervals are analogous to multiple-dose oral regimens, approaching steady state over four to five half-lives.</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.2 Long Infusions</span></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>A **long infusion** is one that is continued until steady state is achieved. During the infusion, plasma concentration rises exponentially toward $C_{ss}$:</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>$$C(t) = \frac{K_0}{CL} \cdot \left(1 - e^{-k_{el} \cdot t}\right) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$$</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>This equation describes a **mirror image** of the post-infusion exponential decline. The approach to steady state is mono-exponential for a one-compartment model.</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>Once the infusion is stopped (at time $T_{end}$), the concentration declines as:</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>$$C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}$$</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4.3 General Concentration Equations During and After Infusion</span></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Phase <span class="pp">|</span> Equation <span class="pp">|</span></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> During infusion <span class="pp">|</span> $C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$ <span class="pp">|</span></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> At steady state (during continued infusion) <span class="pp">|</span> $C = C_{ss}$ <span class="pp">|</span></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> After infusion stops <span class="pp">|</span> $C(t) = C_{ss} \cdot e^{-k_{el} \cdot (t - T_{end})}$ <span class="pp">|</span></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Measuring Concentrations During Infusion</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>From a strictly mathematical standpoint, if the following are known:</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The infusion rate ($K_0$)</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The drug clearance ($CL$) and volume of distribution ($V$)</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The target steady-state concentration ($C_{ss}$)</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>Then plasma concentrations at any time point during the infusion can be **predicted** without measurement, using:</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>$$C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)$$</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>Accordingly, if a truly constant-rate infusion is being administered and the pharmacokinetic parameters are already characterized, collecting samples during the infusion adds limited additional information. The post-infusion concentration–time data alone are sufficient to estimate the relevant parameters.</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="fu">## 6. Loading Doses Combined with Maintenance Infusions</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.1 Rationale</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>The time required to reach steady state via a constant-rate infusion alone is four to five half-lives. For drugs with long half-lives, this delay may be clinically unacceptable. A **loading dose** (IV bolus) administered simultaneously at the start of the infusion allows the plasma concentration to reach $C_{ss}$ immediately.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.2 Combined Equation</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>When an IV bolus (loading dose) and a constant-rate infusion are given simultaneously, the total plasma concentration is the sum of contributions from each:</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>$$C(t) = \underbrace{C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right)}_{\text{infusion}} + \underbrace{C_0 \cdot e^{-k_{el} \cdot t}}_{\text{bolus}}$$</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>where $C_0 = \frac{\text{Loading Dose}}{V}$.</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.3 Optimal Loading Dose</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>If the loading dose is chosen such that $C_0 = C_{ss}$, the two exponential terms cancel:</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>$$C(t) = C_{ss} \cdot \left(1 - e^{-k_{el} \cdot t}\right) + C_{ss} \cdot e^{-k_{el} \cdot t} = C_{ss}$$</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>The plasma concentration is constant at $C_{ss}$ from time zero onward — there is no transient approach phase. The required loading dose is therefore:</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>$$\text{Loading Dose} = C_{ss} \cdot V$$</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="fu">### 6.4 Effect of Suboptimal Loading Dose</span></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>If $C_0 \neq C_{ss}$, the concentration–time profile will show an initial transient that either rises toward $C_{ss}$ (if $C_0 &lt; C_{ss}$) or falls toward $C_{ss}$ (if $C_0 &gt; C_{ss}$) before converging to the steady-state plateau. The infusion component continues to drive the system toward $C_{ss}$ in either case; the loading dose only alters how quickly the apparent steady state is reached from the combined-dose perspective.</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="fu">## 7. Summary of Key Concepts</span></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Zero-order input, first-order elimination** characterizes IV infusion pharmacokinetics.</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Steady state** is achieved when the rate of infusion equals the rate of elimination: $K_0 = CL \cdot C_{ss}$.</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Time to steady state** depends on the elimination half-life and is independent of the infusion rate; it takes approximately four to five half-lives.</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Short infusions** behave like IV bolus doses after the infusion ends; multiple short infusions accumulate to steady state similarly to multiple oral doses.</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Long infusions** produce an exponential approach to $C_{ss}$, described by $C(t) = C_{ss}(1 - e^{-k_{el} t})$.</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Concentration during infusion can be predicted** mathematically if $CL$, $V$, and $K_0$ are known; sampling during the infusion may not always add analytical value.</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Loading doses** can be combined with maintenance infusions to achieve $C_{ss}$ immediately; the optimal loading dose is $C_{ss} \cdot V$.</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>All infusion concepts reduce to the same mathematical framework as IV bolus kinetics — the post-infusion decline is $e^{-k_{el} t}$, and the approach to maximum is $1 - e^{-k_{el} t}$, its mirror image.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

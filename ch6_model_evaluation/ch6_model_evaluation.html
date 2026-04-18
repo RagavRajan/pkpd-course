@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute)">
+<meta name="dcterms.date" content="2026-04-18">
+
+<title>Chapter 6: Model Qualification – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch6_model_evaluation/ch6_model_evaluation.html">Chapter 6: Model Qualification</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#a-risk-based-approach-to-model-qualification" id="toc-a-risk-based-approach-to-model-qualification" class="nav-link" data-scroll-target="#a-risk-based-approach-to-model-qualification"><span class="header-section-number">2</span> A Risk-Based Approach to Model Qualification</a></li>
+  <li><a href="#model-qualification-methods" id="toc-model-qualification-methods" class="nav-link" data-scroll-target="#model-qualification-methods"><span class="header-section-number">3</span> Model Qualification Methods</a>
+  <ul class="collapse">
+  <li><a href="#assumption-checking" id="toc-assumption-checking" class="nav-link" data-scroll-target="#assumption-checking"><span class="header-section-number">3.1</span> Assumption Checking</a></li>
+  <li><a href="#bootstrap-qualification-of-parameter-estimates" id="toc-bootstrap-qualification-of-parameter-estimates" class="nav-link" data-scroll-target="#bootstrap-qualification-of-parameter-estimates"><span class="header-section-number">3.2</span> Bootstrap: Qualification of Parameter Estimates</a>
+  <ul class="collapse">
+  <li><a href="#base-pk-model" id="toc-base-pk-model" class="nav-link" data-scroll-target="#base-pk-model"><span class="header-section-number">3.2.1</span> Base PK Model</a></li>
+  <li><a href="#bootstrap-analysis" id="toc-bootstrap-analysis" class="nav-link" data-scroll-target="#bootstrap-analysis"><span class="header-section-number">3.2.2</span> Bootstrap Analysis</a></li>
+  </ul></li>
+  <li><a href="#visual-predictive-check-vpc" id="toc-visual-predictive-check-vpc" class="nav-link" data-scroll-target="#visual-predictive-check-vpc"><span class="header-section-number">3.3</span> Visual Predictive Check (VPC)</a></li>
+  <li><a href="#log-likelihood-profile" id="toc-log-likelihood-profile" class="nav-link" data-scroll-target="#log-likelihood-profile"><span class="header-section-number">3.4</span> Log-Likelihood Profile</a></li>
+  <li><a href="#diagnostics-summary" id="toc-diagnostics-summary" class="nav-link" data-scroll-target="#diagnostics-summary"><span class="header-section-number">3.5</span> Diagnostics Summary</a></li>
+  </ul></li>
+  <li><a href="#sensitivity-analysis" id="toc-sensitivity-analysis" class="nav-link" data-scroll-target="#sensitivity-analysis"><span class="header-section-number">4</span> Sensitivity Analysis</a></li>
+  <li><a href="#eda-driven-model-selection" id="toc-eda-driven-model-selection" class="nav-link" data-scroll-target="#eda-driven-model-selection"><span class="header-section-number">5</span> EDA-Driven Model Selection</a>
+  <ul class="collapse">
+  <li><a href="#hysteresis-detection" id="toc-hysteresis-detection" class="nav-link" data-scroll-target="#hysteresis-detection"><span class="header-section-number">5.1</span> Hysteresis Detection</a></li>
+  <li><a href="#multi-model-comparison" id="toc-multi-model-comparison" class="nav-link" data-scroll-target="#multi-model-comparison"><span class="header-section-number">5.2</span> Multi-Model Comparison</a></li>
+  </ul></li>
+  <li><a href="#study-guide-questions" id="toc-study-guide-questions" class="nav-link" data-scroll-target="#study-guide-questions"><span class="header-section-number">6</span> Study Guide Questions</a></li>
+  <li><a href="#supplementary-material" id="toc-supplementary-material" class="nav-link" data-scroll-target="#supplementary-material"><span class="header-section-number">7</span> Supplementary Material</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch6_model_evaluation/ch6_model_evaluation.html">Chapter 6: Model Qualification</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Chapter 6: Model Qualification</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 18, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<pre class="{julia}"><code>#| label: setup
+#| echo: false
+using Pumas
+using PumasUtilities
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()</code></pre>
+<section id="overview" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<p>Model qualification (or evaluation) methods help assess how well a model describes the observed data and whether it is suitable for its intended purpose:</p>
+<ul>
+<li>Assumption Checking</li>
+<li>Test Data Sets</li>
+<li>Log-Likelihood Profile</li>
+<li>Bootstrap</li>
+<li>Leverage Analysis</li>
+<li>Predictive Performance (VPC)</li>
+<li>Posterior Predictive Check</li>
+</ul>
+</section>
+<section id="a-risk-based-approach-to-model-qualification" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> A Risk-Based Approach to Model Qualification</h1>
+<ul>
+<li>The level of qualification should match the intended use of the model</li>
+<li>Exploratory models require less rigorous qualification than models used for regulatory decision-making</li>
+<li>All models should pass basic assumption checks and diagnostic evaluation</li>
+</ul>
+</section>
+<section id="model-qualification-methods" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Model Qualification Methods</h1>
+<section id="assumption-checking" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="assumption-checking"><span class="header-section-number">3.1</span> Assumption Checking</h2>
+<ul>
+<li>Distributional assumptions on random effects (ETAs should be approximately normal)</li>
+<li>Residual error assumptions (CWRES should be approximately N(0,1))</li>
+<li>Structural model assumptions (systematic trends in residuals indicate misspecification)</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Interpreting Diagnostic Plots: What Each Panel Reveals">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpreting Diagnostic Plots: What Each Panel Reveals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Standard goodness-of-fit diagnostics each target a specific aspect of model adequacy:</p>
+<ol type="1">
+<li><strong>DV vs PRED</strong> — Assesses population-level structural fit. Systematic deviations from the line of identity indicate structural model misspecification (e.g., wrong number of compartments or incorrect absorption model).</li>
+<li><strong>DV vs IPRED</strong> — Assesses individual-level fit after incorporating empirical Bayes estimates. Scatter should be tighter than DV vs PRED; if not, the random effects structure may be inadequate.</li>
+<li><strong>CWRES vs PRED</strong> — Evaluates residual error model adequacy. A fan-shaped (heteroscedastic) pattern suggests proportional error is needed; a U-shaped trend suggests structural misspecification persists even after accounting for random effects.</li>
+<li><strong>CWRES vs TIME</strong> — Detects time-dependent model misspecification, such as missing absorption lag time, autoinduction, or time-varying clearance.</li>
+</ol>
+<p>If the model is correctly specified, CWRES should be approximately <span class="math inline">\(N(0,1)\)</span> with no systematic trends. Deviations from this expectation guide targeted model refinement.</p>
+</div>
+</div>
+</section>
+<section id="bootstrap-qualification-of-parameter-estimates" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="bootstrap-qualification-of-parameter-estimates"><span class="header-section-number">3.2</span> Bootstrap: Qualification of Parameter Estimates</h2>
+<div class="callout callout-style-default callout-note callout-titled" title="Bootstrap vs. Asymptotic Standard Errors">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Bootstrap vs.&nbsp;Asymptotic Standard Errors
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Asymptotic standard errors derived from the Fisher information matrix assume that the likelihood surface is approximately <strong>quadratic</strong> (i.e., the parameter estimates are normally distributed) near the minimum. This assumption can fail for small datasets, when variance parameters are estimated near their boundary (e.g., <span class="math inline">\(\omega^2 \approx 0\)</span>), or when the likelihood surface is flat or irregular. In such cases, asymptotic confidence intervals may be misleading. <strong>Bootstrap resampling</strong> makes no distributional assumptions: by repeatedly resampling subjects with replacement and re-estimating the model, it constructs empirical confidence intervals that reflect the actual sampling distribution of the estimator. However, bootstrap is not without limitations — if the convergence rate across resamples falls below approximately 80%, this signals model instability or overparameterization, and the bootstrap results themselves become unreliable.</p>
+</div>
+</div>
+<p>Bootstrap provides non-parametric confidence intervals for parameter estimates by resampling subjects with replacement.</p>
+<section id="base-pk-model" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="base-pk-model"><span class="header-section-number">3.2.1</span> Base PK Model</h3>
+<p>The book uses a 1-compartment IV model with combined error (ADVAN1 TRANS2):</p>
+<pre class="{julia}"><code>#| label: ch6-data
+
+pk_df = CSV.read(joinpath(data_dir, "prob_5_1.csv"), DataFrame)
+rename!(pk_df,
+    :ID =&gt; :id, :DV =&gt; :dv, :AMT =&gt; :amt, :TIME =&gt; :time,
+    :II =&gt; :ii, :ADDL =&gt; :addl, :RATE =&gt; :rate,
+)
+
+# Prepare for Pumas
+pk_df.evid = ifelse.(pk_df.amt .&gt; 0, 1, 0)
+pk_df.cmt = fill(1, nrow(pk_df))
+pk_df.dv = ifelse.(pk_df.evid .== 1, missing, pk_df.dv)
+
+pop = read_pumas(pk_df; covariates = [:HT, :WT, :CLCR, :SEX, :AGE])
+println("Subjects: ", length(pop))</code></pre>
+<pre class="{julia}"><code>#| label: ch6-model
+
+# 1-cpt IV model with BLOCK(2) OMEGA and combined error
+# From 501.ctl: ADVAN1 TRANS2, Y=F + F*ERR(1) + ERR(2)
+pk_model = @model begin
+    @metadata begin
+        desc = "1-Cpt IV PopPK (Bootstrap Base Model)"
+    end
+    @param begin
+        tvCL   ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 75.0)
+        Ω      ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+        σ_add  ∈ RealDomain(lower = 0.0, init = 1.0)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR SEX AGE HT
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, sqrt((cp * σ_prop)^2 + σ_add^2))
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: ch6-fit
+
+init_params = (
+    tvCL = 13.0, tvV = 75.0,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2, σ_add = 1.0,
+)
+
+base_fit = fit(pk_model, pop, init_params, Pumas.FOCEI())
+base_fit</code></pre>
+<pre class="{julia}"><code>#| label: ch6-infer
+
+base_infer = infer(base_fit)
+base_infer</code></pre>
+</section>
+<section id="bootstrap-analysis" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="bootstrap-analysis"><span class="header-section-number">3.2.2</span> Bootstrap Analysis</h3>
+<p>In Pumas, bootstrap is performed via <code>infer(fit, Bootstrap())</code>:</p>
+<pre class="{julia}"><code>#| label: ch6-bootstrap
+
+# Bootstrap with 200 replicates (use more for production — e.g., 1000)
+boot_result = infer(base_fit, Pumas.Bootstrap(samples = 200))
+boot_result</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In NONMEM, bootstrap requires external tools (PsN, metrumrg) to resample datasets and re-run the model hundreds of times. In Pumas, <code>infer(fit, Bootstrap())</code> handles everything in a single call.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="visual-predictive-check-vpc" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="visual-predictive-check-vpc"><span class="header-section-number">3.3</span> Visual Predictive Check (VPC)</h2>
+<p>VPC compares the distribution of observed data to simulated data from the model. It assesses whether the model can reproduce the key features of the observed data.</p>
+<p>In NONMEM, VPC requires <code>$SIMULATION</code> and post-processing with R/PsN. In Pumas, use <code>vpc()</code> and <code>vpc_plot()</code>:</p>
+<pre class="{julia}"><code>#| label: ch6-vpc
+
+vpc_result = vpc(base_fit, 200)  # 200 simulations</code></pre>
+<pre class="{julia}"><code>#| label: fig-ch6-vpc
+#| fig-cap: "Visual Predictive Check"
+
+vpc_plot(vpc_result)</code></pre>
+</section>
+<section id="log-likelihood-profile" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="log-likelihood-profile"><span class="header-section-number">3.4</span> Log-Likelihood Profile</h2>
+<p>Log-likelihood profiling provides confidence intervals for individual parameters by fixing one parameter at a range of values and re-estimating the rest:</p>
+<pre class="{julia}"><code>#| label: ch6-ll-profile
+#| eval: false
+
+# Profile tvCL over a range around the estimate
+# (computationally intensive — commented for rendering speed)
+# cl_range = range(coef(base_fit).tvCL * 0.8, coef(base_fit).tvCL * 1.2, length = 20)
+# profiles = [fit(pk_model, pop, merge(coef(base_fit), (tvCL = cl,)), FOCEI();
+#             constantcoef = (tvCL = cl,)) for cl in cl_range]
+# ll_values = loglikelihood.(profiles)</code></pre>
+</section>
+<section id="diagnostics-summary" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="diagnostics-summary"><span class="header-section-number">3.5</span> Diagnostics Summary</h2>
+<pre class="{julia}"><code>#| label: fig-ch6-gof
+#| fig-cap: "GOF Diagnostic Plots"
+
+insp = inspect(base_fit)
+insp_df = DataFrame(insp)
+obs = @rsubset(insp_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, obs.dv_pred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, obs.dv_ipred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "CWRES", title = "CWRES vs PRED")
+scatter!(ax3, obs.dv_pred, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time (hr)", ylabel = "CWRES", title = "CWRES vs TIME")
+scatter!(ax4, obs.time, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax4, 0, color = :black)
+
+fig</code></pre>
+</section>
+</section>
+<section id="sensitivity-analysis" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Sensitivity Analysis</h1>
+<ul>
+<li>Evaluate the impact of model assumptions and data exclusion on conclusions</li>
+<li>Re-estimate model with subsets of data removed (e.g., influential subjects)</li>
+<li>Compare results when assumptions are relaxed (e.g., different error models)</li>
+</ul>
+</section>
+<section id="eda-driven-model-selection" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> EDA-Driven Model Selection</h1>
+<p>Before evaluating a model’s adequacy, the right model structure must be selected. Exploratory data analysis provides the first line of evidence:</p>
+<section id="hysteresis-detection" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="hysteresis-detection"><span class="header-section-number">5.1</span> Hysteresis Detection</h2>
+<p>A concentration-effect (CE) plot reveals whether the response is in equilibrium with plasma concentrations:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 29%">
+<col style="width: 37%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>CE Plot Pattern</th>
+<th>Interpretation</th>
+<th>Model Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No loop (single curve)</td>
+<td>Equilibrium — effect tracks concentration</td>
+<td><strong>Direct response</strong> (Emax, sigmoid Emax)</td>
+</tr>
+<tr class="even">
+<td>Counter-clockwise loop</td>
+<td>Effect lags behind concentration</td>
+<td><strong>Effect compartment</strong> (ke0 delay)</td>
+</tr>
+<tr class="odd">
+<td>Clockwise loop</td>
+<td>Tolerance, sensitization, or indirect mechanism</td>
+<td><strong>Indirect response</strong> (IDR Types I–IV) or tolerance model</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled" title="Systematic Model Selection Framework">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Systematic Model Selection Framework
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Exploratory Data Analysis</strong> — Plot effect vs.&nbsp;time, concentration-effect loops, identify temporal patterns</li>
+<li><strong>Mechanism-Based Selection</strong> — Match drug pharmacology to model structure:
+<ul>
+<li>Receptor binding → Direct or effect compartment</li>
+<li>Enzyme inhibition → IDR Type I or II</li>
+<li>Signal transduction cascade → IDR with transit or effect compartment</li>
+<li>Covalent binding → IDR Type IV or K-PD</li>
+</ul></li>
+<li><strong>Statistical Comparison</strong> — Among mechanistically plausible candidates, use AIC/BIC and GOF to select the best fit</li>
+<li><strong>Qualification</strong> — Bootstrap, VPC, sensitivity analysis for the selected model</li>
+</ol>
+</div>
+</div>
+</section>
+<section id="multi-model-comparison" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="multi-model-comparison"><span class="header-section-number">5.2</span> Multi-Model Comparison</h2>
+<p>When comparing more than two candidate models:</p>
+<pre class="{julia}"><code>#| label: ch6-multi-compare
+#| eval: false
+
+# Compare multiple models systematically
+fits = [fit1, fit2, fit3]
+for (i, f) in enumerate(fits)
+    println("Model $i — AIC: ", round(aic(f), digits=1),
+            "  BIC: ", round(bic(f), digits=1),
+            "  -2LL: ", round(-2*loglikelihood(f), digits=1))
+end
+
+# Or use metrics_table for side-by-side comparison
+metrics_table(fit1, fit2, fit3)
+
+# LRT for nested pairs only
+lrtest(fit1, fit2)  # only valid when fit1 is nested within fit2</code></pre>
+</section>
+</section>
+<section id="study-guide-questions" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Study Guide Questions</h1>
+<ol type="1">
+<li>What are the key differences between model evaluation and model qualification?</li>
+<li>When would you use a bootstrap analysis instead of asymptotic standard errors?</li>
+<li>What does a VPC tell you that GOF plots do not?</li>
+<li>When is model qualification less important?</li>
+<li>What are the limitations of the likelihood ratio test for model comparison?</li>
+</ol>
+</section>
+<section id="supplementary-material" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Supplementary Material</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Topic</th>
+<th>Tutorial</th>
+<th>Key Additions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Lecture: Graphical Diagnostics</strong></td>
+<td><a href="../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">PKPD W6</a></td>
+<td>DV vs PRED/IPRED interpretation, CWRES patterns, time-dependent misspecification</td>
+</tr>
+<tr class="even">
+<td><strong>Lecture: Residual Diagnostics &amp; Error Models</strong></td>
+<td><a href="../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">PKPD W7</a></td>
+<td>Additive vs proportional vs combined error, residual analysis methodology</td>
+</tr>
+<tr class="odd">
+<td><strong>Lecture: Base Model &amp; Likelihood Comparison</strong></td>
+<td><a href="../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">PKPD W5</a></td>
+<td>-2LL, LRT, AIC/BIC theory, model comparison workflow</td>
+</tr>
+<tr class="even">
+<td>PD model selection framework</td>
+<td><a href="https://tutorials.pumas.ai/html/PDModels/05-model-selection.html">PD Model Selection</a></td>
+<td>EDA → mechanism → statistics workflow, hysteresis detection, warfarin case study</td>
+</tr>
+<tr class="odd">
+<td>Bayesian model comparison</td>
+<td><a href="https://tutorials.pumas.ai/html/bayesian/05-model_comparison.html">Bayesian Model Comparison</a></td>
+<td>WAIC, LOO-CV, Bayes factors for non-nested models</td>
+</tr>
+<tr class="even">
+<td>VPC customization</td>
+<td><a href="https://tutorials.pumas.ai/html/LearningPaths/04-LP/11-Module/ContinuousVPC.html">Continuous VPC</a></td>
+<td>Stratified VPC, prediction-corrected VPC, log-scale</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb12" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chapter 6: Model Qualification"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition"</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> today</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-width: 8</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-height: 5</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">  error: false</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pumas</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">PumasUtilities</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">"../data"</span>)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="fu">set_aog_theme!</span>()</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="fu"># Overview</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>Model qualification (or evaluation) methods help assess how well a model describes the observed data and whether it is suitable for its intended purpose:</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Assumption Checking</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Test Data Sets</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Log-Likelihood Profile</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bootstrap</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Leverage Analysis</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Predictive Performance (VPC)</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Posterior Predictive Check</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="fu"># A Risk-Based Approach to Model Qualification</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The level of qualification should match the intended use of the model</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Exploratory models require less rigorous qualification than models used for regulatory decision-making</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>All models should pass basic assumption checks and diagnostic evaluation</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="fu"># Model Qualification Methods</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Assumption Checking</span></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Distributional assumptions on random effects (ETAs should be approximately normal)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Residual error assumptions (CWRES should be approximately N(0,1))</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Structural model assumptions (systematic trends in residuals indicate misspecification)</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Interpreting Diagnostic Plots: What Each Panel Reveals"}</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>Standard goodness-of-fit diagnostics each target a specific aspect of model adequacy:</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**DV vs PRED** — Assesses population-level structural fit. Systematic deviations from the line of identity indicate structural model misspecification (e.g., wrong number of compartments or incorrect absorption model).</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**DV vs IPRED** — Assesses individual-level fit after incorporating empirical Bayes estimates. Scatter should be tighter than DV vs PRED; if not, the random effects structure may be inadequate.</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**CWRES vs PRED** — Evaluates residual error model adequacy. A fan-shaped (heteroscedastic) pattern suggests proportional error is needed; a U-shaped trend suggests structural misspecification persists even after accounting for random effects.</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**CWRES vs TIME** — Detects time-dependent model misspecification, such as missing absorption lag time, autoinduction, or time-varying clearance.</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>If the model is correctly specified, CWRES should be approximately $N(0,1)$ with no systematic trends. Deviations from this expectation guide targeted model refinement.</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bootstrap: Qualification of Parameter Estimates</span></span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Bootstrap vs. Asymptotic Standard Errors"}</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>Asymptotic standard errors derived from the Fisher information matrix assume that the likelihood surface is approximately **quadratic** (i.e., the parameter estimates are normally distributed) near the minimum. This assumption can fail for small datasets, when variance parameters are estimated near their boundary (e.g., $\omega^2 \approx 0$), or when the likelihood surface is flat or irregular. In such cases, asymptotic confidence intervals may be misleading. **Bootstrap resampling** makes no distributional assumptions: by repeatedly resampling subjects with replacement and re-estimating the model, it constructs empirical confidence intervals that reflect the actual sampling distribution of the estimator. However, bootstrap is not without limitations — if the convergence rate across resamples falls below approximately 80%, this signals model instability or overparameterization, and the bootstrap results themselves become unreliable.</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>Bootstrap provides non-parametric confidence intervals for parameter estimates by resampling subjects with replacement.</span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a><span class="fu">### Base PK Model</span></span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>The book uses a 1-compartment IV model with combined error (ADVAN1 TRANS2):</span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-data</span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>pk_df <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="fu">joinpath</span>(data_dir, <span class="st">"prob_5_1.csv"</span>), DataFrame)</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="fu">rename!</span>(pk_df,</span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>ID <span class="op">=&gt;</span> <span class="op">:</span>id, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv, <span class="op">:</span>AMT <span class="op">=&gt;</span> <span class="op">:</span>amt, <span class="op">:</span>TIME <span class="op">=&gt;</span> <span class="op">:</span>time,</span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>II <span class="op">=&gt;</span> <span class="op">:</span>ii, <span class="op">:</span>ADDL <span class="op">=&gt;</span> <span class="op">:</span>addl, <span class="op">:</span>RATE <span class="op">=&gt;</span> <span class="op">:</span>rate,</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare for Pumas</span></span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>pk_df.evid <span class="op">=</span> <span class="fu">ifelse</span>.(pk_df.amt <span class="op">.&gt;</span> <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>)</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>pk_df.cmt <span class="op">=</span> <span class="fu">fill</span>(<span class="fl">1</span>, <span class="fu">nrow</span>(pk_df))</span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>pk_df.dv <span class="op">=</span> <span class="fu">ifelse</span>.(pk_df.evid <span class="op">.==</span> <span class="fl">1</span>, <span class="cn">missing</span>, pk_df.dv)</span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>pop <span class="op">=</span> <span class="fu">read_pumas</span>(pk_df; covariates <span class="op">=</span> [<span class="op">:</span>HT, <span class="op">:</span>WT, <span class="op">:</span>CLCR, <span class="op">:</span>SEX, <span class="op">:</span>AGE])</span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Subjects: "</span>, <span class="fu">length</span>(pop))</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-model</span></span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a><span class="co"># 1-cpt IV model with BLOCK(2) OMEGA and combined error</span></span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a><span class="co"># From 501.ctl: ADVAN1 TRANS2, Y=F + F*ERR(1) + ERR(2)</span></span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>pk_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"1-Cpt IV PopPK (Bootstrap Base Model)"</span></span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">13.0</span>)</span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">75.0</span>)</span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a>        Ω      <span class="op">∈</span> <span class="fu">PSDDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a>        σ_add  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">1.0</span>)</span>
+<span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-125"><a href="#cb12-125" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb12-126"><a href="#cb12-126" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb12-127"><a href="#cb12-127" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-128"><a href="#cb12-128" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@covariates</span> WT CLCR SEX AGE HT</span>
+<span id="cb12-129"><a href="#cb12-129" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb12-130"><a href="#cb12-130" aria-hidden="true" tabindex="-1"></a>        CL <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb12-131"><a href="#cb12-131" aria-hidden="true" tabindex="-1"></a>        Vc <span class="op">=</span> tvV <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb12-132"><a href="#cb12-132" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-133"><a href="#cb12-133" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Central1</span>
+<span id="cb12-134"><a href="#cb12-134" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb12-135"><a href="#cb12-135" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb12-136"><a href="#cb12-136" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">sqrt</span>((cp <span class="op">*</span> σ_prop)<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> σ_add<span class="op">^</span><span class="fl">2</span>))</span>
+<span id="cb12-137"><a href="#cb12-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb12-138"><a href="#cb12-138" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb12-139"><a href="#cb12-139" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-140"><a href="#cb12-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-143"><a href="#cb12-143" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-144"><a href="#cb12-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-fit</span></span>
+<span id="cb12-145"><a href="#cb12-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-146"><a href="#cb12-146" aria-hidden="true" tabindex="-1"></a>init_params <span class="op">=</span> (</span>
+<span id="cb12-147"><a href="#cb12-147" aria-hidden="true" tabindex="-1"></a>    tvCL <span class="op">=</span> <span class="fl">13.0</span>, tvV <span class="op">=</span> <span class="fl">75.0</span>,</span>
+<span id="cb12-148"><a href="#cb12-148" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> [<span class="fl">0.04</span> <span class="fl">0.02</span>; <span class="fl">0.02</span> <span class="fl">0.04</span>],</span>
+<span id="cb12-149"><a href="#cb12-149" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>, σ_add <span class="op">=</span> <span class="fl">1.0</span>,</span>
+<span id="cb12-150"><a href="#cb12-150" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-151"><a href="#cb12-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-152"><a href="#cb12-152" aria-hidden="true" tabindex="-1"></a>base_fit <span class="op">=</span> <span class="fu">fit</span>(pk_model, pop, init_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb12-153"><a href="#cb12-153" aria-hidden="true" tabindex="-1"></a>base_fit</span>
+<span id="cb12-154"><a href="#cb12-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-155"><a href="#cb12-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-158"><a href="#cb12-158" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-159"><a href="#cb12-159" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-infer</span></span>
+<span id="cb12-160"><a href="#cb12-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-161"><a href="#cb12-161" aria-hidden="true" tabindex="-1"></a>base_infer <span class="op">=</span> <span class="fu">infer</span>(base_fit)</span>
+<span id="cb12-162"><a href="#cb12-162" aria-hidden="true" tabindex="-1"></a>base_infer</span>
+<span id="cb12-163"><a href="#cb12-163" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-164"><a href="#cb12-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-165"><a href="#cb12-165" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bootstrap Analysis</span></span>
+<span id="cb12-166"><a href="#cb12-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-167"><a href="#cb12-167" aria-hidden="true" tabindex="-1"></a>In Pumas, bootstrap is performed via <span class="in">`infer(fit, Bootstrap())`</span>:</span>
+<span id="cb12-168"><a href="#cb12-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-171"><a href="#cb12-171" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-172"><a href="#cb12-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-bootstrap</span></span>
+<span id="cb12-173"><a href="#cb12-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-174"><a href="#cb12-174" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap with 200 replicates (use more for production — e.g., 1000)</span></span>
+<span id="cb12-175"><a href="#cb12-175" aria-hidden="true" tabindex="-1"></a>boot_result <span class="op">=</span> <span class="fu">infer</span>(base_fit, Pumas.<span class="fu">Bootstrap</span>(samples <span class="op">=</span> <span class="fl">200</span>))</span>
+<span id="cb12-176"><a href="#cb12-176" aria-hidden="true" tabindex="-1"></a>boot_result</span>
+<span id="cb12-177"><a href="#cb12-177" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-178"><a href="#cb12-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-179"><a href="#cb12-179" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb12-180"><a href="#cb12-180" aria-hidden="true" tabindex="-1"></a>In NONMEM, bootstrap requires external tools (PsN, metrumrg) to resample datasets and re-run the model hundreds of times. In Pumas, <span class="in">`infer(fit, Bootstrap())`</span> handles everything in a single call.</span>
+<span id="cb12-181"><a href="#cb12-181" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb12-182"><a href="#cb12-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-183"><a href="#cb12-183" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visual Predictive Check (VPC)</span></span>
+<span id="cb12-184"><a href="#cb12-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-185"><a href="#cb12-185" aria-hidden="true" tabindex="-1"></a>VPC compares the distribution of observed data to simulated data from the model. It assesses whether the model can reproduce the key features of the observed data.</span>
+<span id="cb12-186"><a href="#cb12-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-187"><a href="#cb12-187" aria-hidden="true" tabindex="-1"></a>In NONMEM, VPC requires <span class="in">`$SIMULATION`</span> and post-processing with R/PsN. In Pumas, use <span class="in">`vpc()`</span> and <span class="in">`vpc_plot()`</span>:</span>
+<span id="cb12-188"><a href="#cb12-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-191"><a href="#cb12-191" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-192"><a href="#cb12-192" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-vpc</span></span>
+<span id="cb12-193"><a href="#cb12-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-194"><a href="#cb12-194" aria-hidden="true" tabindex="-1"></a>vpc_result <span class="op">=</span> <span class="fu">vpc</span>(base_fit, <span class="fl">200</span>)  <span class="co"># 200 simulations</span></span>
+<span id="cb12-195"><a href="#cb12-195" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-196"><a href="#cb12-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-199"><a href="#cb12-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-200"><a href="#cb12-200" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ch6-vpc</span></span>
+<span id="cb12-201"><a href="#cb12-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Visual Predictive Check"</span></span>
+<span id="cb12-202"><a href="#cb12-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-203"><a href="#cb12-203" aria-hidden="true" tabindex="-1"></a><span class="fu">vpc_plot</span>(vpc_result)</span>
+<span id="cb12-204"><a href="#cb12-204" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-205"><a href="#cb12-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-206"><a href="#cb12-206" aria-hidden="true" tabindex="-1"></a><span class="fu">## Log-Likelihood Profile</span></span>
+<span id="cb12-207"><a href="#cb12-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-208"><a href="#cb12-208" aria-hidden="true" tabindex="-1"></a>Log-likelihood profiling provides confidence intervals for individual parameters by fixing one parameter at a range of values and re-estimating the rest:</span>
+<span id="cb12-209"><a href="#cb12-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-212"><a href="#cb12-212" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-213"><a href="#cb12-213" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-ll-profile</span></span>
+<span id="cb12-214"><a href="#cb12-214" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-215"><a href="#cb12-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-216"><a href="#cb12-216" aria-hidden="true" tabindex="-1"></a><span class="co"># Profile tvCL over a range around the estimate</span></span>
+<span id="cb12-217"><a href="#cb12-217" aria-hidden="true" tabindex="-1"></a><span class="co"># (computationally intensive — commented for rendering speed)</span></span>
+<span id="cb12-218"><a href="#cb12-218" aria-hidden="true" tabindex="-1"></a><span class="co"># cl_range = range(coef(base_fit).tvCL * 0.8, coef(base_fit).tvCL * 1.2, length = 20)</span></span>
+<span id="cb12-219"><a href="#cb12-219" aria-hidden="true" tabindex="-1"></a><span class="co"># profiles = [fit(pk_model, pop, merge(coef(base_fit), (tvCL = cl,)), FOCEI();</span></span>
+<span id="cb12-220"><a href="#cb12-220" aria-hidden="true" tabindex="-1"></a><span class="co">#             constantcoef = (tvCL = cl,)) for cl in cl_range]</span></span>
+<span id="cb12-221"><a href="#cb12-221" aria-hidden="true" tabindex="-1"></a><span class="co"># ll_values = loglikelihood.(profiles)</span></span>
+<span id="cb12-222"><a href="#cb12-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-223"><a href="#cb12-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-224"><a href="#cb12-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## Diagnostics Summary</span></span>
+<span id="cb12-225"><a href="#cb12-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-228"><a href="#cb12-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-229"><a href="#cb12-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ch6-gof</span></span>
+<span id="cb12-230"><a href="#cb12-230" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "GOF Diagnostic Plots"</span></span>
+<span id="cb12-231"><a href="#cb12-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-232"><a href="#cb12-232" aria-hidden="true" tabindex="-1"></a>insp <span class="op">=</span> <span class="fu">inspect</span>(base_fit)</span>
+<span id="cb12-233"><a href="#cb12-233" aria-hidden="true" tabindex="-1"></a>insp_df <span class="op">=</span> <span class="fu">DataFrame</span>(insp)</span>
+<span id="cb12-234"><a href="#cb12-234" aria-hidden="true" tabindex="-1"></a>obs <span class="op">=</span> <span class="pp">@rsubset</span>(insp_df, !<span class="fu">ismissing</span>(<span class="op">:</span>dv))</span>
+<span id="cb12-235"><a href="#cb12-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-236"><a href="#cb12-236" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">600</span>))</span>
+<span id="cb12-237"><a href="#cb12-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-238"><a href="#cb12-238" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"PRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV"</span>, title <span class="op">=</span> <span class="st">"DV vs PRED"</span>)</span>
+<span id="cb12-239"><a href="#cb12-239" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax1, obs.dv_pred, obs.dv, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb12-240"><a href="#cb12-240" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax1, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb12-241"><a href="#cb12-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-242"><a href="#cb12-242" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"IPRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV"</span>, title <span class="op">=</span> <span class="st">"DV vs IPRED"</span>)</span>
+<span id="cb12-243"><a href="#cb12-243" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax2, obs.dv_ipred, obs.dv, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb12-244"><a href="#cb12-244" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax2, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb12-245"><a href="#cb12-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-246"><a href="#cb12-246" aria-hidden="true" tabindex="-1"></a>ax3 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"PRED"</span>, ylabel <span class="op">=</span> <span class="st">"CWRES"</span>, title <span class="op">=</span> <span class="st">"CWRES vs PRED"</span>)</span>
+<span id="cb12-247"><a href="#cb12-247" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax3, obs.dv_pred, obs.dv_wres, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb12-248"><a href="#cb12-248" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax3, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb12-249"><a href="#cb12-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-250"><a href="#cb12-250" aria-hidden="true" tabindex="-1"></a>ax4 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"Time (hr)"</span>, ylabel <span class="op">=</span> <span class="st">"CWRES"</span>, title <span class="op">=</span> <span class="st">"CWRES vs TIME"</span>)</span>
+<span id="cb12-251"><a href="#cb12-251" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax4, obs.time, obs.dv_wres, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb12-252"><a href="#cb12-252" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax4, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb12-253"><a href="#cb12-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-254"><a href="#cb12-254" aria-hidden="true" tabindex="-1"></a>fig</span>
+<span id="cb12-255"><a href="#cb12-255" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-256"><a href="#cb12-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-257"><a href="#cb12-257" aria-hidden="true" tabindex="-1"></a><span class="fu"># Sensitivity Analysis</span></span>
+<span id="cb12-258"><a href="#cb12-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-259"><a href="#cb12-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Evaluate the impact of model assumptions and data exclusion on conclusions</span>
+<span id="cb12-260"><a href="#cb12-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Re-estimate model with subsets of data removed (e.g., influential subjects)</span>
+<span id="cb12-261"><a href="#cb12-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Compare results when assumptions are relaxed (e.g., different error models)</span>
+<span id="cb12-262"><a href="#cb12-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-263"><a href="#cb12-263" aria-hidden="true" tabindex="-1"></a><span class="fu"># EDA-Driven Model Selection</span></span>
+<span id="cb12-264"><a href="#cb12-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-265"><a href="#cb12-265" aria-hidden="true" tabindex="-1"></a>Before evaluating a model's adequacy, the right model structure must be selected. Exploratory data analysis provides the first line of evidence:</span>
+<span id="cb12-266"><a href="#cb12-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-267"><a href="#cb12-267" aria-hidden="true" tabindex="-1"></a><span class="fu">## Hysteresis Detection</span></span>
+<span id="cb12-268"><a href="#cb12-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-269"><a href="#cb12-269" aria-hidden="true" tabindex="-1"></a>A concentration-effect (CE) plot reveals whether the response is in equilibrium with plasma concentrations:</span>
+<span id="cb12-270"><a href="#cb12-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-271"><a href="#cb12-271" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> CE Plot Pattern <span class="pp">|</span> Interpretation <span class="pp">|</span> Model Implication <span class="pp">|</span></span>
+<span id="cb12-272"><a href="#cb12-272" aria-hidden="true" tabindex="-1"></a><span class="pp">|-----------------|---------------|-------------------|</span></span>
+<span id="cb12-273"><a href="#cb12-273" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> No loop (single curve) <span class="pp">|</span> Equilibrium — effect tracks concentration <span class="pp">|</span> **Direct response** (Emax, sigmoid Emax) <span class="pp">|</span></span>
+<span id="cb12-274"><a href="#cb12-274" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Counter-clockwise loop <span class="pp">|</span> Effect lags behind concentration <span class="pp">|</span> **Effect compartment** (ke0 delay) <span class="pp">|</span></span>
+<span id="cb12-275"><a href="#cb12-275" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clockwise loop <span class="pp">|</span> Tolerance, sensitization, or indirect mechanism <span class="pp">|</span> **Indirect response** (IDR Types I–IV) or tolerance model <span class="pp">|</span></span>
+<span id="cb12-276"><a href="#cb12-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-277"><a href="#cb12-277" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="Systematic Model Selection Framework"}</span>
+<span id="cb12-278"><a href="#cb12-278" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Exploratory Data Analysis** — Plot effect vs. time, concentration-effect loops, identify temporal patterns</span>
+<span id="cb12-279"><a href="#cb12-279" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Mechanism-Based Selection** — Match drug pharmacology to model structure:</span>
+<span id="cb12-280"><a href="#cb12-280" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Receptor binding → Direct or effect compartment</span>
+<span id="cb12-281"><a href="#cb12-281" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Enzyme inhibition → IDR Type I or II</span>
+<span id="cb12-282"><a href="#cb12-282" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Signal transduction cascade → IDR with transit or effect compartment</span>
+<span id="cb12-283"><a href="#cb12-283" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Covalent binding → IDR Type IV or K-PD</span>
+<span id="cb12-284"><a href="#cb12-284" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Statistical Comparison** — Among mechanistically plausible candidates, use AIC/BIC and GOF to select the best fit</span>
+<span id="cb12-285"><a href="#cb12-285" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Qualification** — Bootstrap, VPC, sensitivity analysis for the selected model</span>
+<span id="cb12-286"><a href="#cb12-286" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb12-287"><a href="#cb12-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-288"><a href="#cb12-288" aria-hidden="true" tabindex="-1"></a><span class="fu">## Multi-Model Comparison</span></span>
+<span id="cb12-289"><a href="#cb12-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-290"><a href="#cb12-290" aria-hidden="true" tabindex="-1"></a>When comparing more than two candidate models:</span>
+<span id="cb12-291"><a href="#cb12-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-294"><a href="#cb12-294" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb12-295"><a href="#cb12-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch6-multi-compare</span></span>
+<span id="cb12-296"><a href="#cb12-296" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-297"><a href="#cb12-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-298"><a href="#cb12-298" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare multiple models systematically</span></span>
+<span id="cb12-299"><a href="#cb12-299" aria-hidden="true" tabindex="-1"></a>fits <span class="op">=</span> [fit1, fit2, fit3]</span>
+<span id="cb12-300"><a href="#cb12-300" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i, f) <span class="kw">in</span> <span class="fu">enumerate</span>(fits)</span>
+<span id="cb12-301"><a href="#cb12-301" aria-hidden="true" tabindex="-1"></a>    <span class="fu">println</span>(<span class="st">"Model </span><span class="sc">$</span>i<span class="st"> — AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(f), digits<span class="op">=</span><span class="fl">1</span>),</span>
+<span id="cb12-302"><a href="#cb12-302" aria-hidden="true" tabindex="-1"></a>            <span class="st">"  BIC: "</span>, <span class="fu">round</span>(<span class="fu">bic</span>(f), digits<span class="op">=</span><span class="fl">1</span>),</span>
+<span id="cb12-303"><a href="#cb12-303" aria-hidden="true" tabindex="-1"></a>            <span class="st">"  -2LL: "</span>, <span class="fu">round</span>(<span class="fu">-2*loglikelihood</span>(f), digits<span class="op">=</span><span class="fl">1</span>))</span>
+<span id="cb12-304"><a href="#cb12-304" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb12-305"><a href="#cb12-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-306"><a href="#cb12-306" aria-hidden="true" tabindex="-1"></a><span class="co"># Or use metrics_table for side-by-side comparison</span></span>
+<span id="cb12-307"><a href="#cb12-307" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics_table</span>(fit1, fit2, fit3)</span>
+<span id="cb12-308"><a href="#cb12-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-309"><a href="#cb12-309" aria-hidden="true" tabindex="-1"></a><span class="co"># LRT for nested pairs only</span></span>
+<span id="cb12-310"><a href="#cb12-310" aria-hidden="true" tabindex="-1"></a><span class="fu">lrtest</span>(fit1, fit2)  <span class="co"># only valid when fit1 is nested within fit2</span></span>
+<span id="cb12-311"><a href="#cb12-311" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-312"><a href="#cb12-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-313"><a href="#cb12-313" aria-hidden="true" tabindex="-1"></a><span class="fu"># Study Guide Questions</span></span>
+<span id="cb12-314"><a href="#cb12-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-315"><a href="#cb12-315" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>What are the key differences between model evaluation and model qualification?</span>
+<span id="cb12-316"><a href="#cb12-316" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>When would you use a bootstrap analysis instead of asymptotic standard errors?</span>
+<span id="cb12-317"><a href="#cb12-317" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>What does a VPC tell you that GOF plots do not?</span>
+<span id="cb12-318"><a href="#cb12-318" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>When is model qualification less important?</span>
+<span id="cb12-319"><a href="#cb12-319" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>What are the limitations of the likelihood ratio test for model comparison?</span>
+<span id="cb12-320"><a href="#cb12-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-321"><a href="#cb12-321" aria-hidden="true" tabindex="-1"></a><span class="fu"># Supplementary Material</span></span>
+<span id="cb12-322"><a href="#cb12-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-323"><a href="#cb12-323" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Topic <span class="pp">|</span> Tutorial <span class="pp">|</span> Key Additions <span class="pp">|</span></span>
+<span id="cb12-324"><a href="#cb12-324" aria-hidden="true" tabindex="-1"></a><span class="pp">|-------|----------|---------------|</span></span>
+<span id="cb12-325"><a href="#cb12-325" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Graphical Diagnostics** <span class="pp">|</span> <span class="co">[</span><span class="ot">PKPD W6</span><span class="co">](../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.qmd)</span> <span class="pp">|</span> DV vs PRED/IPRED interpretation, CWRES patterns, time-dependent misspecification <span class="pp">|</span></span>
+<span id="cb12-326"><a href="#cb12-326" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Residual Diagnostics &amp; Error Models** <span class="pp">|</span> <span class="co">[</span><span class="ot">PKPD W7</span><span class="co">](../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.qmd)</span> <span class="pp">|</span> Additive vs proportional vs combined error, residual analysis methodology <span class="pp">|</span></span>
+<span id="cb12-327"><a href="#cb12-327" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Base Model &amp; Likelihood Comparison** <span class="pp">|</span> <span class="co">[</span><span class="ot">PKPD W5</span><span class="co">](../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.qmd)</span> <span class="pp">|</span> -2LL, LRT, AIC/BIC theory, model comparison workflow <span class="pp">|</span></span>
+<span id="cb12-328"><a href="#cb12-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PD model selection framework <span class="pp">|</span> <span class="co">[</span><span class="ot">PD Model Selection</span><span class="co">](https://tutorials.pumas.ai/html/PDModels/05-model-selection.html)</span> <span class="pp">|</span> EDA → mechanism → statistics workflow, hysteresis detection, warfarin case study <span class="pp">|</span></span>
+<span id="cb12-329"><a href="#cb12-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bayesian model comparison <span class="pp">|</span> <span class="co">[</span><span class="ot">Bayesian Model Comparison</span><span class="co">](https://tutorials.pumas.ai/html/bayesian/05-model_comparison.html)</span> <span class="pp">|</span> WAIC, LOO-CV, Bayes factors for non-nested models <span class="pp">|</span></span>
+<span id="cb12-330"><a href="#cb12-330" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> VPC customization <span class="pp">|</span> <span class="co">[</span><span class="ot">Continuous VPC</span><span class="co">](https://tutorials.pumas.ai/html/LearningPaths/04-LP/11-Module/ContinuousVPC.html)</span> <span class="pp">|</span> Stratified VPC, prediction-corrected VPC, log-scale <span class="pp">|</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

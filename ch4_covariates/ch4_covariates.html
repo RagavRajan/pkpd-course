@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute)">
+<meta name="dcterms.date" content="2026-04-18">
+
+<title>Chapter 4: Covariate Model Building – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch4_covariates/ch4_covariates.html">Chapter 4: Covariate Model Building</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#objectives-of-covariate-model-development" id="toc-objectives-of-covariate-model-development" class="nav-link" data-scroll-target="#objectives-of-covariate-model-development"><span class="header-section-number">2</span> Objectives of Covariate Model Development</a></li>
+  <li><a href="#common-covariate-parameterizations" id="toc-common-covariate-parameterizations" class="nav-link" data-scroll-target="#common-covariate-parameterizations"><span class="header-section-number">3</span> Common Covariate Parameterizations</a>
+  <ul class="collapse">
+  <li><a href="#continuous-covariates" id="toc-continuous-covariates" class="nav-link" data-scroll-target="#continuous-covariates"><span class="header-section-number">3.1</span> Continuous Covariates</a></li>
+  <li><a href="#categorical-covariates" id="toc-categorical-covariates" class="nav-link" data-scroll-target="#categorical-covariates"><span class="header-section-number">3.2</span> Categorical Covariates</a></li>
+  <li><a href="#desirable-properties" id="toc-desirable-properties" class="nav-link" data-scroll-target="#desirable-properties"><span class="header-section-number">3.3</span> Desirable Properties</a></li>
+  </ul></li>
+  <li><a href="#data-and-base-model" id="toc-data-and-base-model" class="nav-link" data-scroll-target="#data-and-base-model"><span class="header-section-number">4</span> Data and Base Model</a>
+  <ul class="collapse">
+  <li><a href="#ebe-covariate-screening-plots" id="toc-ebe-covariate-screening-plots" class="nav-link" data-scroll-target="#ebe-covariate-screening-plots"><span class="header-section-number">4.1</span> EBE-Covariate Screening Plots</a></li>
+  </ul></li>
+  <li><a href="#full-covariate-model" id="toc-full-covariate-model" class="nav-link" data-scroll-target="#full-covariate-model"><span class="header-section-number">5</span> Full Covariate Model</a></li>
+  <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">6</span> Model Comparison</a></li>
+  <li><a href="#covariate-modeling-methods-in-pumas" id="toc-covariate-modeling-methods-in-pumas" class="nav-link" data-scroll-target="#covariate-modeling-methods-in-pumas"><span class="header-section-number">7</span> Covariate Modeling Methods in Pumas</a>
+  <ul class="collapse">
+  <li><a href="#automated-covariate-selection" id="toc-automated-covariate-selection" class="nav-link" data-scroll-target="#automated-covariate-selection"><span class="header-section-number">7.1</span> Automated Covariate Selection</a>
+  <ul class="collapse">
+  <li><a href="#forward-selection" id="toc-forward-selection" class="nav-link" data-scroll-target="#forward-selection"><span class="header-section-number">7.1.1</span> Forward Selection</a></li>
+  <li><a href="#backward-elimination" id="toc-backward-elimination" class="nav-link" data-scroll-target="#backward-elimination"><span class="header-section-number">7.1.2</span> Backward Elimination</a></li>
+  <li><a href="#aic-vs-bic-vs-lrt" id="toc-aic-vs-bic-vs-lrt" class="nav-link" data-scroll-target="#aic-vs-bic-vs-lrt"><span class="header-section-number">7.1.3</span> AIC vs BIC vs LRT</a></li>
+  </ul></li>
+  <li><a href="#time-varying-covariates" id="toc-time-varying-covariates" class="nav-link" data-scroll-target="#time-varying-covariates"><span class="header-section-number">7.2</span> Time-Varying Covariates</a></li>
+  <li><a href="#missing-covariates-in-population-models" id="toc-missing-covariates-in-population-models" class="nav-link" data-scroll-target="#missing-covariates-in-population-models"><span class="header-section-number">7.3</span> Missing Covariates in Population Models</a></li>
+  </ul></li>
+  <li><a href="#gof-diagnostics-full-model" id="toc-gof-diagnostics-full-model" class="nav-link" data-scroll-target="#gof-diagnostics-full-model"><span class="header-section-number">8</span> GOF Diagnostics: Full Model</a></li>
+  <li><a href="#study-guide-questions" id="toc-study-guide-questions" class="nav-link" data-scroll-target="#study-guide-questions"><span class="header-section-number">9</span> Study Guide Questions</a></li>
+  <li><a href="#supplementary-material" id="toc-supplementary-material" class="nav-link" data-scroll-target="#supplementary-material"><span class="header-section-number">10</span> Supplementary Material</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch1_intro_nlme/ch1_intro_nlme.html">Chapters</a></li><li class="breadcrumb-item"><a href="../ch4_covariates/ch4_covariates.html">Chapter 4: Covariate Model Building</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Chapter 4: Covariate Model Building</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adapted from Marc R. Gastonguay, Ph.D.&nbsp;(Metrum Institute) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 18, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<pre class="{julia}"><code>#| label: setup
+#| echo: false
+using Pumas
+using DataFramesMeta
+using CSV
+using CairoMakie
+using AlgebraOfGraphics
+using Statistics
+using LinearAlgebra
+
+data_dir = joinpath(@__DIR__, "../data")
+set_aog_theme!()</code></pre>
+<section id="overview" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Overview</h1>
+<p>Covariate model building identifies measurable patient factors that explain inter-individual variability in PK/PD parameters:</p>
+<ul>
+<li>Objectives of covariate model development</li>
+<li>Common covariate model parameterizations</li>
+<li>Data reduction before covariate building</li>
+<li>Covariate screening methods (traditional and automated)</li>
+<li>Inferences about covariate effects</li>
+</ul>
+</section>
+<section id="objectives-of-covariate-model-development" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Objectives of Covariate Model Development</h1>
+<ul>
+<li>Identify factors that explain variability in PK/PD parameters</li>
+<li>Reduce unexplained inter-individual variability</li>
+<li>Improve model predictions for individual patients</li>
+<li>Support dose adjustment recommendations for special populations</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="Why Covariates Reduce Inter-Individual Variability">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Covariates Reduce Inter-Individual Variability
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When a covariate genuinely explains inter-individual variability, incorporating it into the model splits the single population parameter into covariate-defined subgroups, each with its own typical value. The random effect <span class="math inline">\(\eta_i\)</span> must then only account for the residual difference between the individual’s true parameter and the subgroup-specific population prediction, rather than the overall population mean. This forces <span class="math inline">\(\eta\)</span> to do less work, producing a tighter distribution and a smaller <span class="math inline">\(\omega\)</span>.</p>
+<p><strong>Intuitive example:</strong> Suppose males have true CL <span class="math inline">\(\approx\)</span> 10 L/h and females have true CL <span class="math inline">\(\approx\)</span> 8 L/h. A model without a sex covariate estimates <span class="math inline">\(\text{tvCL} \approx 9\)</span> L/h with a large <span class="math inline">\(\omega_{CL}\)</span> that absorbs the male–female difference. A model that includes sex estimates <span class="math inline">\(\text{tvCL}_\text{male} = 10\)</span> and <span class="math inline">\(\text{tvCL}_\text{female} = 8\)</span>, and <span class="math inline">\(\omega_{CL}\)</span> shrinks because within each group the <span class="math inline">\(\eta\)</span> values cluster more tightly around zero. The individual clearances have not changed — <span class="math inline">\(\eta\)</span> simply shifts to accommodate the new, more precise population prediction.</p>
+</div>
+</div>
+</section>
+<section id="common-covariate-parameterizations" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Common Covariate Parameterizations</h1>
+<section id="continuous-covariates" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="continuous-covariates"><span class="header-section-number">3.1</span> Continuous Covariates</h2>
+<p><strong>Power model (centered on reference value):</strong></p>
+<p><span class="math display">\[TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3}\]</span></p>
+<p><strong>Linear model:</strong></p>
+<p><span class="math display">\[TVCL = \theta_1 + \theta_3 \cdot (CLCR - 80)\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled" title="Physiological Basis of Common Covariate-Parameter Relationships">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Physiological Basis of Common Covariate-Parameter Relationships
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Body weight on <span class="math inline">\(V\)</span>:</strong> The apparent volume of distribution is <span class="math inline">\(V = V_P + \sum_i K_{P,i} \cdot V_{T,i}\)</span>, where <span class="math inline">\(V_{T,i}\)</span> are tissue volumes and <span class="math inline">\(K_{P,i}\)</span> are tissue-to-plasma partition coefficients. A larger body has greater tissue mass and total body water, so <span class="math inline">\(V\)</span> scales with body size. Allometric scaling formalizes this: <span class="math inline">\(V \propto \text{BW}^{1.0}\)</span> and <span class="math inline">\(CL \propto \text{BW}^{0.75}\)</span>, reflecting biological scaling laws derived from fractal geometry and cross-species metabolic rate observations.</p>
+<p><strong>Creatinine clearance on <span class="math inline">\(CL\)</span>:</strong> For renally eliminated drugs, clearance is proportional to glomerular filtration rate (GFR). Filtration clearance is <span class="math inline">\(CL_F = f_u \cdot \text{GFR}\)</span>, where only unbound drug is filtered. The Cockcroft-Gault equation estimates <span class="math inline">\(\text{CLcr}\)</span> as a surrogate for GFR, making it a natural covariate for renal clearance.</p>
+<p><strong>Hepatic function on <span class="math inline">\(CL\)</span>:</strong> For hepatically cleared drugs, the well-stirred model predicts <span class="math inline">\(CL_H = \frac{Q_H \cdot f_u \cdot CL_{\text{int}}}{Q_H + f_u \cdot CL_{\text{int}}}\)</span>, where <span class="math inline">\(Q_H\)</span> is hepatic blood flow, <span class="math inline">\(f_u\)</span> is fraction unbound, and <span class="math inline">\(CL_{\text{int}}\)</span> is intrinsic clearance. Intrinsic clearance depends on hepatic enzyme activity (CYP genotype, enzyme induction/inhibition from DDIs), so covariates reflecting hepatic function or metabolizer status directly modulate <span class="math inline">\(CL\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="categorical-covariates" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="categorical-covariates"><span class="header-section-number">3.2</span> Categorical Covariates</h2>
+<p><strong>Proportional shift:</strong></p>
+<p><span class="math display">\[TVCL = \theta_1 \cdot (1 + \theta_3 \cdot SEX)\]</span></p>
+<p><strong>Separate typical values:</strong></p>
+<p><span class="math display">\[TVCL = \theta_1 \cdot (1 - SEX) + \theta_2 \cdot SEX\]</span></p>
+</section>
+<section id="desirable-properties" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="desirable-properties"><span class="header-section-number">3.3</span> Desirable Properties</h2>
+<ul>
+<li>Centering continuous covariates on a reference value (e.g., median)</li>
+<li>Power model ensures positivity of parameters</li>
+<li>Interpretable covariate effects (e.g., fold-change per unit)</li>
+</ul>
+</section>
+</section>
+<section id="data-and-base-model" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Data and Base Model</h1>
+<pre class="{julia}"><code>#| label: ch4-data
+
+cov_df = CSV.read(joinpath(data_dir, "poppk_wcovs.csv"), DataFrame)
+rename!(cov_df,
+    :ID =&gt; :id, :DV =&gt; :dv, :AMT =&gt; :amt, :TIME =&gt; :time,
+    :II =&gt; :ii, :ADDL =&gt; :addl, :RATE =&gt; :rate,
+)
+
+cov_df.evid = ifelse.(cov_df.amt .&gt; 0, 1, 0)
+cov_df.cmt = fill(1, nrow(cov_df))
+cov_df.dv = ifelse.(cov_df.evid .== 1, missing, cov_df.dv)
+
+pop = read_pumas(cov_df; covariates = [:HT, :WT, :CLCR, :SEX, :AGE])
+println("Subjects: ", length(pop))</code></pre>
+<section id="ebe-covariate-screening-plots" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="ebe-covariate-screening-plots"><span class="header-section-number">4.1</span> EBE-Covariate Screening Plots</h2>
+<div class="callout callout-style-default callout-warning callout-titled" title="η-Shrinkage Limits EBE-Based Covariate Screening">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+η-Shrinkage Limits EBE-Based Covariate Screening
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When <span class="math inline">\(\eta\)</span>-shrinkage exceeds approximately 30%, individual empirical Bayes estimates (EBEs) regress toward zero and lose their ability to reflect true inter-individual differences. This has two consequences for covariate screening: (1) genuine covariate–parameter relationships may be obscured because the <span class="math inline">\(\hat{\eta}\)</span> values have collapsed toward the population mean, and (2) spurious patterns may emerge from the shrinkage structure itself rather than from biology. A flat EBE-vs-covariate plot under high shrinkage may reflect information poverty rather than the absence of a real relationship. Always compute and report <span class="math inline">\(\eta\)</span>-shrinkage before interpreting EBE-covariate diagnostic plots; when shrinkage is substantial, consider alternative screening approaches such as simulation-based diagnostics.</p>
+</div>
+</div>
+<p>Before formal covariate modeling, screen ETA estimates vs.&nbsp;covariates:</p>
+<pre class="{julia}"><code>#| label: ch4-base-model
+
+# Base model: 1-cpt IV, BLOCK(2) OMEGA, proportional error
+# From 501.ctl
+base_model = @model begin
+    @metadata begin
+        desc = "Base PopPK Model (no covariates)"
+    end
+    @param begin
+        tvCL   ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV    ∈ RealDomain(lower = 0.0, init = 75.0)
+        Ω      ∈ PSDDomain(2)
+        σ_prop ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR SEX AGE HT
+    @pre begin
+        CL = tvCL * exp(η[1])
+        Vc = tvV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: ch4-base-fit
+
+base_params = (
+    tvCL = 13.0, tvV = 75.0,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2,
+)
+base_fit = fit(base_model, pop, base_params, Pumas.FOCEI())
+base_fit</code></pre>
+<pre class="{julia}"><code>#| label: fig-ch4-ebe-screening
+#| fig-cap: "EBE vs Covariate Screening Plots"
+
+base_insp = inspect(base_fit)
+base_df = DataFrame(base_insp)
+# Get one row per subject (first obs row)
+subj_df = combine(groupby(@rsubset(base_df, !ismissing(:dv)), :id), first)
+
+fig = Figure(size = (900, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "CLCR", ylabel = "ETA(CL)")
+scatter!(ax1, subj_df.CLCR, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax1, 0, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "WT", ylabel = "ETA(V)")
+scatter!(ax2, subj_df.WT, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax2, 0, color = :black)
+
+ax3 = Axis(fig[1, 3], xlabel = "AGE", ylabel = "ETA(CL)")
+scatter!(ax3, subj_df.AGE, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 1], xlabel = "AGE", ylabel = "ETA(V)")
+scatter!(ax4, subj_df.AGE, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax4, 0, color = :black)
+
+ax5 = Axis(fig[2, 2], xlabel = "SEX", ylabel = "ETA(CL)")
+scatter!(ax5, subj_df.SEX, subj_df.η₁, color = :navy, markersize = 6)
+hlines!(ax5, 0, color = :black)
+
+ax6 = Axis(fig[2, 3], xlabel = "SEX", ylabel = "ETA(V)")
+scatter!(ax6, subj_df.SEX, subj_df.η₂, color = :navy, markersize = 6)
+hlines!(ax6, 0, color = :black)
+
+fig</code></pre>
+</section>
+</section>
+<section id="full-covariate-model" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Full Covariate Model</h1>
+<p>From 510.ctl — power model parameterization with CLCR and AGE on CL, WT and AGE on V:</p>
+<p><span class="math display">\[TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3} \cdot \left(\frac{AGE}{45}\right)^{\theta_4}\]</span></p>
+<p><span class="math display">\[TVV = \theta_2 \cdot \left(\frac{WT}{70}\right)^{\theta_5} \cdot \left(\frac{AGE}{45}\right)^{\theta_6}\]</span></p>
+<pre class="{julia}"><code>#| label: ch4-full-model
+
+full_cov_model = @model begin
+    @metadata begin
+        desc = "Full Covariate Model (power parameterization)"
+    end
+    @param begin
+        tvCL      ∈ RealDomain(lower = 0.0, init = 13.0)
+        tvV       ∈ RealDomain(lower = 0.0, init = 75.0)
+        dCL_CLCR  ∈ RealDomain(init = 0.5)      # THETA(3): CL~CLCR power
+        dCL_AGE   ∈ RealDomain(init = -0.3)      # THETA(4): CL~AGE power
+        dV_WT     ∈ RealDomain(init = 0.5)        # THETA(5): V~WT power
+        dV_AGE    ∈ RealDomain(init = 0.1)         # THETA(6): V~AGE power
+        Ω         ∈ PSDDomain(2)
+        σ_prop    ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR AGE SEX HT
+    @pre begin
+        TVCL = tvCL * (CLCR / 80)^dCL_CLCR * (AGE / 45)^dCL_AGE
+        CL   = TVCL * exp(η[1])
+        TVV  = tvV * (WT / 70)^dV_WT * (AGE / 45)^dV_AGE
+        Vc   = TVV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end</code></pre>
+<pre class="{julia}"><code>#| label: ch4-full-fit
+
+full_params = (
+    tvCL = 13.0, tvV = 75.0,
+    dCL_CLCR = 0.5, dCL_AGE = -0.3,
+    dV_WT = 0.5, dV_AGE = 0.1,
+    Ω = [0.04 0.02; 0.02 0.04],
+    σ_prop = 0.2,
+)
+full_fit = fit(full_cov_model, pop, full_params, Pumas.FOCEI())
+full_fit</code></pre>
+<pre class="{julia}"><code>#| label: ch4-full-infer
+
+full_infer = infer(full_fit)
+full_infer</code></pre>
+</section>
+<section id="model-comparison" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Model Comparison</h1>
+<pre class="{julia}"><code>#| label: ch4-compare
+
+println("Covariate Model Comparison")
+println("=" ^ 50)
+println("Base Model    AIC: ", round(aic(base_fit), digits = 1))
+println("Full Cov      AIC: ", round(aic(full_fit), digits = 1))
+
+delta_ofv = -2 * loglikelihood(base_fit) - (-2 * loglikelihood(full_fit))
+println("\nDelta OFV: ", round(delta_ofv, digits = 2), " (4 df)")
+println("Chi-sq critical (p=0.05, 4df): 9.49")
+println("Chi-sq critical (p=0.005, 4df): 14.86")</code></pre>
+</section>
+<section id="covariate-modeling-methods-in-pumas" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Covariate Modeling Methods in Pumas</h1>
+<section id="automated-covariate-selection" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="automated-covariate-selection"><span class="header-section-number">7.1</span> Automated Covariate Selection</h2>
+<p>Pumas provides <code>covariate_select()</code> for automated forward addition / backward elimination. The key design principle: <strong>define all covariate effects in the model upfront</strong>, then use <code>control_param</code> to specify which parameters “turn on/off” each effect. Setting a control parameter to zero removes its covariate effect.</p>
+<section id="forward-selection" class="level3" data-number="7.1.1">
+<h3 data-number="7.1.1" class="anchored" data-anchor-id="forward-selection"><span class="header-section-number">7.1.1</span> Forward Selection</h3>
+<p>Starts with base model (all covariate effects zeroed out), iteratively adds the single most impactful covariate:</p>
+<pre class="{julia}"><code>#| label: ch4-forward-select
+#| eval: false
+
+# Step 1: Define model with ALL candidate covariate effects pre-coded
+full_cov_model = @model begin
+    @param begin
+        tvCL     ∈ RealDomain(lower = 0.0, init = 4.0)
+        tvV      ∈ RealDomain(lower = 0.0, init = 70.0)
+        dWTCL    ∈ RealDomain(init = 0.0)     # WT effect on CL (power)
+        dWTV     ∈ RealDomain(init = 0.0)     # WT effect on V (power)
+        dCLCR_CL ∈ RealDomain(init = 0.0)     # CLCR effect on CL (power)
+        dAGE_CL  ∈ RealDomain(init = 0.0)     # AGE effect on CL (power)
+        dSEX_CL  ∈ RealDomain(init = 0.0)     # SEX effect on CL (proportional shift)
+        Ω        ∈ PSDDomain(2)
+        σ_prop   ∈ RealDomain(lower = 0.0, init = 0.2)
+    end
+    @random begin
+        η ~ MvNormal(Ω)
+    end
+    @covariates WT CLCR AGE SEX
+    @pre begin
+        CL = tvCL * (WT / 70)^dWTCL * (CLCR / 80)^dCLCR_CL *
+             (AGE / 45)^dAGE_CL * (1 + dSEX_CL * (SEX == 1)) * exp(η[1])
+        Vc = tvV * (WT / 70)^dWTV * exp(η[2])
+    end
+    @dynamics Central1
+    @derived begin
+        cp := @. Central / Vc
+        dv ~ @. Normal(cp, abs(cp) * σ_prop)
+    end
+end
+
+# Step 2: Forward selection — control_param lists the covariate effect parameters
+covar_result = covariate_select(
+    full_cov_model, pop, init_params, Pumas.FOCEI();
+    control_param = (:dWTCL, :dWTV, :dCLCR_CL, :dAGE_CL, :dSEX_CL),
+    method = CovariateSelection.Forward,
+    criterion = aic,
+)
+
+# Access results
+covar_result.best_model    # final selected model
+covar_result.fits          # all intermediate fits</code></pre>
+</section>
+<section id="backward-elimination" class="level3" data-number="7.1.2">
+<h3 data-number="7.1.2" class="anchored" data-anchor-id="backward-elimination"><span class="header-section-number">7.1.2</span> Backward Elimination</h3>
+<p>Starts with full model (all effects active), iteratively removes the least impactful:</p>
+<pre class="{julia}"><code>#| label: ch4-backward-elim
+#| eval: false
+
+covar_result_be = covariate_select(
+    full_cov_model, pop, full_params, Pumas.FOCEI();
+    control_param = (:dWTCL, :dWTV, :dCLCR_CL, :dAGE_CL, :dSEX_CL),
+    method = CovariateSelection.Backward,
+    criterion = bic,   # BIC penalizes complexity more than AIC
+)</code></pre>
+<div class="callout callout-style-default callout-note callout-titled" title="Covariate Selection Methodologies: SCM, GAM, and FFM">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Covariate Selection Methodologies: SCM, GAM, and FFM
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Stepwise Covariate Modeling (SCM):</strong> The most widely used approach, consisting of forward addition followed by backward elimination within the full nonlinear mixed-effects model. Forward steps add covariates using a liberal threshold (e.g., <span class="math inline">\(p &lt; 0.05\)</span>); backward steps remove covariates using a stricter threshold (e.g., <span class="math inline">\(p &lt; 0.001\)</span>). Each step constitutes a hypothesis test, raising concerns about alpha spending from multiple comparisons — in practice, corrections such as Bonferroni are rarely applied, which is a known limitation.</p>
+<p><strong>Generalized Additive Modeling (GAM):</strong> A non-parametric, EBE-based screening method that operates outside the PK model. Individual <span class="math inline">\(\hat{\eta}\)</span> values are regressed against candidate covariates using simple linear models, and the best-fitting covariate is selected iteratively. GAM is computationally efficient but inherits the shrinkage bias of EBEs: when <span class="math inline">\(\eta\)</span>-shrinkage is substantial, GAM results may be unreliable.</p>
+<p><strong>Full Fixed-Effects Model (FFM):</strong> All biologically plausible covariates are included simultaneously from the outset, and no stepwise hypothesis testing is performed. Covariate importance is judged by the clinical significance of effect magnitudes (e.g., whether a covariate shifts exposure by <span class="math inline">\(\geq\)</span> 20%) rather than by <span class="math inline">\(p\)</span>-values. FFM avoids the multiple-testing problem inherent in SCM but requires careful prior identification and de-correlation of candidate covariates using domain knowledge.</p>
+</div>
+</div>
+</section>
+<section id="aic-vs-bic-vs-lrt" class="level3" data-number="7.1.3">
+<h3 data-number="7.1.3" class="anchored" data-anchor-id="aic-vs-bic-vs-lrt"><span class="header-section-number">7.1.3</span> AIC vs BIC vs LRT</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 39%">
+<col style="width: 32%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criterion</th>
+<th>Formula</th>
+<th>Favors</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AIC</td>
+<td><span class="math inline">\(-2LL + 2k\)</span></td>
+<td>Predictive accuracy; may overfit with large n</td>
+</tr>
+<tr class="even">
+<td>BIC</td>
+<td><span class="math inline">\(-2LL + k \cdot \log(n)\)</span></td>
+<td>Parsimony; stronger penalty for large datasets</td>
+</tr>
+<tr class="odd">
+<td>LRT</td>
+<td><span class="math inline">\(\Delta OFV \sim \chi^2(\Delta df)\)</span></td>
+<td>Nested model comparison only; requires p-value cutoff</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Forward selection:</strong> typically use AIC (p ≈ 0.05 equivalent) or LRT with α = 0.05</li>
+<li><strong>Backward elimination:</strong> typically use BIC or LRT with stricter α = 0.01 (or 0.001)</li>
+<li>AIC and BIC work for both nested and non-nested models</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>NONMEM vs Pumas Covariate Workflow:</strong></p>
+<ul>
+<li>NONMEM: Manual control stream editing + SCM in PsN</li>
+<li>Pumas: <code>covariate_select()</code> automates forward/backward selection, or use manual AIC/LRT comparison as shown above</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="time-varying-covariates" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="time-varying-covariates"><span class="header-section-number">7.2</span> Time-Varying Covariates</h2>
+<p>Covariates that change during the study (e.g., weight, creatinine clearance, concomitant medications) require special handling:</p>
+<pre class="{julia}"><code>#| label: ch4-time-varying
+#| eval: false
+
+# In the dataset: include covariate values at each observation/event time
+# Pumas interpolates between recorded values using piece-wise constant interpolation:
+#   :left  → LOCF (Last Observation Carried Forward) — Pumas default
+#   :right → NOCB (Next Observation Carried Backward) — NONMEM default
+
+pop = read_pumas(df; covariates = [:WT, :CLCR], covariates_direction = :left)
+
+# The covariate is automatically available as a time-varying quantity in @pre</code></pre>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>NONMEM defaults to NOCB</strong> (right-continuous interpolation), while <strong>Pumas defaults to LOCF</strong> (left-continuous). When comparing results between the two, explicitly set <code>covariates_direction = :right</code> in Pumas for NONMEM equivalence.</p>
+</div>
+</div>
+</section>
+<section id="missing-covariates-in-population-models" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="missing-covariates-in-population-models"><span class="header-section-number">7.3</span> Missing Covariates in Population Models</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 27%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Strategy</th>
+<th>When to Use</th>
+<th>Pumas Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Median imputation</td>
+<td>Standard approach for sporadic missingness</td>
+<td><code>@rtransform :WT = coalesce(:WT, 70.0)</code> before <code>read_pumas</code></td>
+</tr>
+<tr class="even">
+<td>Group-wise imputation</td>
+<td>When covariate differs by subgroup</td>
+<td><code>groupby(:SEX)</code> → <code>@transform :WT = coalesce.(:WT, median(skipmissing(:WT)))</code></td>
+</tr>
+<tr class="odd">
+<td>Complete case</td>
+<td>When missingness is minimal</td>
+<td><code>dropmissing(df, [:WT, :CLCR])</code></td>
+</tr>
+<tr class="even">
+<td>Flag + sensitivity</td>
+<td>When imputation impact is uncertain</td>
+<td>Add <code>:WT_IMPUTED</code> column, run with/without imputed subjects</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="gof-diagnostics-full-model" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> GOF Diagnostics: Full Model</h1>
+<pre class="{julia}"><code>#| label: fig-ch4-full-gof
+#| fig-cap: "Full Covariate Model GOF Diagnostics"
+
+full_insp = inspect(full_fit)
+full_df = DataFrame(full_insp)
+obs = @rsubset(full_df, !ismissing(:dv))
+
+fig = Figure(size = (800, 600))
+
+ax1 = Axis(fig[1, 1], xlabel = "PRED", ylabel = "DV", title = "DV vs PRED")
+scatter!(ax1, obs.dv_pred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax1, 0, 1, color = :black)
+
+ax2 = Axis(fig[1, 2], xlabel = "IPRED", ylabel = "DV", title = "DV vs IPRED")
+scatter!(ax2, obs.dv_ipred, obs.dv, color = :navy, markersize = 4, alpha = 0.5)
+ablines!(ax2, 0, 1, color = :black)
+
+ax3 = Axis(fig[2, 1], xlabel = "PRED", ylabel = "CWRES", title = "CWRES vs PRED")
+scatter!(ax3, obs.dv_pred, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax3, 0, color = :black)
+
+ax4 = Axis(fig[2, 2], xlabel = "Time", ylabel = "CWRES", title = "CWRES vs TIME")
+scatter!(ax4, obs.time, obs.dv_wres, color = :navy, markersize = 4, alpha = 0.5)
+hlines!(ax4, 0, color = :black)
+
+fig</code></pre>
+</section>
+<section id="study-guide-questions" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Study Guide Questions</h1>
+<ol type="1">
+<li>What are desirable properties of covariate-parameter models?</li>
+<li>How does centering a continuous covariate on its median help interpretation?</li>
+<li>What is the difference between forward addition and backward elimination?</li>
+<li>When might a statistically significant covariate NOT be clinically relevant?</li>
+<li>What are the limitations of using EBE-based covariate screening?</li>
+<li>How would you calculate the initial estimate for OMEGA assuming 30% CV with exponential IIV?</li>
+</ol>
+</section>
+<section id="supplementary-material" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Supplementary Material</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Topic</th>
+<th>Tutorial</th>
+<th>Key Additions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Lecture: Covariate Fundamentals</strong></td>
+<td><a href="../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">PKPD W7.5</a></td>
+<td>Covariate types, functional forms, parameterization strategies</td>
+</tr>
+<tr class="even">
+<td><strong>Lecture: Covariate Diagnostics &amp; Methodology</strong></td>
+<td><a href="../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">PKPD W8</a></td>
+<td>EBE screening, η-shrinkage, SCM/GAM/FFM comparison</td>
+</tr>
+<tr class="odd">
+<td><strong>Lecture: Volume of Distribution</strong></td>
+<td><a href="../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">PK W4</a></td>
+<td>Why body weight affects V — tissue mass, body water, protein binding</td>
+</tr>
+<tr class="even">
+<td><strong>Lecture: Renal Elimination</strong></td>
+<td><a href="../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">PK W7b</a></td>
+<td>Why CLcr predicts CL — GFR, filtration, secretion, reabsorption</td>
+</tr>
+<tr class="odd">
+<td>Covariate model introduction</td>
+<td><a href="https://tutorials.pumas.ai/html/introduction/covariate.html">Covariates</a></td>
+<td>Allometric scaling, hepatic/renal CL breakdown, time-varying covariates, categorical effects</td>
+</tr>
+<tr class="even">
+<td>AIC/BIC/LRT theory</td>
+<td><a href="https://tutorials.pumas.ai/html/covariate_select/01-intro.html">Covariate Selection Intro</a></td>
+<td>Mathematical derivations, penalty comparison, custom OFV functions</td>
+</tr>
+<tr class="odd">
+<td>Forward selection workflow</td>
+<td><a href="https://tutorials.pumas.ai/html/covariate_select/02-forward_selection.html">Forward Selection</a></td>
+<td><code>covariate_select()</code> API, control_param patterns, custom criteria</td>
+</tr>
+<tr class="even">
+<td>Backward elimination workflow</td>
+<td><a href="https://tutorials.pumas.ai/html/covariate_select/03-backward_elimination.html">Backward Elimination</a></td>
+<td>Full backward workflow, BIC criterion, result interpretation</td>
+</tr>
+<tr class="odd">
+<td>Mixed stepwise (SCM)</td>
+<td><a href="https://tutorials.pumas.ai/html/covariate_select/04-mixed.html">Mixed Selection</a></td>
+<td>Combined forward + backward in one pipeline</td>
+</tr>
+<tr class="even">
+<td>Cloud batch covariate search</td>
+<td><a href="https://tutorials.pumas.ai/html/covariate_select/05-batch_job.html">Batch Job</a></td>
+<td>Running covariate_select on JuliaHub for large populations</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Chapter 4: Covariate Model Building"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "MI-210 Essentials of Population PKPD M&amp;S — Pumas Edition"</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Adapted from Marc R. Gastonguay, Ph.D. (Metrum Institute)"</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> today</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-width: 8</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-height: 5</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">  error: false</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pumas</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFramesMeta</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CSV</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">"../data"</span>)</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="fu">set_aog_theme!</span>()</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="fu"># Overview</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>Covariate model building identifies measurable patient factors that explain inter-individual variability in PK/PD parameters:</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Objectives of covariate model development</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Common covariate model parameterizations</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Data reduction before covariate building</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Covariate screening methods (traditional and automated)</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Inferences about covariate effects</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="fu"># Objectives of Covariate Model Development</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Identify factors that explain variability in PK/PD parameters</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reduce unexplained inter-individual variability</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Improve model predictions for individual patients</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Support dose adjustment recommendations for special populations</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Why Covariates Reduce Inter-Individual Variability"}</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>When a covariate genuinely explains inter-individual variability, incorporating it into the model splits the single population parameter into covariate-defined subgroups, each with its own typical value. The random effect $\eta_i$ must then only account for the residual difference between the individual's true parameter and the subgroup-specific population prediction, rather than the overall population mean. This forces $\eta$ to do less work, producing a tighter distribution and a smaller $\omega$.</span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>**Intuitive example:** Suppose males have true CL $\approx$ 10 L/h and females have true CL $\approx$ 8 L/h. A model without a sex covariate estimates $\text{tvCL} \approx 9$ L/h with a large $\omega_{CL}$ that absorbs the male--female difference. A model that includes sex estimates $\text{tvCL}_\text{male} = 10$ and $\text{tvCL}_\text{female} = 8$, and $\omega_{CL}$ shrinks because within each group the $\eta$ values cluster more tightly around zero. The individual clearances have not changed --- $\eta$ simply shifts to accommodate the new, more precise population prediction.</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Common Covariate Parameterizations</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Continuous Covariates</span></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>**Power model (centered on reference value):**</span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>$$TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3}$$</span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>**Linear model:**</span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>$$TVCL = \theta_1 + \theta_3 \cdot (CLCR - 80)$$</span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Physiological Basis of Common Covariate-Parameter Relationships"}</span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>**Body weight on $V$:** The apparent volume of distribution is $V = V_P + \sum_i K_{P,i} \cdot V_{T,i}$, where $V_{T,i}$ are tissue volumes and $K_{P,i}$ are tissue-to-plasma partition coefficients. A larger body has greater tissue mass and total body water, so $V$ scales with body size. Allometric scaling formalizes this: $V \propto \text{BW}^{1.0}$ and $CL \propto \text{BW}^{0.75}$, reflecting biological scaling laws derived from fractal geometry and cross-species metabolic rate observations.</span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a>**Creatinine clearance on $CL$:** For renally eliminated drugs, clearance is proportional to glomerular filtration rate (GFR). Filtration clearance is $CL_F = f_u \cdot \text{GFR}$, where only unbound drug is filtered. The Cockcroft-Gault equation estimates $\text{CLcr}$ as a surrogate for GFR, making it a natural covariate for renal clearance.</span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a>**Hepatic function on $CL$:** For hepatically cleared drugs, the well-stirred model predicts $CL_H = \frac{Q_H \cdot f_u \cdot CL_{\text{int}}}{Q_H + f_u \cdot CL_{\text{int}}}$, where $Q_H$ is hepatic blood flow, $f_u$ is fraction unbound, and $CL_{\text{int}}$ is intrinsic clearance. Intrinsic clearance depends on hepatic enzyme activity (CYP genotype, enzyme induction/inhibition from DDIs), so covariates reflecting hepatic function or metabolizer status directly modulate $CL$.</span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="fu">## Categorical Covariates</span></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a>**Proportional shift:**</span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>$$TVCL = \theta_1 \cdot (1 + \theta_3 \cdot SEX)$$</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>**Separate typical values:**</span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>$$TVCL = \theta_1 \cdot (1 - SEX) + \theta_2 \cdot SEX$$</span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## Desirable Properties</span></span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Centering continuous covariates on a reference value (e.g., median)</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Power model ensures positivity of parameters</span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Interpretable covariate effects (e.g., fold-change per unit)</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data and Base Model</span></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-data</span></span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>cov_df <span class="op">=</span> CSV.<span class="fu">read</span>(<span class="fu">joinpath</span>(data_dir, <span class="st">"poppk_wcovs.csv"</span>), DataFrame)</span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="fu">rename!</span>(cov_df,</span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>ID <span class="op">=&gt;</span> <span class="op">:</span>id, <span class="op">:</span>DV <span class="op">=&gt;</span> <span class="op">:</span>dv, <span class="op">:</span>AMT <span class="op">=&gt;</span> <span class="op">:</span>amt, <span class="op">:</span>TIME <span class="op">=&gt;</span> <span class="op">:</span>time,</span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>II <span class="op">=&gt;</span> <span class="op">:</span>ii, <span class="op">:</span>ADDL <span class="op">=&gt;</span> <span class="op">:</span>addl, <span class="op">:</span>RATE <span class="op">=&gt;</span> <span class="op">:</span>rate,</span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>cov_df.evid <span class="op">=</span> <span class="fu">ifelse</span>.(cov_df.amt <span class="op">.&gt;</span> <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>)</span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>cov_df.cmt <span class="op">=</span> <span class="fu">fill</span>(<span class="fl">1</span>, <span class="fu">nrow</span>(cov_df))</span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>cov_df.dv <span class="op">=</span> <span class="fu">ifelse</span>.(cov_df.evid <span class="op">.==</span> <span class="fl">1</span>, <span class="cn">missing</span>, cov_df.dv)</span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>pop <span class="op">=</span> <span class="fu">read_pumas</span>(cov_df; covariates <span class="op">=</span> [<span class="op">:</span>HT, <span class="op">:</span>WT, <span class="op">:</span>CLCR, <span class="op">:</span>SEX, <span class="op">:</span>AGE])</span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Subjects: "</span>, <span class="fu">length</span>(pop))</span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## EBE-Covariate Screening Plots</span></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="η-Shrinkage Limits EBE-Based Covariate Screening"}</span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>When $\eta$-shrinkage exceeds approximately 30%, individual empirical Bayes estimates (EBEs) regress toward zero and lose their ability to reflect true inter-individual differences. This has two consequences for covariate screening: (1) genuine covariate--parameter relationships may be obscured because the $\hat{\eta}$ values have collapsed toward the population mean, and (2) spurious patterns may emerge from the shrinkage structure itself rather than from biology. A flat EBE-vs-covariate plot under high shrinkage may reflect information poverty rather than the absence of a real relationship. Always compute and report $\eta$-shrinkage before interpreting EBE-covariate diagnostic plots; when shrinkage is substantial, consider alternative screening approaches such as simulation-based diagnostics.</span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a>Before formal covariate modeling, screen ETA estimates vs. covariates:</span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-base-model</span></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="co"># Base model: 1-cpt IV, BLOCK(2) OMEGA, proportional error</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co"># From 501.ctl</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a>base_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Base PopPK Model (no covariates)"</span></span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a>        tvCL   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">13.0</span>)</span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>        tvV    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">75.0</span>)</span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a>        Ω      <span class="op">∈</span> <span class="fu">PSDDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a>        σ_prop <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@covariates</span> WT CLCR SEX AGE HT</span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>        CL <span class="op">=</span> tvCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a>        Vc <span class="op">=</span> tvV <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Central1</span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-base-fit</span></span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>base_params <span class="op">=</span> (</span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a>    tvCL <span class="op">=</span> <span class="fl">13.0</span>, tvV <span class="op">=</span> <span class="fl">75.0</span>,</span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> [<span class="fl">0.04</span> <span class="fl">0.02</span>; <span class="fl">0.02</span> <span class="fl">0.04</span>],</span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a>base_fit <span class="op">=</span> <span class="fu">fit</span>(base_model, pop, base_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a>base_fit</span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ch4-ebe-screening</span></span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "EBE vs Covariate Screening Plots"</span></span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>base_insp <span class="op">=</span> <span class="fu">inspect</span>(base_fit)</span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a>base_df <span class="op">=</span> <span class="fu">DataFrame</span>(base_insp)</span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a><span class="co"># Get one row per subject (first obs row)</span></span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a>subj_df <span class="op">=</span> <span class="fu">combine</span>(<span class="fu">groupby</span>(<span class="pp">@rsubset</span>(base_df, !<span class="fu">ismissing</span>(<span class="op">:</span>dv)), <span class="op">:</span>id), first)</span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">900</span>, <span class="fl">600</span>))</span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"CLCR"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(CL)"</span>)</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax1, subj_df.CLCR, subj_df.η₁, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax1, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"WT"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(V)"</span>)</span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax2, subj_df.WT, subj_df.η₂, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax2, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a>ax3 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">3</span>], xlabel <span class="op">=</span> <span class="st">"AGE"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(CL)"</span>)</span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax3, subj_df.AGE, subj_df.η₁, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax3, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a>ax4 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"AGE"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(V)"</span>)</span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax4, subj_df.AGE, subj_df.η₂, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax4, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a>ax5 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"SEX"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(CL)"</span>)</span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax5, subj_df.SEX, subj_df.η₁, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax5, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a>ax6 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">3</span>], xlabel <span class="op">=</span> <span class="st">"SEX"</span>, ylabel <span class="op">=</span> <span class="st">"ETA(V)"</span>)</span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax6, subj_df.SEX, subj_df.η₂, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">6</span>)</span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax6, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a>fig</span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a><span class="fu"># Full Covariate Model</span></span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a>From 510.ctl — power model parameterization with CLCR and AGE on CL, WT and AGE on V:</span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a>$$TVCL = \theta_1 \cdot \left(\frac{CLCR}{80}\right)^{\theta_3} \cdot \left(\frac{AGE}{45}\right)^{\theta_4}$$</span>
+<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a>$$TVV = \theta_2 \cdot \left(\frac{WT}{70}\right)^{\theta_5} \cdot \left(\frac{AGE}{45}\right)^{\theta_6}$$</span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-full-model</span></span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>full_cov_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@metadata</span> <span class="cf">begin</span></span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>        desc <span class="op">=</span> <span class="st">"Full Covariate Model (power parameterization)"</span></span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>        tvCL      <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">13.0</span>)</span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>        tvV       <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">75.0</span>)</span>
+<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>        dCL_CLCR  <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.5</span>)      <span class="co"># THETA(3): CL~CLCR power</span></span>
+<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a>        dCL_AGE   <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>)      <span class="co"># THETA(4): CL~AGE power</span></span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a>        dV_WT     <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.5</span>)        <span class="co"># THETA(5): V~WT power</span></span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a>        dV_AGE    <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.1</span>)         <span class="co"># THETA(6): V~AGE power</span></span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a>        Ω         <span class="op">∈</span> <span class="fu">PSDDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a>        σ_prop    <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@covariates</span> WT CLCR AGE SEX HT</span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a>        TVCL <span class="op">=</span> tvCL <span class="op">*</span> (CLCR <span class="op">/</span> <span class="fl">80</span>)<span class="op">^</span>dCL_CLCR <span class="op">*</span> (AGE <span class="op">/</span> <span class="fl">45</span>)<span class="op">^</span>dCL_AGE</span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a>        CL   <span class="op">=</span> TVCL <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb14-246"><a href="#cb14-246" aria-hidden="true" tabindex="-1"></a>        TVV  <span class="op">=</span> tvV <span class="op">*</span> (WT <span class="op">/</span> <span class="fl">70</span>)<span class="op">^</span>dV_WT <span class="op">*</span> (AGE <span class="op">/</span> <span class="fl">45</span>)<span class="op">^</span>dV_AGE</span>
+<span id="cb14-247"><a href="#cb14-247" aria-hidden="true" tabindex="-1"></a>        Vc   <span class="op">=</span> TVV <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Central1</span>
+<span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-full-fit</span></span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a>full_params <span class="op">=</span> (</span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a>    tvCL <span class="op">=</span> <span class="fl">13.0</span>, tvV <span class="op">=</span> <span class="fl">75.0</span>,</span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a>    dCL_CLCR <span class="op">=</span> <span class="fl">0.5</span>, dCL_AGE <span class="op">=</span> <span class="op">-</span><span class="fl">0.3</span>,</span>
+<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a>    dV_WT <span class="op">=</span> <span class="fl">0.5</span>, dV_AGE <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span id="cb14-266"><a href="#cb14-266" aria-hidden="true" tabindex="-1"></a>    Ω <span class="op">=</span> [<span class="fl">0.04</span> <span class="fl">0.02</span>; <span class="fl">0.02</span> <span class="fl">0.04</span>],</span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a>    σ_prop <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a>full_fit <span class="op">=</span> <span class="fu">fit</span>(full_cov_model, pop, full_params, Pumas.<span class="fu">FOCEI</span>())</span>
+<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a>full_fit</span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-full-infer</span></span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a>full_infer <span class="op">=</span> <span class="fu">infer</span>(full_fit)</span>
+<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a>full_infer</span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a><span class="fu"># Model Comparison</span></span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-compare</span></span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Covariate Model Comparison"</span>)</span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"="</span> <span class="op">^</span> <span class="fl">50</span>)</span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Base Model    AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(base_fit), digits <span class="op">=</span> <span class="fl">1</span>))</span>
+<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Full Cov      AIC: "</span>, <span class="fu">round</span>(<span class="fu">aic</span>(full_fit), digits <span class="op">=</span> <span class="fl">1</span>))</span>
+<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a>delta_ofv <span class="op">=</span> <span class="op">-</span><span class="fl">2</span> <span class="op">*</span> <span class="fu">loglikelihood</span>(base_fit) <span class="op">-</span> (<span class="op">-</span><span class="fl">2</span> <span class="op">*</span> <span class="fu">loglikelihood</span>(full_fit))</span>
+<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Delta OFV: "</span>, <span class="fu">round</span>(delta_ofv, digits <span class="op">=</span> <span class="fl">2</span>), <span class="st">" (4 df)"</span>)</span>
+<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Chi-sq critical (p=0.05, 4df): 9.49"</span>)</span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(<span class="st">"Chi-sq critical (p=0.005, 4df): 14.86"</span>)</span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a><span class="fu"># Covariate Modeling Methods in Pumas</span></span>
+<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a><span class="fu">## Automated Covariate Selection</span></span>
+<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a>Pumas provides <span class="in">`covariate_select()`</span> for automated forward addition / backward elimination. The key design principle: **define all covariate effects in the model upfront**, then use <span class="in">`control_param`</span> to specify which parameters "turn on/off" each effect. Setting a control parameter to zero removes its covariate effect.</span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a><span class="fu">### Forward Selection</span></span>
+<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a>Starts with base model (all covariate effects zeroed out), iteratively adds the single most impactful covariate:</span>
+<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-forward-select</span></span>
+<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Define model with ALL candidate covariate effects pre-coded</span></span>
+<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a>full_cov_model <span class="op">=</span> <span class="pp">@model</span> <span class="cf">begin</span></span>
+<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a>        tvCL     <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">4.0</span>)</span>
+<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a>        tvV      <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">70.0</span>)</span>
+<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>        dWTCL    <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.0</span>)     <span class="co"># WT effect on CL (power)</span></span>
+<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a>        dWTV     <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.0</span>)     <span class="co"># WT effect on V (power)</span></span>
+<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a>        dCLCR_CL <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.0</span>)     <span class="co"># CLCR effect on CL (power)</span></span>
+<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a>        dAGE_CL  <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.0</span>)     <span class="co"># AGE effect on CL (power)</span></span>
+<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>        dSEX_CL  <span class="op">∈</span> <span class="fu">RealDomain</span>(init <span class="op">=</span> <span class="fl">0.0</span>)     <span class="co"># SEX effect on CL (proportional shift)</span></span>
+<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a>        Ω        <span class="op">∈</span> <span class="fu">PSDDomain</span>(<span class="fl">2</span>)</span>
+<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a>        σ_prop   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower <span class="op">=</span> <span class="fl">0.0</span>, init <span class="op">=</span> <span class="fl">0.2</span>)</span>
+<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@random</span> <span class="cf">begin</span></span>
+<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a>        η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@covariates</span> WT CLCR AGE SEX</span>
+<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a>        CL <span class="op">=</span> tvCL <span class="op">*</span> (WT <span class="op">/</span> <span class="fl">70</span>)<span class="op">^</span>dWTCL <span class="op">*</span> (CLCR <span class="op">/</span> <span class="fl">80</span>)<span class="op">^</span>dCLCR_CL <span class="op">*</span></span>
+<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a>             (AGE <span class="op">/</span> <span class="fl">45</span>)<span class="op">^</span>dAGE_CL <span class="op">*</span> (<span class="fl">1</span> <span class="op">+</span> dSEX_CL <span class="op">*</span> (SEX <span class="op">==</span> <span class="fl">1</span>)) <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>])</span>
+<span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a>        Vc <span class="op">=</span> tvV <span class="op">*</span> (WT <span class="op">/</span> <span class="fl">70</span>)<span class="op">^</span>dWTV <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>])</span>
+<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-338"><a href="#cb14-338" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@dynamics</span> Central1</span>
+<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb14-340"><a href="#cb14-340" aria-hidden="true" tabindex="-1"></a>        cp <span class="op">:=</span> @. Central <span class="op">/</span> Vc</span>
+<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a>        dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp) <span class="op">*</span> σ_prop)</span>
+<span id="cb14-342"><a href="#cb14-342" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb14-343"><a href="#cb14-343" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb14-344"><a href="#cb14-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-345"><a href="#cb14-345" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Forward selection — control_param lists the covariate effect parameters</span></span>
+<span id="cb14-346"><a href="#cb14-346" aria-hidden="true" tabindex="-1"></a>covar_result <span class="op">=</span> <span class="fu">covariate_select</span>(</span>
+<span id="cb14-347"><a href="#cb14-347" aria-hidden="true" tabindex="-1"></a>    full_cov_model, pop, init_params, Pumas.<span class="fu">FOCEI</span>();</span>
+<span id="cb14-348"><a href="#cb14-348" aria-hidden="true" tabindex="-1"></a>    control_param <span class="op">=</span> (<span class="op">:</span>dWTCL, <span class="op">:</span>dWTV, <span class="op">:</span>dCLCR_CL, <span class="op">:</span>dAGE_CL, <span class="op">:</span>dSEX_CL),</span>
+<span id="cb14-349"><a href="#cb14-349" aria-hidden="true" tabindex="-1"></a>    method <span class="op">=</span> CovariateSelection.Forward,</span>
+<span id="cb14-350"><a href="#cb14-350" aria-hidden="true" tabindex="-1"></a>    criterion <span class="op">=</span> aic,</span>
+<span id="cb14-351"><a href="#cb14-351" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-352"><a href="#cb14-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-353"><a href="#cb14-353" aria-hidden="true" tabindex="-1"></a><span class="co"># Access results</span></span>
+<span id="cb14-354"><a href="#cb14-354" aria-hidden="true" tabindex="-1"></a>covar_result.best_model    <span class="co"># final selected model</span></span>
+<span id="cb14-355"><a href="#cb14-355" aria-hidden="true" tabindex="-1"></a>covar_result.fits          <span class="co"># all intermediate fits</span></span>
+<span id="cb14-356"><a href="#cb14-356" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-357"><a href="#cb14-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a><span class="fu">### Backward Elimination</span></span>
+<span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-360"><a href="#cb14-360" aria-hidden="true" tabindex="-1"></a>Starts with full model (all effects active), iteratively removes the least impactful:</span>
+<span id="cb14-361"><a href="#cb14-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-364"><a href="#cb14-364" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-365"><a href="#cb14-365" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-backward-elim</span></span>
+<span id="cb14-366"><a href="#cb14-366" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-367"><a href="#cb14-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-368"><a href="#cb14-368" aria-hidden="true" tabindex="-1"></a>covar_result_be <span class="op">=</span> <span class="fu">covariate_select</span>(</span>
+<span id="cb14-369"><a href="#cb14-369" aria-hidden="true" tabindex="-1"></a>    full_cov_model, pop, full_params, Pumas.<span class="fu">FOCEI</span>();</span>
+<span id="cb14-370"><a href="#cb14-370" aria-hidden="true" tabindex="-1"></a>    control_param <span class="op">=</span> (<span class="op">:</span>dWTCL, <span class="op">:</span>dWTV, <span class="op">:</span>dCLCR_CL, <span class="op">:</span>dAGE_CL, <span class="op">:</span>dSEX_CL),</span>
+<span id="cb14-371"><a href="#cb14-371" aria-hidden="true" tabindex="-1"></a>    method <span class="op">=</span> CovariateSelection.Backward,</span>
+<span id="cb14-372"><a href="#cb14-372" aria-hidden="true" tabindex="-1"></a>    criterion <span class="op">=</span> bic,   <span class="co"># BIC penalizes complexity more than AIC</span></span>
+<span id="cb14-373"><a href="#cb14-373" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-374"><a href="#cb14-374" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-375"><a href="#cb14-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-376"><a href="#cb14-376" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="Covariate Selection Methodologies: SCM, GAM, and FFM"}</span>
+<span id="cb14-377"><a href="#cb14-377" aria-hidden="true" tabindex="-1"></a>**Stepwise Covariate Modeling (SCM):** The most widely used approach, consisting of forward addition followed by backward elimination within the full nonlinear mixed-effects model. Forward steps add covariates using a liberal threshold (e.g., $p &lt; 0.05$); backward steps remove covariates using a stricter threshold (e.g., $p &lt; 0.001$). Each step constitutes a hypothesis test, raising concerns about alpha spending from multiple comparisons --- in practice, corrections such as Bonferroni are rarely applied, which is a known limitation.</span>
+<span id="cb14-378"><a href="#cb14-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-379"><a href="#cb14-379" aria-hidden="true" tabindex="-1"></a>**Generalized Additive Modeling (GAM):** A non-parametric, EBE-based screening method that operates outside the PK model. Individual $\hat{\eta}$ values are regressed against candidate covariates using simple linear models, and the best-fitting covariate is selected iteratively. GAM is computationally efficient but inherits the shrinkage bias of EBEs: when $\eta$-shrinkage is substantial, GAM results may be unreliable.</span>
+<span id="cb14-380"><a href="#cb14-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-381"><a href="#cb14-381" aria-hidden="true" tabindex="-1"></a>**Full Fixed-Effects Model (FFM):** All biologically plausible covariates are included simultaneously from the outset, and no stepwise hypothesis testing is performed. Covariate importance is judged by the clinical significance of effect magnitudes (e.g., whether a covariate shifts exposure by $\geq$ 20%) rather than by $p$-values. FFM avoids the multiple-testing problem inherent in SCM but requires careful prior identification and de-correlation of candidate covariates using domain knowledge.</span>
+<span id="cb14-382"><a href="#cb14-382" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-383"><a href="#cb14-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-384"><a href="#cb14-384" aria-hidden="true" tabindex="-1"></a><span class="fu">### AIC vs BIC vs LRT</span></span>
+<span id="cb14-385"><a href="#cb14-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-386"><a href="#cb14-386" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Criterion <span class="pp">|</span> Formula <span class="pp">|</span> Favors <span class="pp">|</span></span>
+<span id="cb14-387"><a href="#cb14-387" aria-hidden="true" tabindex="-1"></a><span class="pp">|-----------|---------|--------|</span></span>
+<span id="cb14-388"><a href="#cb14-388" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> AIC <span class="pp">|</span> $-2LL + 2k$ <span class="pp">|</span> Predictive accuracy; may overfit with large n <span class="pp">|</span></span>
+<span id="cb14-389"><a href="#cb14-389" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> BIC <span class="pp">|</span> $-2LL + k \cdot \log(n)$ <span class="pp">|</span> Parsimony; stronger penalty for large datasets <span class="pp">|</span></span>
+<span id="cb14-390"><a href="#cb14-390" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LRT <span class="pp">|</span> $\Delta OFV \sim \chi^2(\Delta df)$ <span class="pp">|</span> Nested model comparison only; requires p-value cutoff <span class="pp">|</span></span>
+<span id="cb14-391"><a href="#cb14-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-392"><a href="#cb14-392" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Forward selection:** typically use AIC (p ≈ 0.05 equivalent) or LRT with α = 0.05</span>
+<span id="cb14-393"><a href="#cb14-393" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Backward elimination:** typically use BIC or LRT with stricter α = 0.01 (or 0.001)</span>
+<span id="cb14-394"><a href="#cb14-394" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>AIC and BIC work for both nested and non-nested models</span>
+<span id="cb14-395"><a href="#cb14-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-396"><a href="#cb14-396" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb14-397"><a href="#cb14-397" aria-hidden="true" tabindex="-1"></a>**NONMEM vs Pumas Covariate Workflow:**</span>
+<span id="cb14-398"><a href="#cb14-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-399"><a href="#cb14-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>NONMEM: Manual control stream editing + SCM in PsN</span>
+<span id="cb14-400"><a href="#cb14-400" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pumas: <span class="in">`covariate_select()`</span> automates forward/backward selection, or use manual AIC/LRT comparison as shown above</span>
+<span id="cb14-401"><a href="#cb14-401" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-402"><a href="#cb14-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-403"><a href="#cb14-403" aria-hidden="true" tabindex="-1"></a><span class="fu">## Time-Varying Covariates</span></span>
+<span id="cb14-404"><a href="#cb14-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-405"><a href="#cb14-405" aria-hidden="true" tabindex="-1"></a>Covariates that change during the study (e.g., weight, creatinine clearance, concomitant medications) require special handling:</span>
+<span id="cb14-406"><a href="#cb14-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-409"><a href="#cb14-409" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-410"><a href="#cb14-410" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: ch4-time-varying</span></span>
+<span id="cb14-411"><a href="#cb14-411" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-412"><a href="#cb14-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-413"><a href="#cb14-413" aria-hidden="true" tabindex="-1"></a><span class="co"># In the dataset: include covariate values at each observation/event time</span></span>
+<span id="cb14-414"><a href="#cb14-414" aria-hidden="true" tabindex="-1"></a><span class="co"># Pumas interpolates between recorded values using piece-wise constant interpolation:</span></span>
+<span id="cb14-415"><a href="#cb14-415" aria-hidden="true" tabindex="-1"></a><span class="co">#   :left  → LOCF (Last Observation Carried Forward) — Pumas default</span></span>
+<span id="cb14-416"><a href="#cb14-416" aria-hidden="true" tabindex="-1"></a><span class="co">#   :right → NOCB (Next Observation Carried Backward) — NONMEM default</span></span>
+<span id="cb14-417"><a href="#cb14-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-418"><a href="#cb14-418" aria-hidden="true" tabindex="-1"></a>pop <span class="op">=</span> <span class="fu">read_pumas</span>(df; covariates <span class="op">=</span> [<span class="op">:</span>WT, <span class="op">:</span>CLCR], covariates_direction <span class="op">=</span> <span class="op">:</span>left)</span>
+<span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a><span class="co"># The covariate is automatically available as a time-varying quantity in @pre</span></span>
+<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>**NONMEM defaults to NOCB** (right-continuous interpolation), while **Pumas defaults to LOCF** (left-continuous). When comparing results between the two, explicitly set <span class="in">`covariates_direction = :right`</span> in Pumas for NONMEM equivalence.</span>
+<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a><span class="fu">## Missing Covariates in Population Models</span></span>
+<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-429"><a href="#cb14-429" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Strategy <span class="pp">|</span> When to Use <span class="pp">|</span> Pumas Implementation <span class="pp">|</span></span>
+<span id="cb14-430"><a href="#cb14-430" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|------------|---------------------|</span></span>
+<span id="cb14-431"><a href="#cb14-431" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Median imputation <span class="pp">|</span> Standard approach for sporadic missingness <span class="pp">|</span> <span class="in">`@rtransform :WT = coalesce(:WT, 70.0)`</span> before <span class="in">`read_pumas`</span> <span class="pp">|</span></span>
+<span id="cb14-432"><a href="#cb14-432" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Group-wise imputation <span class="pp">|</span> When covariate differs by subgroup <span class="pp">|</span> <span class="in">`groupby(:SEX)`</span> → <span class="in">`@transform :WT = coalesce.(:WT, median(skipmissing(:WT)))`</span> <span class="pp">|</span></span>
+<span id="cb14-433"><a href="#cb14-433" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Complete case <span class="pp">|</span> When missingness is minimal <span class="pp">|</span> <span class="in">`dropmissing(df, [:WT, :CLCR])`</span> <span class="pp">|</span></span>
+<span id="cb14-434"><a href="#cb14-434" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Flag + sensitivity <span class="pp">|</span> When imputation impact is uncertain <span class="pp">|</span> Add <span class="in">`:WT_IMPUTED`</span> column, run with/without imputed subjects <span class="pp">|</span></span>
+<span id="cb14-435"><a href="#cb14-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-436"><a href="#cb14-436" aria-hidden="true" tabindex="-1"></a><span class="fu"># GOF Diagnostics: Full Model</span></span>
+<span id="cb14-437"><a href="#cb14-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-440"><a href="#cb14-440" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb14-441"><a href="#cb14-441" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-ch4-full-gof</span></span>
+<span id="cb14-442"><a href="#cb14-442" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Full Covariate Model GOF Diagnostics"</span></span>
+<span id="cb14-443"><a href="#cb14-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-444"><a href="#cb14-444" aria-hidden="true" tabindex="-1"></a>full_insp <span class="op">=</span> <span class="fu">inspect</span>(full_fit)</span>
+<span id="cb14-445"><a href="#cb14-445" aria-hidden="true" tabindex="-1"></a>full_df <span class="op">=</span> <span class="fu">DataFrame</span>(full_insp)</span>
+<span id="cb14-446"><a href="#cb14-446" aria-hidden="true" tabindex="-1"></a>obs <span class="op">=</span> <span class="pp">@rsubset</span>(full_df, !<span class="fu">ismissing</span>(<span class="op">:</span>dv))</span>
+<span id="cb14-447"><a href="#cb14-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-448"><a href="#cb14-448" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> <span class="fu">Figure</span>(size <span class="op">=</span> (<span class="fl">800</span>, <span class="fl">600</span>))</span>
+<span id="cb14-449"><a href="#cb14-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-450"><a href="#cb14-450" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"PRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV"</span>, title <span class="op">=</span> <span class="st">"DV vs PRED"</span>)</span>
+<span id="cb14-451"><a href="#cb14-451" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax1, obs.dv_pred, obs.dv, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb14-452"><a href="#cb14-452" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax1, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-453"><a href="#cb14-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-454"><a href="#cb14-454" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"IPRED"</span>, ylabel <span class="op">=</span> <span class="st">"DV"</span>, title <span class="op">=</span> <span class="st">"DV vs IPRED"</span>)</span>
+<span id="cb14-455"><a href="#cb14-455" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax2, obs.dv_ipred, obs.dv, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb14-456"><a href="#cb14-456" aria-hidden="true" tabindex="-1"></a><span class="fu">ablines!</span>(ax2, <span class="fl">0</span>, <span class="fl">1</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-457"><a href="#cb14-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-458"><a href="#cb14-458" aria-hidden="true" tabindex="-1"></a>ax3 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">1</span>], xlabel <span class="op">=</span> <span class="st">"PRED"</span>, ylabel <span class="op">=</span> <span class="st">"CWRES"</span>, title <span class="op">=</span> <span class="st">"CWRES vs PRED"</span>)</span>
+<span id="cb14-459"><a href="#cb14-459" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax3, obs.dv_pred, obs.dv_wres, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb14-460"><a href="#cb14-460" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax3, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-461"><a href="#cb14-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-462"><a href="#cb14-462" aria-hidden="true" tabindex="-1"></a>ax4 <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">2</span>, <span class="fl">2</span>], xlabel <span class="op">=</span> <span class="st">"Time"</span>, ylabel <span class="op">=</span> <span class="st">"CWRES"</span>, title <span class="op">=</span> <span class="st">"CWRES vs TIME"</span>)</span>
+<span id="cb14-463"><a href="#cb14-463" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ax4, obs.time, obs.dv_wres, color <span class="op">=</span> <span class="op">:</span>navy, markersize <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span>
+<span id="cb14-464"><a href="#cb14-464" aria-hidden="true" tabindex="-1"></a><span class="fu">hlines!</span>(ax4, <span class="fl">0</span>, color <span class="op">=</span> <span class="op">:</span>black)</span>
+<span id="cb14-465"><a href="#cb14-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-466"><a href="#cb14-466" aria-hidden="true" tabindex="-1"></a>fig</span>
+<span id="cb14-467"><a href="#cb14-467" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-468"><a href="#cb14-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-469"><a href="#cb14-469" aria-hidden="true" tabindex="-1"></a><span class="fu"># Study Guide Questions</span></span>
+<span id="cb14-470"><a href="#cb14-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-471"><a href="#cb14-471" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>What are desirable properties of covariate-parameter models?</span>
+<span id="cb14-472"><a href="#cb14-472" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>How does centering a continuous covariate on its median help interpretation?</span>
+<span id="cb14-473"><a href="#cb14-473" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>What is the difference between forward addition and backward elimination?</span>
+<span id="cb14-474"><a href="#cb14-474" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>When might a statistically significant covariate NOT be clinically relevant?</span>
+<span id="cb14-475"><a href="#cb14-475" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>What are the limitations of using EBE-based covariate screening?</span>
+<span id="cb14-476"><a href="#cb14-476" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>How would you calculate the initial estimate for OMEGA assuming 30% CV with exponential IIV?</span>
+<span id="cb14-477"><a href="#cb14-477" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-478"><a href="#cb14-478" aria-hidden="true" tabindex="-1"></a><span class="fu"># Supplementary Material</span></span>
+<span id="cb14-479"><a href="#cb14-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-480"><a href="#cb14-480" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Topic <span class="pp">|</span> Tutorial <span class="pp">|</span> Key Additions <span class="pp">|</span></span>
+<span id="cb14-481"><a href="#cb14-481" aria-hidden="true" tabindex="-1"></a><span class="pp">|-------|----------|---------------|</span></span>
+<span id="cb14-482"><a href="#cb14-482" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Covariate Fundamentals** <span class="pp">|</span> <span class="co">[</span><span class="ot">PKPD W7.5</span><span class="co">](../lectures/pkpd/W7.5-covariate-modeling-fundamentals.qmd)</span> <span class="pp">|</span> Covariate types, functional forms, parameterization strategies <span class="pp">|</span></span>
+<span id="cb14-483"><a href="#cb14-483" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Covariate Diagnostics &amp; Methodology** <span class="pp">|</span> <span class="co">[</span><span class="ot">PKPD W8</span><span class="co">](../lectures/pkpd/W8-covariate-diagnostics-and-methodology.qmd)</span> <span class="pp">|</span> EBE screening, η-shrinkage, SCM/GAM/FFM comparison <span class="pp">|</span></span>
+<span id="cb14-484"><a href="#cb14-484" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Volume of Distribution** <span class="pp">|</span> <span class="co">[</span><span class="ot">PK W4</span><span class="co">](../lectures/pk/W4-volume-of-distribution-and-protein-binding.qmd)</span> <span class="pp">|</span> Why body weight affects V — tissue mass, body water, protein binding <span class="pp">|</span></span>
+<span id="cb14-485"><a href="#cb14-485" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Lecture: Renal Elimination** <span class="pp">|</span> <span class="co">[</span><span class="ot">PK W7b</span><span class="co">](../lectures/pk/W7b-well-stirred-model-and-renal-elimination.qmd)</span> <span class="pp">|</span> Why CLcr predicts CL — GFR, filtration, secretion, reabsorption <span class="pp">|</span></span>
+<span id="cb14-486"><a href="#cb14-486" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Covariate model introduction <span class="pp">|</span> <span class="co">[</span><span class="ot">Covariates</span><span class="co">](https://tutorials.pumas.ai/html/introduction/covariate.html)</span> <span class="pp">|</span> Allometric scaling, hepatic/renal CL breakdown, time-varying covariates, categorical effects <span class="pp">|</span></span>
+<span id="cb14-487"><a href="#cb14-487" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> AIC/BIC/LRT theory <span class="pp">|</span> <span class="co">[</span><span class="ot">Covariate Selection Intro</span><span class="co">](https://tutorials.pumas.ai/html/covariate_select/01-intro.html)</span> <span class="pp">|</span> Mathematical derivations, penalty comparison, custom OFV functions <span class="pp">|</span></span>
+<span id="cb14-488"><a href="#cb14-488" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Forward selection workflow <span class="pp">|</span> <span class="co">[</span><span class="ot">Forward Selection</span><span class="co">](https://tutorials.pumas.ai/html/covariate_select/02-forward_selection.html)</span> <span class="pp">|</span> <span class="in">`covariate_select()`</span> API, control_param patterns, custom criteria <span class="pp">|</span></span>
+<span id="cb14-489"><a href="#cb14-489" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Backward elimination workflow <span class="pp">|</span> <span class="co">[</span><span class="ot">Backward Elimination</span><span class="co">](https://tutorials.pumas.ai/html/covariate_select/03-backward_elimination.html)</span> <span class="pp">|</span> Full backward workflow, BIC criterion, result interpretation <span class="pp">|</span></span>
+<span id="cb14-490"><a href="#cb14-490" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mixed stepwise (SCM) <span class="pp">|</span> <span class="co">[</span><span class="ot">Mixed Selection</span><span class="co">](https://tutorials.pumas.ai/html/covariate_select/04-mixed.html)</span> <span class="pp">|</span> Combined forward + backward in one pipeline <span class="pp">|</span></span>
+<span id="cb14-491"><a href="#cb14-491" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cloud batch covariate search <span class="pp">|</span> <span class="co">[</span><span class="ot">Batch Job</span><span class="co">](https://tutorials.pumas.ai/html/covariate_select/05-batch_job.html)</span> <span class="pp">|</span> Running covariate_select on JuliaHub for large populations <span class="pp">|</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

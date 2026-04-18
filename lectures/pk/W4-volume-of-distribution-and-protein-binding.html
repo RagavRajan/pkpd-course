@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Week 4 Pharmacokinetics: Volume of Distribution — Extent of Distribution and Plasma Protein Binding – MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MI-210: Essentials of Population PKPD M&amp;S — Pumas Edition</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-chapters" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Chapters</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-chapters">    
+        <li>
+    <a class="dropdown-item" href="../../ch1_intro_nlme/ch1_intro_nlme.html">
+ <span class="dropdown-text">Ch 1: Intro to NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch2_data_assembly/ch2_data_assembly.html">
+ <span class="dropdown-text">Ch 2: Data Assembly</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch3_nlme_models/ch3_coding_nlme.html">
+ <span class="dropdown-text">Ch 3: Coding NLME Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch4_covariates/ch4_covariates.html">
+ <span class="dropdown-text">Ch 4: Covariates</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch5_simulation/ch5_simulation.html">
+ <span class="dropdown-text">Ch 5: Simulation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch6_model_evaluation/ch6_model_evaluation.html">
+ <span class="dropdown-text">Ch 6: Model Evaluation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ch7_pkpd_models/ch7_pkpd_models.html">
+ <span class="dropdown-text">Ch 7: PK-PD Models</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-lectures" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Lectures</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-lectures">    
+        <li class="dropdown-header">— PK Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1a-foundations-of-pk-terminology-and-data.html">
+ <span class="dropdown-text">PK W1a: Terminology &amp; Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1b-units-dimensionality-and-rate-processes.html">
+ <span class="dropdown-text">PK W1b: Units &amp; Rate Processes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W1c-mathematical-foundations-of-pk.html">
+ <span class="dropdown-text">PK W1c: Math Foundations</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W2-one-compartment-iv-bolus-model.html">
+ <span class="dropdown-text">PK W2: 1-Cpt IV Bolus</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W3-drug-transport-diffusion-and-distribution.html">
+ <span class="dropdown-text">PK W3: Transport &amp; Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W4-volume-of-distribution-and-protein-binding.html">
+ <span class="dropdown-text">PK W4: Volume of Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W5-volume-of-distribution-mechanisms-and-determinants.html">
+ <span class="dropdown-text">PK W5: Vd Mechanisms</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W6-clearance-hepatic-extraction-and-intrinsic-clearance.html">
+ <span class="dropdown-text">PK W6: Clearance &amp; Hepatic CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7a-hepatic-clearance-intrinsic-clearance-and-extraction-ratio.html">
+ <span class="dropdown-text">PK W7a: Intrinsic CL &amp; ER</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W7b-well-stirred-model-and-renal-elimination.html">
+ <span class="dropdown-text">PK W7b: Well-Stirred &amp; Renal CL</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W8-extravascular-dosing-and-oral-absorption.html">
+ <span class="dropdown-text">PK W8: Oral Absorption</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pk/W9-iv-infusion-kinetics.html">
+ <span class="dropdown-text">PK W9: IV Infusion</span></a>
+  </li>  
+        <li class="dropdown-header">— PKPD Modeling Course —</li>
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W1-philosophy-principles-and-practice.html">
+ <span class="dropdown-text">PKPD W1: Philosophy &amp; Practice</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W2-structural-models-and-parameter-estimation.html">
+ <span class="dropdown-text">PKPD W2: Structural Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W4-population-pk-model-components-and-nlme.html">
+ <span class="dropdown-text">PKPD W4: PopPK Components &amp; NLME</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W5-base-model-diagnostics-and-likelihood-comparison.html">
+ <span class="dropdown-text">PKPD W5: Base Model &amp; Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W6-graphical-diagnostics-and-residual-analysis.html">
+ <span class="dropdown-text">PKPD W6: Graphical Diagnostics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7-residual-diagnostics-and-error-model-specification.html">
+ <span class="dropdown-text">PKPD W7: Error Models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W7.5-covariate-modeling-fundamentals.html">
+ <span class="dropdown-text">PKPD W7.5: Covariate Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../lectures/pkpd/W8-covariate-diagnostics-and-methodology.html">
+ <span class="dropdown-text">PKPD W8: Covariate Methodology</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../sensei-progress.html"> <i class="bi bi-mortarboard-fill" role="img">
+</i> 
+<span class="menu-text">Sensei Progress</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Week 4 Pharmacokinetics: Volume of Distribution — Extent of Distribution and Plasma Protein Binding</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MI-210: Essentials of Population PKPD M&amp;S</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch1_intro_nlme/ch1_intro_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 1: Introduction to Nonlinear Regression and NLME Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch2_data_assembly/ch2_data_assembly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 2: Population PK-PD Data Requirements and Formatting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch3_nlme_models/ch3_coding_nlme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 3: Coding Population Nonlinear Mixed Effects Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch4_covariates/ch4_covariates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 4: Covariate Model Building</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch5_simulation/ch5_simulation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch6_model_evaluation/ch6_model_evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Model Qualification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../ch7_pkpd_models/ch7_pkpd_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Direct and Indirect Continuous Pop PK-PD Models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#recap-rate-of-distribution-previous-lecture" id="toc-recap-rate-of-distribution-previous-lecture" class="nav-link active" data-scroll-target="#recap-rate-of-distribution-previous-lecture"><span class="header-section-number">1</span> Recap: Rate of Distribution (Previous Lecture)</a>
+  <ul class="collapse">
+  <li><a href="#perfusion-rate-limitation" id="toc-perfusion-rate-limitation" class="nav-link" data-scroll-target="#perfusion-rate-limitation"><span class="header-section-number">1.1</span> Perfusion Rate Limitation</a></li>
+  <li><a href="#from-perfusion-rate-limitation-to-distribution-half-life" id="toc-from-perfusion-rate-limitation-to-distribution-half-life" class="nav-link" data-scroll-target="#from-perfusion-rate-limitation-to-distribution-half-life"><span class="header-section-number">1.2</span> From Perfusion Rate Limitation to Distribution Half-Life</a></li>
+  </ul></li>
+  <li><a href="#todays-topic-extent-of-distribution-and-apparent-volume-of-distribution" id="toc-todays-topic-extent-of-distribution-and-apparent-volume-of-distribution" class="nav-link" data-scroll-target="#todays-topic-extent-of-distribution-and-apparent-volume-of-distribution"><span class="header-section-number">2</span> Today’s Topic: Extent of Distribution and Apparent Volume of Distribution</a></li>
+  <li><a href="#the-concept-of-apparent-volume-of-distribution" id="toc-the-concept-of-apparent-volume-of-distribution" class="nav-link" data-scroll-target="#the-concept-of-apparent-volume-of-distribution"><span class="header-section-number">3</span> The Concept of “Apparent” Volume of Distribution</a>
+  <ul class="collapse">
+  <li><a href="#why-apparent" id="toc-why-apparent" class="nav-link" data-scroll-target="#why-apparent"><span class="header-section-number">3.1</span> Why “Apparent”?</a></li>
+  <li><a href="#formal-definition" id="toc-formal-definition" class="nav-link" data-scroll-target="#formal-definition"><span class="header-section-number">3.2</span> Formal Definition</a></li>
+  <li><a href="#clinical-range" id="toc-clinical-range" class="nav-link" data-scroll-target="#clinical-range"><span class="header-section-number">3.3</span> Clinical Range</a></li>
+  </ul></li>
+  <li><a href="#partitioning-between-plasma-and-tissue" id="toc-partitioning-between-plasma-and-tissue" class="nav-link" data-scroll-target="#partitioning-between-plasma-and-tissue"><span class="header-section-number">4</span> Partitioning Between Plasma and Tissue</a>
+  <ul class="collapse">
+  <li><a href="#two-compartment-framework" id="toc-two-compartment-framework" class="nav-link" data-scroll-target="#two-compartment-framework"><span class="header-section-number">4.1</span> Two-Compartment Framework</a></li>
+  <li><a href="#implications-for-special-populations" id="toc-implications-for-special-populations" class="nav-link" data-scroll-target="#implications-for-special-populations"><span class="header-section-number">4.2</span> Implications for Special Populations</a></li>
+  </ul></li>
+  <li><a href="#fraction-of-drug-in-plasma" id="toc-fraction-of-drug-in-plasma" class="nav-link" data-scroll-target="#fraction-of-drug-in-plasma"><span class="header-section-number">5</span> Fraction of Drug in Plasma</a></li>
+  <li><a href="#drug-binding-in-blood-and-plasma" id="toc-drug-binding-in-blood-and-plasma" class="nav-link" data-scroll-target="#drug-binding-in-blood-and-plasma"><span class="header-section-number">6</span> Drug Binding in Blood and Plasma</a></li>
+  <li><a href="#plasma-protein-binding" id="toc-plasma-protein-binding" class="nav-link" data-scroll-target="#plasma-protein-binding"><span class="header-section-number">7</span> Plasma Protein Binding</a>
+  <ul class="collapse">
+  <li><a href="#key-plasma-proteins" id="toc-key-plasma-proteins" class="nav-link" data-scroll-target="#key-plasma-proteins"><span class="header-section-number">7.1</span> Key Plasma Proteins</a></li>
+  <li><a href="#fraction-unbound-in-plasma-f_u" id="toc-fraction-unbound-in-plasma-f_u" class="nav-link" data-scroll-target="#fraction-unbound-in-plasma-f_u"><span class="header-section-number">7.2</span> Fraction Unbound in Plasma (<span class="math inline">\(f_U\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#derivation-of-plasma-protein-binding-equations" id="toc-derivation-of-plasma-protein-binding-equations" class="nav-link" data-scroll-target="#derivation-of-plasma-protein-binding-equations"><span class="header-section-number">8</span> Derivation of Plasma Protein Binding Equations</a>
+  <ul class="collapse">
+  <li><a href="#reaction-at-equilibrium" id="toc-reaction-at-equilibrium" class="nav-link" data-scroll-target="#reaction-at-equilibrium"><span class="header-section-number">8.1</span> Reaction at Equilibrium</a></li>
+  <li><a href="#fraction-of-unoccupied-protein" id="toc-fraction-of-unoccupied-protein" class="nav-link" data-scroll-target="#fraction-of-unoccupied-protein"><span class="header-section-number">8.2</span> Fraction of Unoccupied Protein</a></li>
+  <li><a href="#solving-for-bound-drug-concentration" id="toc-solving-for-bound-drug-concentration" class="nav-link" data-scroll-target="#solving-for-bound-drug-concentration"><span class="header-section-number">8.3</span> Solving for Bound Drug Concentration</a></li>
+  <li><a href="#solving-for-the-fraction-unbound" id="toc-solving-for-the-fraction-unbound" class="nav-link" data-scroll-target="#solving-for-the-fraction-unbound"><span class="header-section-number">8.4</span> Solving for the Fraction Unbound</a></li>
+  <li><a href="#clinical-scenarios-affecting-f_u" id="toc-clinical-scenarios-affecting-f_u" class="nav-link" data-scroll-target="#clinical-scenarios-affecting-f_u"><span class="header-section-number">8.5</span> Clinical Scenarios Affecting <span class="math inline">\(f_U\)</span></a></li>
+  </ul></li>
+  <li><a href="#tissue-binding-and-the-final-volume-equation" id="toc-tissue-binding-and-the-final-volume-equation" class="nav-link" data-scroll-target="#tissue-binding-and-the-final-volume-equation"><span class="header-section-number">9</span> Tissue Binding and the Final Volume Equation</a>
+  <ul class="collapse">
+  <li><a href="#tissue-binding-is-inferred-not-measured" id="toc-tissue-binding-is-inferred-not-measured" class="nav-link" data-scroll-target="#tissue-binding-is-inferred-not-measured"><span class="header-section-number">9.1</span> Tissue Binding is Inferred, Not Measured</a></li>
+  <li><a href="#derivation" id="toc-derivation" class="nav-link" data-scroll-target="#derivation"><span class="header-section-number">9.2</span> Derivation</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation"><span class="header-section-number">9.3</span> Interpretation</a></li>
+  </ul></li>
+  <li><a href="#connection-to-pharmacokinetic-modeling" id="toc-connection-to-pharmacokinetic-modeling" class="nav-link" data-scroll-target="#connection-to-pharmacokinetic-modeling"><span class="header-section-number">10</span> Connection to Pharmacokinetic Modeling</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">11</span> Summary</a></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">12</span> Looking Ahead</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Week 4 Pharmacokinetics: Volume of Distribution — Extent of Distribution and Plasma Protein Binding</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Lecture Notes</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="recap-rate-of-distribution-previous-lecture" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="recap-rate-of-distribution-previous-lecture"><span class="header-section-number">1</span> Recap: Rate of Distribution (Previous Lecture)</h2>
+<p>The previous session established the foundational concepts required to understand volume of distribution. The discussion began with membrane biology and drug transport, covering:</p>
+<ul>
+<li><strong>Diffusion and drug properties</strong>: The partition coefficient, molecular size, lipophilicity, and charge all govern drug permeability across membranes.</li>
+<li><strong>pH partition hypothesis</strong>: The charge state of a molecule determines its membrane permeability. Ionized drugs are more polar and partition differently than un-ionized drugs. The Henderson–Hasselbalch equation formalizes this relationship.</li>
+<li><strong>Carrier-mediated transport</strong>: Both equilibrating and concentrating transporter mechanisms were discussed in the context of Fick’s law of diffusion.</li>
+<li><strong>Fick’s law and absorption</strong>: Fick’s law describes the flux of a molecule across a membrane and provides the mathematical foundation for understanding the rate of absorption.</li>
+</ul>
+<p>The rate of distribution into tissues was then addressed through the concepts of <strong>perfusion rate limitation</strong> and <strong>permeability rate limitation</strong>.</p>
+<section id="perfusion-rate-limitation" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="perfusion-rate-limitation"><span class="header-section-number">1.1</span> Perfusion Rate Limitation</h3>
+<p>In perfusion-limited distribution, tissue membranes present no significant barrier to drug penetration. The rate-limiting factor is how rapidly blood delivers drug to the organ. Perfusion is defined as blood flow per unit volume of tissue (units: mL·min⁻¹·mL⁻¹ tissue). Under this assumption, drug characteristics such as molecular size and lipid solubility drive tissue permeation, not the membrane itself.</p>
+</section>
+<section id="from-perfusion-rate-limitation-to-distribution-half-life" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="from-perfusion-rate-limitation-to-distribution-half-life"><span class="header-section-number">1.2</span> From Perfusion Rate Limitation to Distribution Half-Life</h3>
+<p>The distribution half-life is a direct consequence of perfusion rate limitation. The elimination rate constant <span class="math inline">\(k_{el}\)</span>, the factor of <span class="math inline">\(\ln 2 \approx 0.693\)</span>, and all related quantities emerge from first principles rooted in this concept. Understanding the derivation — rather than accepting the formula at face value — is essential for correctly interpreting pharmacokinetic models.</p>
+<p><strong>Core summary of previous lectures</strong>: All concepts covered thus far address <em>how</em> and <em>at what rate</em> drug enters tissues. The permeation rate depends on molecular size, lipophilicity, and charge; the resulting concentration in tissue depends on tissue volume; and that concentration is further modulated by the affinity of the drug for the tissue. The volume of tissue was introduced specifically because it relates the amount of drug in tissue to its concentration there.</p>
+<hr>
+</section>
+</section>
+<section id="todays-topic-extent-of-distribution-and-apparent-volume-of-distribution" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="todays-topic-extent-of-distribution-and-apparent-volume-of-distribution"><span class="header-section-number">2</span> Today’s Topic: Extent of Distribution and Apparent Volume of Distribution</h2>
+<p>While previous lectures addressed the <em>rate</em> of drug distribution into tissues, this session addresses the <em>extent</em> — that is, how much drug distributes into tissues at equilibrium. The extent of distribution defines the apparent volume of distribution (<span class="math inline">\(V_d\)</span>).</p>
+<hr>
+</section>
+<section id="the-concept-of-apparent-volume-of-distribution" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-concept-of-apparent-volume-of-distribution"><span class="header-section-number">3</span> The Concept of “Apparent” Volume of Distribution</h2>
+<section id="why-apparent" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="why-apparent"><span class="header-section-number">3.1</span> Why “Apparent”?</h3>
+<p>The term <em>apparent</em> is deliberate. When we say a volume of distribution is “apparent,” we mean it is <em>inferred</em> rather than directly measured. In a clinical setting, the only accessible measurement is drug concentration in plasma over time. We cannot routinely measure drug concentration in tissues directly. Therefore, we observe what we can (plasma concentration) and <em>infer</em> what we cannot (peripheral tissue concentration). This inferential nature is what makes the volume of distribution <em>apparent</em>.</p>
+<p>This is analogous to the use of surrogate biomarkers in medicine: cholesterol is measured as a surrogate to infer cardiovascular risk. We look at one measurable quantity to draw conclusions about another that cannot be directly observed.</p>
+</section>
+<section id="formal-definition" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="formal-definition"><span class="header-section-number">3.2</span> Formal Definition</h3>
+<p>At equilibrium, the apparent volume of distribution is defined as:</p>
+<p><span class="math display">\[V = \frac{A}{C}\]</span></p>
+<p>where <span class="math inline">\(A\)</span> is the total amount of drug in the body at equilibrium and <span class="math inline">\(C\)</span> is the plasma drug concentration. Volume of distribution is therefore a <strong>proportionality factor</strong> that relates the total amount of drug in the body to the plasma concentration. Nothing more, nothing less.</p>
+</section>
+<section id="clinical-range" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="clinical-range"><span class="header-section-number">3.3</span> Clinical Range</h3>
+<p>The apparent volume of distribution ranges from approximately <strong>3 liters</strong> to <strong>40,000 liters</strong> for different drugs. Importantly, these values do not represent actual anatomical fluid volumes — they represent the <em>drug-carrying capacity</em> of the body’s fluids. A high <span class="math inline">\(V_d\)</span> indicates that a large fraction of drug resides outside plasma (e.g., sequestered in tissues), while a low <span class="math inline">\(V_d\)</span> (close to plasma volume) indicates the drug is largely confined to plasma.</p>
+<hr>
+</section>
+</section>
+<section id="partitioning-between-plasma-and-tissue" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="partitioning-between-plasma-and-tissue"><span class="header-section-number">4</span> Partitioning Between Plasma and Tissue</h2>
+<section id="two-compartment-framework" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="two-compartment-framework"><span class="header-section-number">4.1</span> Two-Compartment Framework</h3>
+<p>Consider a simplified body consisting of a plasma compartment (volume <span class="math inline">\(V_P\)</span>) and a single tissue compartment (volume <span class="math inline">\(V_T\)</span>). The amounts in each compartment at equilibrium are:</p>
+<ul>
+<li>Amount in plasma: <span class="math inline">\(V_P \cdot C\)</span></li>
+<li>Amount in tissue: <span class="math inline">\(V_T \cdot K_P \cdot C\)</span></li>
+</ul>
+<p>where <span class="math inline">\(K_P\)</span> is the <strong>tissue-to-plasma equilibrium distribution ratio</strong> — the ratio of drug concentration in tissue to that in plasma at equilibrium. It is a dimensionless constant for a given drug and tissue.</p>
+<p>The total amount in the body is:</p>
+<p><span class="math display">\[A = V_P \cdot C + V_T \cdot K_P \cdot C\]</span></p>
+<p>Dividing both sides by <span class="math inline">\(C\)</span>:</p>
+<p><span class="math display">\[V = V_P + V_T \cdot K_P\]</span></p>
+<p>For a body composed of <span class="math inline">\(n\)</span> tissues:</p>
+<p><span class="math display">\[\boxed{V = V_P + \sum_{i=1}^{n} K_{P,i} \cdot V_{T,i}}\]</span></p>
+<p>This equation reveals that the apparent volume is <em>amplified</em> beyond the plasma volume by the extent of tissue partitioning (<span class="math inline">\(K_P\)</span>) scaled by tissue volumes. <span class="math inline">\(K_P\)</span> is the driver of the apparent nature of the volume.</p>
+</section>
+<section id="implications-for-special-populations" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="implications-for-special-populations"><span class="header-section-number">4.2</span> Implications for Special Populations</h3>
+<p><strong>Adipose tissue</strong>: <span class="math inline">\(K_P\)</span> values can be very high (e.g., 5) for lipophilic drugs. Since adipose tissue constitutes approximately 20% of body volume, even moderate <span class="math inline">\(K_P\)</span> values lead to substantially elevated apparent volumes. In obesity, the tissue volume term (<span class="math inline">\(V_T\)</span>) increases markedly, driving down plasma concentrations and necessitating dose adjustment.</p>
+<p><strong>Neonates</strong>: Newborns have a large fraction of body weight as extracellular water, which decreases progressively over the first 28 days of life. For polar drugs that distribute into body water, the volume of distribution decreases as the baby grows, requiring downward dose adjustment over time to maintain target concentrations.</p>
+<p><strong>Sepsis</strong>: Infection-driven edema causes a rapid increase in body water volume. For drugs that distribute into this expanded fluid space, a loading dose is required to achieve adequate plasma concentrations. The standard approach involves a loading dose (e.g., 25 mg/kg) followed by a maintenance dose as the edema resolves.</p>
+<p><strong>Malnutrition</strong>: Malnourished patients (e.g., low birth weight neonates) present yet another altered volume of distribution, reinforcing that accurate dosing requires understanding the physiological drivers of <span class="math inline">\(V\)</span>.</p>
+<hr>
+</section>
+</section>
+<section id="fraction-of-drug-in-plasma" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="fraction-of-drug-in-plasma"><span class="header-section-number">5</span> Fraction of Drug in Plasma</h2>
+<p>The fraction of total drug residing in plasma is:</p>
+<p><span class="math display">\[f_{plasma} = \frac{V_P \cdot C}{V \cdot C} = \frac{V_P}{V}\]</span></p>
+<p>As <span class="math inline">\(V\)</span> increases, a smaller fraction of drug resides in plasma. High tissue binding or high plasma protein binding both increase <span class="math inline">\(V\)</span>, leading to lower measured plasma concentrations.</p>
+<hr>
+</section>
+<section id="drug-binding-in-blood-and-plasma" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="drug-binding-in-blood-and-plasma"><span class="header-section-number">6</span> Drug Binding in Blood and Plasma</h2>
+<p>Drug can bind to components in both blood and plasma. The relevant concentrations are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(C_{BL}\)</span></td>
+<td>Drug concentration in whole blood</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(C\)</span></td>
+<td>Drug concentration in plasma (total)</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(C_U\)</span></td>
+<td>Concentration of unbound (free) drug in plasma</td>
+</tr>
+</tbody>
+</table>
+<p>Only unbound drug can cross membranes, exert pharmacological effects, and be eliminated. Therefore, the pharmacologically relevant volume is:</p>
+<p><span class="math display">\[V_U = \frac{A}{C_U} \quad \text{(unbound volume of distribution)}\]</span></p>
+<hr>
+</section>
+<section id="plasma-protein-binding" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="plasma-protein-binding"><span class="header-section-number">7</span> Plasma Protein Binding</h2>
+<section id="key-plasma-proteins" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="key-plasma-proteins"><span class="header-section-number">7.1</span> Key Plasma Proteins</h3>
+<ul>
+<li><strong>Albumin</strong>: Binds acidic drugs predominantly.</li>
+<li><strong>Alpha-1-acid glycoprotein (AAG)</strong>: Binds basic drugs predominantly.</li>
+<li><strong>Large proteins</strong> (e.g., immunoglobulins): Can bind to multiple plasma proteins simultaneously.</li>
+</ul>
+<p>Plasma protein concentrations are highly variable and are sensitive to the body’s homeostatic state, including nutritional status and the presence of infection or inflammation.</p>
+</section>
+<section id="fraction-unbound-in-plasma-f_u" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="fraction-unbound-in-plasma-f_u"><span class="header-section-number">7.2</span> Fraction Unbound in Plasma (<span class="math inline">\(f_U\)</span>)</h3>
+<p>The fraction of unbound drug in plasma is:</p>
+<p><span class="math display">\[f_U = \frac{C_U}{C}\]</span></p>
+<p>This is the primary metric of interest (rather than the bound fraction <span class="math inline">\(f_B = 1 - f_U\)</span>) because only unbound drug is pharmacologically active.</p>
+<hr>
+</section>
+</section>
+<section id="derivation-of-plasma-protein-binding-equations" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="derivation-of-plasma-protein-binding-equations"><span class="header-section-number">8</span> Derivation of Plasma Protein Binding Equations</h2>
+<section id="reaction-at-equilibrium" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="reaction-at-equilibrium"><span class="header-section-number">8.1</span> Reaction at Equilibrium</h3>
+<p>Assuming a single binding site per protein molecule:</p>
+<p><span class="math display">\[\text{Drug} + \text{Protein} \rightleftharpoons \text{Drug-Protein Complex}\]</span></p>
+<p>At equilibrium, the <strong>association constant</strong> <span class="math inline">\(K_A\)</span> is:</p>
+<p><span class="math display">\[K_A = \frac{[\text{Drug-Protein}]}{[\text{Drug}][\text{Protein}]} = \frac{C_{BD}}{C_U \cdot P}\]</span></p>
+<p>where <span class="math inline">\(C_{BD}\)</span> is the concentration of bound drug, <span class="math inline">\(C_U\)</span> is the concentration of unbound drug, and <span class="math inline">\(P\)</span> is the concentration of unoccupied protein.</p>
+</section>
+<section id="fraction-of-unoccupied-protein" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="fraction-of-unoccupied-protein"><span class="header-section-number">8.2</span> Fraction of Unoccupied Protein</h3>
+<p>Let <span class="math inline">\(P_T\)</span> denote the total protein concentration. Define <span class="math inline">\(f_{UP}\)</span> as the fraction of binding sites that are unoccupied:</p>
+<p><span class="math display">\[f_{UP} = \frac{P}{P_T}\]</span></p>
+<p>This is exactly analogous to <span class="math inline">\(f_U = C_U / C\)</span> for the drug.</p>
+</section>
+<section id="solving-for-bound-drug-concentration" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="solving-for-bound-drug-concentration"><span class="header-section-number">8.3</span> Solving for Bound Drug Concentration</h3>
+<p>Substituting <span class="math inline">\(P = f_{UP} \cdot P_T\)</span> into the expression for <span class="math inline">\(K_A\)</span>:</p>
+<p><span class="math display">\[C_{BD} = K_A \cdot C_U \cdot f_{UP} \cdot P_T\]</span></p>
+<p>This equation states that the concentration of bound drug is proportional to: - <span class="math inline">\(K_A\)</span>: the association constant (drug-specific, fixed for a given drug) - <span class="math inline">\(f_{UP}\)</span>: the fraction of unoccupied binding sites (variable, depends on saturation and competition) - <span class="math inline">\(P_T\)</span>: total protein concentration (physiologically variable) - <span class="math inline">\(C_U\)</span>: the unbound drug concentration</p>
+</section>
+<section id="solving-for-the-fraction-unbound" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="solving-for-the-fraction-unbound"><span class="header-section-number">8.4</span> Solving for the Fraction Unbound</h3>
+<p>Total plasma drug concentration:</p>
+<p><span class="math display">\[C = C_U + C_{BD}\]</span></p>
+<p>Substituting the expression for <span class="math inline">\(C_{BD}\)</span>:</p>
+<p><span class="math display">\[C = C_U + K_A \cdot f_{UP} \cdot P_T \cdot C_U = C_U \left(1 + K_A \cdot f_{UP} \cdot P_T\right)\]</span></p>
+<p>Therefore:</p>
+<p><span class="math display">\[\boxed{f_U = \frac{C_U}{C} = \frac{1}{1 + K_A \cdot f_{UP} \cdot P_T}}\]</span></p>
+<p>This equation is a cornerstone of pharmacokinetics. It describes how <span class="math inline">\(f_U\)</span> depends on:</p>
+<ol type="1">
+<li><strong>Total protein concentration</strong> (<span class="math inline">\(P_T\)</span>): decreases <span class="math inline">\(f_U\)</span> as protein increases.</li>
+<li><strong>Fraction of unoccupied binding sites</strong> (<span class="math inline">\(f_{UP}\)</span>): decreases with saturation or competitive displacement.</li>
+<li><strong>Association constant</strong> (<span class="math inline">\(K_A\)</span>): a fixed property of the drug-protein pair.</li>
+</ol>
+</section>
+<section id="clinical-scenarios-affecting-f_u" class="level3" data-number="8.5">
+<h3 data-number="8.5" class="anchored" data-anchor-id="clinical-scenarios-affecting-f_u"><span class="header-section-number">8.5</span> Clinical Scenarios Affecting <span class="math inline">\(f_U\)</span></h3>
+<ul>
+<li><strong>Drug-drug interactions</strong>: A competing drug occupies binding sites, reducing <span class="math inline">\(f_{UP}\)</span> for the drug of interest and increasing its <span class="math inline">\(f_U\)</span> — meaning more free (active) drug is present.</li>
+<li><strong>Binding site saturation</strong>: High drug concentrations or drugs with slow dissociation from proteins reduce <span class="math inline">\(f_{UP}\)</span> over time.</li>
+<li><strong>Changes in protein concentration</strong>: Infection, inflammation, malnutrition, or altered dietary habits change <span class="math inline">\(P_T\)</span>, directly altering <span class="math inline">\(f_U\)</span>.</li>
+</ul>
+<p>These phenomena drive non-linearities in both clearance and volume of distribution.</p>
+<hr>
+</section>
+</section>
+<section id="tissue-binding-and-the-final-volume-equation" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="tissue-binding-and-the-final-volume-equation"><span class="header-section-number">9</span> Tissue Binding and the Final Volume Equation</h2>
+<section id="tissue-binding-is-inferred-not-measured" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="tissue-binding-is-inferred-not-measured"><span class="header-section-number">9.1</span> Tissue Binding is Inferred, Not Measured</h3>
+<p>Binding to tissues is difficult to measure directly, particularly in clinical settings. It is therefore inferred from plasma measurements — consistent with the “apparent” nature of <span class="math inline">\(V\)</span>.</p>
+</section>
+<section id="derivation" class="level3" data-number="9.2">
+<h3 data-number="9.2" class="anchored" data-anchor-id="derivation"><span class="header-section-number">9.2</span> Derivation</h3>
+<p>From the two-compartment framework:</p>
+<p><span class="math display">\[V \cdot C = V_P \cdot C + V_T \cdot C_{TW}\]</span></p>
+<p>where <span class="math inline">\(C_{TW}\)</span> is the drug concentration in tissue water. Dividing throughout by <span class="math inline">\(C\)</span>:</p>
+<p><span class="math display">\[V = V_P + V_T \cdot \frac{C_{TW}}{C}\]</span></p>
+<p>Define the <strong>fraction unbound in tissue</strong> as:</p>
+<p><span class="math display">\[f_{UT} = \frac{C_{UT}}{C_{TW}}\]</span></p>
+<p>where <span class="math inline">\(C_{UT}\)</span> is the unbound drug concentration in tissue water. At distribution equilibrium, only unbound drug exchanges freely across membranes, so:</p>
+<p><span class="math display">\[C_U = C_{UT} \implies f_U \cdot C = f_{UT} \cdot C_{TW}\]</span></p>
+<p>Therefore:</p>
+<p><span class="math display">\[\frac{C_{TW}}{C} = \frac{f_U}{f_{UT}}\]</span></p>
+<p>Substituting back:</p>
+<p><span class="math display">\[\boxed{V = V_P + V_T \cdot \frac{f_U}{f_{UT}}}\]</span></p>
+</section>
+<section id="interpretation" class="level3" data-number="9.3">
+<h3 data-number="9.3" class="anchored" data-anchor-id="interpretation"><span class="header-section-number">9.3</span> Interpretation</h3>
+<ul>
+<li><strong>Increasing <span class="math inline">\(f_U\)</span></strong> (less plasma protein binding): increases <span class="math inline">\(V\)</span> — more free drug available to enter tissues.</li>
+<li><strong>Increasing <span class="math inline">\(f_{UT}\)</span></strong> (more tissue binding): decreases <span class="math inline">\(V\)</span> — drug is sequestered within tissues and the apparent peripheral volume contracts relative to what would be expected from plasma measurements alone.</li>
+</ul>
+<p>This equation is the second fundamental result of this session. When <span class="math inline">\(f_{UT}\)</span> is averaged across all tissues, this framework directly underlies physiologically-based pharmacokinetic (PBPK) modeling.</p>
+<hr>
+</section>
+</section>
+<section id="connection-to-pharmacokinetic-modeling" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="connection-to-pharmacokinetic-modeling"><span class="header-section-number">10</span> Connection to Pharmacokinetic Modeling</h2>
+<p>Both fundamental equations derived here:</p>
+<p><span class="math display">\[f_U = \frac{1}{1 + K_A \cdot f_{UP} \cdot P_T}\]</span></p>
+<p><span class="math display">\[V = V_P + V_T \cdot \frac{f_U}{f_{UT}}\]</span></p>
+<p>provide the physiological underpinning for compartmental and PBPK models. In a two-compartment model, the peripheral volume <span class="math inline">\(V_2\)</span> is not simply a fitting parameter — it reflects <span class="math inline">\(V_T \cdot f_U / f_{UT}\)</span> and the physiological properties that determine it. Understanding these relationships is essential for making mechanistic interpretations from fitted models, rather than treating model parameters as abstract numbers.</p>
+<p>Preclinical experiments measuring tissue concentrations at various time points allow estimation of <span class="math inline">\(f_{UT}\)</span> and <span class="math inline">\(K_P\)</span> values. Combined with knowledge of organ perfusion rates, drug physicochemical properties (size, lipophilicity, charge), and protein binding, these values enable prediction and simulation of drug distribution in diverse populations.</p>
+<hr>
+</section>
+<section id="summary" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="summary"><span class="header-section-number">11</span> Summary</h2>
+<p>The key concepts introduced in this session are:</p>
+<ol type="1">
+<li><p>The <strong>apparent volume of distribution</strong> is a proportionality constant relating total body drug amount to plasma drug concentration. It is <em>apparent</em> because tissue concentrations are inferred, not directly measured.</p></li>
+<li><p>The volume equation <span class="math inline">\(V = V_P + \sum_i K_{P,i} \cdot V_{T,i}\)</span> shows how tissue partitioning amplifies the apparent volume beyond the plasma volume.</p></li>
+<li><p><strong>Fraction unbound in plasma</strong> (<span class="math inline">\(f_U\)</span>) is governed by <span class="math inline">\(f_U = 1 / (1 + K_A \cdot f_{UP} \cdot P_T)\)</span>, and is sensitive to protein concentration, binding site occupancy, and drug-drug interactions.</p></li>
+<li><p><strong>Fraction unbound in tissue</strong> (<span class="math inline">\(f_{UT}\)</span>) modulates volume through <span class="math inline">\(V = V_P + V_T \cdot f_U / f_{UT}\)</span>.</p></li>
+<li><p>Volume of distribution has direct clinical implications in special populations including neonates, obese patients, and patients with sepsis or malnutrition.</p></li>
+</ol>
+<hr>
+</section>
+<section id="looking-ahead" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">12</span> Looking Ahead</h2>
+<p>The next session will cover: - Drug distribution into intracellular fluids - A synthesis of all volume of distribution concepts - An introduction to clearance</p>
+<p><em>Note: There will be no session the following Sunday due to the conference. The subsequent Sunday will include the second half of the volume of distribution discussion and the transition to clearance.</em></p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Week 4 Pharmacokinetics: Volume of Distribution — Extent of Distribution and Plasma Protein Binding"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Lecture Notes"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recap: Rate of Distribution (Previous Lecture)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>The previous session established the foundational concepts required to understand volume of distribution. The discussion began with membrane biology and drug transport, covering:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Diffusion and drug properties**: The partition coefficient, molecular size, lipophilicity, and charge all govern drug permeability across membranes.</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**pH partition hypothesis**: The charge state of a molecule determines its membrane permeability. Ionized drugs are more polar and partition differently than un-ionized drugs. The Henderson–Hasselbalch equation formalizes this relationship.</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Carrier-mediated transport**: Both equilibrating and concentrating transporter mechanisms were discussed in the context of Fick's law of diffusion.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Fick's law and absorption**: Fick's law describes the flux of a molecule across a membrane and provides the mathematical foundation for understanding the rate of absorption.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>The rate of distribution into tissues was then addressed through the concepts of **perfusion rate limitation** and **permeability rate limitation**.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Perfusion Rate Limitation</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>In perfusion-limited distribution, tissue membranes present no significant barrier to drug penetration. The rate-limiting factor is how rapidly blood delivers drug to the organ. Perfusion is defined as blood flow per unit volume of tissue (units: mL·min⁻¹·mL⁻¹ tissue). Under this assumption, drug characteristics such as molecular size and lipid solubility drive tissue permeation, not the membrane itself.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">### From Perfusion Rate Limitation to Distribution Half-Life</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>The distribution half-life is a direct consequence of perfusion rate limitation. The elimination rate constant $k_{el}$, the factor of $\ln 2 \approx 0.693$, and all related quantities emerge from first principles rooted in this concept. Understanding the derivation — rather than accepting the formula at face value — is essential for correctly interpreting pharmacokinetic models.</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>**Core summary of previous lectures**: All concepts covered thus far address *how* and *at what rate* drug enters tissues. The permeation rate depends on molecular size, lipophilicity, and charge; the resulting concentration in tissue depends on tissue volume; and that concentration is further modulated by the affinity of the drug for the tissue. The volume of tissue was introduced specifically because it relates the amount of drug in tissue to its concentration there.</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">## Today's Topic: Extent of Distribution and Apparent Volume of Distribution</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>While previous lectures addressed the *rate* of drug distribution into tissues, this session addresses the *extent* — that is, how much drug distributes into tissues at equilibrium. The extent of distribution defines the apparent volume of distribution ($V_d$).</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Concept of "Apparent" Volume of Distribution</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why "Apparent"?</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>The term *apparent* is deliberate. When we say a volume of distribution is "apparent," we mean it is *inferred* rather than directly measured. In a clinical setting, the only accessible measurement is drug concentration in plasma over time. We cannot routinely measure drug concentration in tissues directly. Therefore, we observe what we can (plasma concentration) and *infer* what we cannot (peripheral tissue concentration). This inferential nature is what makes the volume of distribution *apparent*.</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>This is analogous to the use of surrogate biomarkers in medicine: cholesterol is measured as a surrogate to infer cardiovascular risk. We look at one measurable quantity to draw conclusions about another that cannot be directly observed.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### Formal Definition</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>At equilibrium, the apparent volume of distribution is defined as:</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>$$V = \frac{A}{C}$$</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>where $A$ is the total amount of drug in the body at equilibrium and $C$ is the plasma drug concentration. Volume of distribution is therefore a **proportionality factor** that relates the total amount of drug in the body to the plasma concentration. Nothing more, nothing less.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="fu">### Clinical Range</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>The apparent volume of distribution ranges from approximately **3 liters** to **40,000 liters** for different drugs. Importantly, these values do not represent actual anatomical fluid volumes — they represent the *drug-carrying capacity* of the body's fluids. A high $V_d$ indicates that a large fraction of drug resides outside plasma (e.g., sequestered in tissues), while a low $V_d$ (close to plasma volume) indicates the drug is largely confined to plasma.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Partitioning Between Plasma and Tissue</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Two-Compartment Framework</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>Consider a simplified body consisting of a plasma compartment (volume $V_P$) and a single tissue compartment (volume $V_T$). The amounts in each compartment at equilibrium are:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Amount in plasma: $V_P \cdot C$</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Amount in tissue: $V_T \cdot K_P \cdot C$</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>where $K_P$ is the **tissue-to-plasma equilibrium distribution ratio** — the ratio of drug concentration in tissue to that in plasma at equilibrium. It is a dimensionless constant for a given drug and tissue.</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>The total amount in the body is:</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>$$A = V_P \cdot C + V_T \cdot K_P \cdot C$$</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>Dividing both sides by $C$:</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>$$V = V_P + V_T \cdot K_P$$</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>For a body composed of $n$ tissues:</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>$$\boxed{V = V_P + \sum_{i=1}^{n} K_{P,i} \cdot V_{T,i}}$$</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>This equation reveals that the apparent volume is *amplified* beyond the plasma volume by the extent of tissue partitioning ($K_P$) scaled by tissue volumes. $K_P$ is the driver of the apparent nature of the volume.</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implications for Special Populations</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>**Adipose tissue**: $K_P$ values can be very high (e.g., 5) for lipophilic drugs. Since adipose tissue constitutes approximately 20% of body volume, even moderate $K_P$ values lead to substantially elevated apparent volumes. In obesity, the tissue volume term ($V_T$) increases markedly, driving down plasma concentrations and necessitating dose adjustment.</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>**Neonates**: Newborns have a large fraction of body weight as extracellular water, which decreases progressively over the first 28 days of life. For polar drugs that distribute into body water, the volume of distribution decreases as the baby grows, requiring downward dose adjustment over time to maintain target concentrations.</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>**Sepsis**: Infection-driven edema causes a rapid increase in body water volume. For drugs that distribute into this expanded fluid space, a loading dose is required to achieve adequate plasma concentrations. The standard approach involves a loading dose (e.g., 25 mg/kg) followed by a maintenance dose as the edema resolves.</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>**Malnutrition**: Malnourished patients (e.g., low birth weight neonates) present yet another altered volume of distribution, reinforcing that accurate dosing requires understanding the physiological drivers of $V$.</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fraction of Drug in Plasma</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>The fraction of total drug residing in plasma is:</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>$$f_{plasma} = \frac{V_P \cdot C}{V \cdot C} = \frac{V_P}{V}$$</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>As $V$ increases, a smaller fraction of drug resides in plasma. High tissue binding or high plasma protein binding both increase $V$, leading to lower measured plasma concentrations.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="fu">## Drug Binding in Blood and Plasma</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>Drug can bind to components in both blood and plasma. The relevant concentrations are:</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Symbol <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------|-----------|</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $C_{BL}$ <span class="pp">|</span> Drug concentration in whole blood <span class="pp">|</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $C$ <span class="pp">|</span> Drug concentration in plasma (total) <span class="pp">|</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $C_U$ <span class="pp">|</span> Concentration of unbound (free) drug in plasma <span class="pp">|</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>Only unbound drug can cross membranes, exert pharmacological effects, and be eliminated. Therefore, the pharmacologically relevant volume is:</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>$$V_U = \frac{A}{C_U} \quad \text{(unbound volume of distribution)}$$</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="fu">## Plasma Protein Binding</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Key Plasma Proteins</span></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Albumin**: Binds acidic drugs predominantly.</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Alpha-1-acid glycoprotein (AAG)**: Binds basic drugs predominantly.</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Large proteins** (e.g., immunoglobulins): Can bind to multiple plasma proteins simultaneously.</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>Plasma protein concentrations are highly variable and are sensitive to the body's homeostatic state, including nutritional status and the presence of infection or inflammation.</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fraction Unbound in Plasma ($f_U$)</span></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>The fraction of unbound drug in plasma is:</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>$$f_U = \frac{C_U}{C}$$</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>This is the primary metric of interest (rather than the bound fraction $f_B = 1 - f_U$) because only unbound drug is pharmacologically active.</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derivation of Plasma Protein Binding Equations</span></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reaction at Equilibrium</span></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>Assuming a single binding site per protein molecule:</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>$$\text{Drug} + \text{Protein} \rightleftharpoons \text{Drug-Protein Complex}$$</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>At equilibrium, the **association constant** $K_A$ is:</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>$$K_A = \frac{<span class="co">[</span><span class="ot">\text{Drug-Protein}</span><span class="co">]</span>}{<span class="co">[</span><span class="ot">\text{Drug}</span><span class="co">][\text{Protein}]</span>} = \frac{C_{BD}}{C_U \cdot P}$$</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>where $C_{BD}$ is the concentration of bound drug, $C_U$ is the concentration of unbound drug, and $P$ is the concentration of unoccupied protein.</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fraction of Unoccupied Protein</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>Let $P_T$ denote the total protein concentration. Define $f_{UP}$ as the fraction of binding sites that are unoccupied:</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>$$f_{UP} = \frac{P}{P_T}$$</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>This is exactly analogous to $f_U = C_U / C$ for the drug.</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="fu">### Solving for Bound Drug Concentration</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>Substituting $P = f_{UP} \cdot P_T$ into the expression for $K_A$:</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>$$C_{BD} = K_A \cdot C_U \cdot f_{UP} \cdot P_T$$</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>This equation states that the concentration of bound drug is proportional to:</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$K_A$: the association constant (drug-specific, fixed for a given drug)</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$f_{UP}$: the fraction of unoccupied binding sites (variable, depends on saturation and competition)</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$P_T$: total protein concentration (physiologically variable)</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$C_U$: the unbound drug concentration</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">### Solving for the Fraction Unbound</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>Total plasma drug concentration:</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>$$C = C_U + C_{BD}$$</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>Substituting the expression for $C_{BD}$:</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>$$C = C_U + K_A \cdot f_{UP} \cdot P_T \cdot C_U = C_U \left(1 + K_A \cdot f_{UP} \cdot P_T\right)$$</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>Therefore:</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>$$\boxed{f_U = \frac{C_U}{C} = \frac{1}{1 + K_A \cdot f_{UP} \cdot P_T}}$$</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>This equation is a cornerstone of pharmacokinetics. It describes how $f_U$ depends on:</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Total protein concentration** ($P_T$): decreases $f_U$ as protein increases.</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Fraction of unoccupied binding sites** ($f_{UP}$): decreases with saturation or competitive displacement.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Association constant** ($K_A$): a fixed property of the drug-protein pair.</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="fu">### Clinical Scenarios Affecting $f_U$</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Drug-drug interactions**: A competing drug occupies binding sites, reducing $f_{UP}$ for the drug of interest and increasing its $f_U$ — meaning more free (active) drug is present.</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Binding site saturation**: High drug concentrations or drugs with slow dissociation from proteins reduce $f_{UP}$ over time.</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Changes in protein concentration**: Infection, inflammation, malnutrition, or altered dietary habits change $P_T$, directly altering $f_U$.</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>These phenomena drive non-linearities in both clearance and volume of distribution.</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tissue Binding and the Final Volume Equation</span></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="fu">### Tissue Binding is Inferred, Not Measured</span></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>Binding to tissues is difficult to measure directly, particularly in clinical settings. It is therefore inferred from plasma measurements — consistent with the "apparent" nature of $V$.</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="fu">### Derivation</span></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>From the two-compartment framework:</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>$$V \cdot C = V_P \cdot C + V_T \cdot C_{TW}$$</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>where $C_{TW}$ is the drug concentration in tissue water. Dividing throughout by $C$:</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>$$V = V_P + V_T \cdot \frac{C_{TW}}{C}$$</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>Define the **fraction unbound in tissue** as:</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>$$f_{UT} = \frac{C_{UT}}{C_{TW}}$$</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>where $C_{UT}$ is the unbound drug concentration in tissue water. At distribution equilibrium, only unbound drug exchanges freely across membranes, so:</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>$$C_U = C_{UT} \implies f_U \cdot C = f_{UT} \cdot C_{TW}$$</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>Therefore:</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>$$\frac{C_{TW}}{C} = \frac{f_U}{f_{UT}}$$</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>Substituting back:</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>$$\boxed{V = V_P + V_T \cdot \frac{f_U}{f_{UT}}}$$</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretation</span></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Increasing $f_U$** (less plasma protein binding): increases $V$ — more free drug available to enter tissues.</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Increasing $f_{UT}$** (more tissue binding): decreases $V$ — drug is sequestered within tissues and the apparent peripheral volume contracts relative to what would be expected from plasma measurements alone.</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>This equation is the second fundamental result of this session. When $f_{UT}$ is averaged across all tissues, this framework directly underlies physiologically-based pharmacokinetic (PBPK) modeling.</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="fu">## Connection to Pharmacokinetic Modeling</span></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>Both fundamental equations derived here:</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>$$f_U = \frac{1}{1 + K_A \cdot f_{UP} \cdot P_T}$$</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>$$V = V_P + V_T \cdot \frac{f_U}{f_{UT}}$$</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>provide the physiological underpinning for compartmental and PBPK models. In a two-compartment model, the peripheral volume $V_2$ is not simply a fitting parameter — it reflects $V_T \cdot f_U / f_{UT}$ and the physiological properties that determine it. Understanding these relationships is essential for making mechanistic interpretations from fitted models, rather than treating model parameters as abstract numbers.</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a>Preclinical experiments measuring tissue concentrations at various time points allow estimation of $f_{UT}$ and $K_P$ values. Combined with knowledge of organ perfusion rates, drug physicochemical properties (size, lipophilicity, charge), and protein binding, these values enable prediction and simulation of drug distribution in diverse populations.</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>The key concepts introduced in this session are:</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>The **apparent volume of distribution** is a proportionality constant relating total body drug amount to plasma drug concentration. It is *apparent* because tissue concentrations are inferred, not directly measured.</span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>The volume equation $V = V_P + \sum_i K_{P,i} \cdot V_{T,i}$ shows how tissue partitioning amplifies the apparent volume beyond the plasma volume.</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Fraction unbound in plasma** ($f_U$) is governed by $f_U = 1 / (1 + K_A \cdot f_{UP} \cdot P_T)$, and is sensitive to protein concentration, binding site occupancy, and drug-drug interactions.</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Fraction unbound in tissue** ($f_{UT}$) modulates volume through $V = V_P + V_T \cdot f_U / f_{UT}$.</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Volume of distribution has direct clinical implications in special populations including neonates, obese patients, and patients with sepsis or malnutrition.</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## Looking Ahead</span></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a>The next session will cover:</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Drug distribution into intracellular fluids</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A synthesis of all volume of distribution concepts</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>An introduction to clearance</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>*Note: There will be no session the following Sunday due to the conference. The subsequent Sunday will include the second half of the volume of distribution discussion and the transition to clearance.*</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
